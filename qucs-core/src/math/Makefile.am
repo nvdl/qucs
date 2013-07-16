@@ -33,12 +33,15 @@ pkginclude_HEADERS =    \
     complex.h           \
     real.h
 
+noinst_TEMPLATES = tmatrix.cpp
+
 noinst_HEADERS =        \
     fspecial.h          \
     matrix.h            \
     precision.h         \
     complex.h           \
-    real.h
+    real.h              \
+    tmatrix.h
 
 noinst_LTLIBRARIES = libqucsmath.la
 
