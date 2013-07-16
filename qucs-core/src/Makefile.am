@@ -53,7 +53,7 @@ pkginclude_HEADERS = compat.h logging.h object.h vector.h consts.h node.h \
   operatingpoint.h
 
 noinst_TEMPLATES = tridiag.cpp hash.cpp \
-	tmatrix.cpp tvector.cpp eqnsys.cpp states.cpp \
+	tvector.cpp eqnsys.cpp states.cpp \
 	nasolver.cpp
 
 noinst_HEADERS = $(noinst_TEMPLATES)            \
@@ -65,7 +65,7 @@ noinst_HEADERS = $(noinst_TEMPLATES)            \
 	range.h history.h devstates.h tokens_citi.h check_citi.h check_zvr.h  \
 	tokens_zvr.h check_mdl.h tokens_mdl.h differentiate.h tokens_csv.h  \
 	check_csv.h analyses.h receiver.h interpolator.h
-	logging.h net.h input.h dataset.h equation.h tvector.h tmatrix.h \
+	logging.h net.h input.h dataset.h equation.h tvector.h \
 	environment.h exceptionstack.h check_netlist.h module.h nasolver.h \
 	states.h analysis.h trsolver.h nasolution.h eqnsys.h compat.h \
 	exception.h object.h node.h circuit.h constants.h vector.h \
