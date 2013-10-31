@@ -1060,17 +1060,17 @@ void e_trsolver::truncateHistory (nr_double_t t)
 
 int e_trsolver::getJacRows()
 {
-    return A->getRows();
+    return A->rows();
 }
 
 int e_trsolver::getJacCols()
 {
-    return A->getCols();
+    return A->cols();
 }
 
 void e_trsolver::getJacData(int r, int c, nr_double_t& data)
 {
-    data = A->get(r,c);
+    data = (*A)(r,c);
 }
 
 // properties
