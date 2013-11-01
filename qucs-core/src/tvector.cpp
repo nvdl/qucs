@@ -36,18 +36,6 @@
 
 namespace qucs {
 
-// Sets the tvector element at the given position.
-template <class nr_type_t>
-void tvector<nr_type_t>::set (int i, nr_type_t z) {
-  data.at(i) = z;
-}
-
-// Sets all the tvector elements to the given value.
-template <class nr_type_t>
-void tvector<nr_type_t>::set (nr_type_t z) {
-  for (std::size_t i = 0; i < data.size (); i++)
-    data[i] = z;
-}
 
 // Sets the specified tvector elements to the given value.
 template <class nr_type_t>
@@ -88,7 +76,8 @@ tvector<nr_type_t> operator + (tvector<nr_type_t> a, tvector<nr_type_t> b) {
   assert (a.size () == b.size ());
   int n = a.size ();
   tvector<nr_type_t> res (n);
-  for (int i = 0; i < n; i++) res.set (i, a(i) + b(i));
+  for (int i = 0; i < n; i++) 
+    res(i) = a(i) + b(i);
   return res;
 }
 
@@ -108,7 +97,8 @@ tvector<nr_type_t> operator - (tvector<nr_type_t> a, tvector<nr_type_t> b) {
   assert (a.size () == b.size ());
   int n = a.size ();
   tvector<nr_type_t> res (n);
-  for (int i = 0; i < n; i++) res.set (i, a(i) - b(i));
+  for (int i = 0; i < n; i++) 
+    res(i) =  a(i) - b(i);
   return res;
 }
 
@@ -143,7 +133,8 @@ template <class nr_type_t>
 tvector<nr_type_t> operator * (nr_double_t s, tvector<nr_type_t> a) {
   int n = a.size ();
   tvector<nr_type_t> res (n);
-  for (int i = 0; i < n; i++) res.set (i, s * a(i));
+  for (int i = 0; i < n; i++) 
+    res(i) = s * a(i);
   return res;
 }
 
@@ -158,7 +149,8 @@ tvector<nr_type_t> operator * (tvector<nr_type_t> a, tvector<nr_type_t> b) {
   assert (a.size () == b.size ());
   int n = a.size ();
   tvector<nr_type_t> res (n);
-  for (int i = 0; i < n; i++) res.set (i, a(i) * b(i));
+  for (int i = 0; i < n; i++) 
+    res(i) = a(i) * b(i);
   return res;
 }
 
@@ -167,7 +159,8 @@ template <class nr_type_t>
 nr_type_t scalar (tvector<nr_type_t> a, tvector<nr_type_t> b) {
   assert (a.size () == b.size ());
   nr_type_t n = 0;
-  for (int i = 0; i < a.size (); i++) n += a(i) * b(i);
+  for (int i = 0; i < a.size (); i++) 
+    n += a(i) * b(i);
   return n;
 }
 
@@ -191,7 +184,8 @@ template <class nr_type_t>
 tvector<nr_type_t> operator - (tvector<nr_type_t> a) {
   int n = a.size ();
   tvector<nr_type_t> res (n);
-  for (int i = 0; i < n; i++) res.set (i, -a(i));
+  for (int i = 0; i < n; i++) 
+    res(i) =-a(i);
   return res;
 }
 
@@ -218,7 +212,8 @@ template <class nr_type_t>
 tvector<nr_type_t> operator + (nr_type_t s, tvector<nr_type_t> a) {
   int n = a.size ();
   tvector<nr_type_t> res (n);
-  for (int i = 0; i < n; i++) res.set (i, s + a(i));
+  for (int i = 0; i < n; i++) 
+    res(i) = s + a(i);
   return res;
 }
 
@@ -282,7 +277,7 @@ template <class nr_type_t>
 tvector<nr_type_t> conj (tvector<nr_type_t> a) {
   int n = a.size ();
   tvector<nr_type_t> res (n);
-  for (int i = 0; i < n; i++) res.set (i, conj (a(i)));
+  for (int i = 0; i < n; i++) res(i) =  conj (a(i));
   return res;
 }
 
