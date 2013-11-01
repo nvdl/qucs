@@ -83,8 +83,8 @@ class tvector
       for (unsigned int i = 0; i < this->size(); ++i)
 	(*this)(i) = c;
   }
-  void set (nr_type_t, int, int);
-  void set (tvector, int, int);
+  void set (nr_type_t, int, int) = delete;
+  void set (tvector, int, int) = delete;
   std::size_t  size (void) const { return data.size (); }
   nr_type_t * getData (void) { return data.data(); }
   void setZero() { 

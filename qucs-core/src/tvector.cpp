@@ -36,15 +36,6 @@
 
 namespace qucs {
 
-
-// Sets the specified tvector elements to the given value.
-template <class nr_type_t>
-void tvector<nr_type_t>::set (nr_type_t z, int start, int stop) {
-  for (std::size_t i = start; i < stop; i++)
-    data[i] = z;
-}
-
-
 /* The function returns the number of entries with the given value
    deviating no more than the given epsilon. */
 template <class nr_type_t>
@@ -52,13 +43,6 @@ int tvector<nr_type_t>::contains (nr_type_t val, nr_double_t eps) {
   int count = 0;
   for (int i = 0; i < (int)data.size (); i++) if (abs ((data)[i] - val) <= eps) count++;
   return count;
-}
-
-// Copies the specified elements from the given tvector.
-template <class nr_type_t>
-void tvector<nr_type_t>::set (tvector<nr_type_t> a, int start, int stop) {
-  for (int i = start; i < stop; i++)
-    (*data)[i] = a(i);
 }
 
 // The function swaps the given rows with each other.
