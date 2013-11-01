@@ -77,13 +77,18 @@ class tvector
   tvector (const std::size_t i) : data(i) {};
   tvector (const tvector &) = default;
   ~tvector () = default;
-  nr_type_t get (int) const;
   void set (int, nr_type_t);
   void set (nr_type_t);
   void set (nr_type_t, int, int);
   void set (tvector, int, int);
   std::size_t  size (void) const { return data.size (); }
   nr_type_t * getData (void) { return data.data(); }
+  void setZero() { 
+    if(this->size() > 0)
+      for (unsigned int i = 0; i++ ; i < this->size())
+	(*this)(i) = 0;
+  }
+
   void exchangeRows (int, int);
   int  isFinite (void);
   void print (void);

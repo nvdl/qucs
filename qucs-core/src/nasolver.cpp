@@ -1143,26 +1143,26 @@ int nasolver<nr_type_t>::checkConvergence (void)
     // and relative tolerance values
     for (r = 0; r < N; r++)
     {
-        v_abs = abs (x->get (r) - xprev->get (r));
-        v_rel = abs (x->get (r));
+        v_abs = abs ((*x)(r) - (*xprev)(r));
+        v_rel = abs ((*x)(r));
         if (v_abs >= vntol + reltol * v_rel) return 0;
         if (!convHelper)
         {
-            i_abs = abs (z->get (r) - zprev->get (r));
-            i_rel = abs (z->get (r));
+	    i_abs = abs ((*z)(r) - (*zprev)(r));
+            i_rel = abs ((*z)(r));
             if (i_abs >= abstol + reltol * i_rel) return 0;
         }
     }
 
     for (r = 0; r < M; r++)
     {
-        i_abs = abs (x->get (r + N) - xprev->get (r + N));
-        i_rel = abs (x->get (r + N));
+        i_abs = abs ((*x)(r + N) - (*xprev)(r + N));
+        i_rel = abs ((*x)(r + N));
         if (i_abs >= abstol + reltol * i_rel) return 0;
         if (!convHelper)
         {
-            v_abs = abs (z->get (r + N) - zprev->get (r + N));
-            v_rel = abs (z->get (r + N));
+	    v_abs = abs ((*z)(r + N) - (*zprev)(r + N));
+            v_rel = abs ((*z)(r + N));
             if (v_abs >= vntol + reltol * v_rel) return 0;
         }
     }
@@ -1220,7 +1220,7 @@ void nasolver<nr_type_t>::saveNodeVoltages (void)
         /* for (int i = 0; i < n->size(); i++)*/
 	for(auto &currentn: *n)
         {
-	  currentn->getCircuit()->setV (currentn->getPort (), x->get (r));
+	  currentn->getCircuit()->setV (currentn->getPort (), (*x)(r));
         }
     }
     // save reference node
@@ -1242,7 +1242,7 @@ void nasolver<nr_type_t>::saveBranchCurrents (void)
     for (int r = 0; r < M; r++)
     {
         vs = findVoltageSource (r);
-        vs->setJ (r, x->get (r + N));
+        vs->setJ (r, (*x)(r + N));
     }
 }
 
@@ -1267,7 +1267,7 @@ void nasolver<nr_type_t>::storeSolution (void)
     for (r = 0; r < N; r++)
     {
         struct nodelist_t * n = nlist->getNode (r);
-	nr_type_t gr = x->get (r);
+	nr_type_t gr = (*x)(r);
 	qucs::naentry<nr_type_t> entry(gr, 0);
         solution.insert({{n->name, entry }});
     }
@@ -1276,7 +1276,7 @@ void nasolver<nr_type_t>::storeSolution (void)
     {
         circuit * vs = findVoltageSource (r);
         int vn = r - vs->getVoltageSource () + 1;
-	nr_type_t xg = x->get (r + N);
+        nr_type_t xg = (*x)(r + N);
 	qucs::naentry<nr_type_t> entry(xg, vn);
         solution.insert({{vs->getName (), entry}});
     }
@@ -1327,7 +1327,7 @@ void nasolver<nr_type_t>::saveResults (const std::string &volts, const std::stri
 	  std::string n = createV (r, volts, saveOPs);
 	  if(!n.empty())
 	    {
-                saveVariable (n, x->get (r), f);
+	      saveVariable (n, (*x)(r), f);
             }
         }
     }
@@ -1340,7 +1340,7 @@ void nasolver<nr_type_t>::saveResults (const std::string &volts, const std::stri
 	  std::string n = createI (r, amps, saveOPs);
 	  if (!n.empty())
             {
-                saveVariable (n, x->get (r + N), f);
+                saveVariable (n, (*x)(r + N), f);
             }
         }
     }
