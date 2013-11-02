@@ -41,17 +41,19 @@ namespace qucs {
 template <class nr_type_t>
 int tvector<nr_type_t>::contains (nr_type_t val, nr_double_t eps) {
   int count = 0;
-  for (int i = 0; i < (int)data.size (); i++) if (abs ((data)[i] - val) <= eps) count++;
+  for (int i = 0; i < (int)this->size (); i++)
+    if (abs ((*this)[i] - val) <= eps)
+      count++;
   return count;
 }
 
 // The function swaps the given rows with each other.
 template <class nr_type_t>
 void tvector<nr_type_t>::exchangeRows (int r1, int r2) {
-  assert (r1 >= 0 && r2 >= 0 && r1 < (int)data.size () && r2 < (int)data.size ());
-  nr_type_t s = (data)[r1];
-  (data)[r1] = (data)[r2];
-  (data)[r2] = s;
+  assert (r1 >= 0 && r2 >= 0 && r1 < (int)this->size () && r2 < (int)this->size ());
+  nr_type_t s = (*this)[r1];
+  (*this)[r1] = (*this)[r2];
+  (*this)[r2] = s;
 }
 
 // Addition.
@@ -68,10 +70,9 @@ tvector<nr_type_t> operator + (tvector<nr_type_t> a, tvector<nr_type_t> b) {
 // Intrinsic vector addition.
 template <class nr_type_t>
 tvector<nr_type_t> tvector<nr_type_t>::operator += (tvector<nr_type_t> a) {
-  assert (a.getSize () == (int)data.size ());
-  std::vector<nr_type_t> * src = a.getData ();
-  std::vector<nr_type_t> * dst = data;
-  for (int i = 0; i < (int)data.size (); i++) (*dst)[i] += (*src)[i];
+  assert (a.getSize () == (int)this->size ());
+  for (int i = 0; i < (int)this->size (); i++)
+    (*this)[i] += a[i];
   return *this;
 }
 
@@ -89,26 +90,25 @@ tvector<nr_type_t> operator - (tvector<nr_type_t> a, tvector<nr_type_t> b) {
 // Intrinsic vector subtraction.
 template <class nr_type_t>
 tvector<nr_type_t> tvector<nr_type_t>::operator -= (tvector<nr_type_t> a) {
-  assert (a.size () == (int)data.size ());
-  std::vector<nr_type_t> * src = a.getData ();
-  std::vector<nr_type_t> * dst = data;
-  for (int i = 0; i < (int)data.size (); i++) (*dst)[i] -= (*src)[i];
+  assert (a.size () == (int)this->size ());
+  for (int i = 0; i < (int)this->size (); i++)
+    (*this)[i] -= (a)[i];
   return *this;
 }
 
 // Intrinsic scalar multiplication.
 template <class nr_type_t>
 tvector<nr_type_t> tvector<nr_type_t>::operator *= (nr_double_t s) {
-  std::vector<nr_type_t> * dst = data;
-  for (int i = 0; i < (int)data.size (); i++) (*dst)[i] *= s;
+  for (int i = 0; i < (int)this->size (); i++)
+    (*this)[i] *= s;
   return *this;
 }
 
 // Intrinsic scalar division.
 template <class nr_type_t>
 tvector<nr_type_t> tvector<nr_type_t>::operator /= (nr_double_t s) {
-  std::vector<nr_type_t> * dst = data;
-  for (int i = 0; i < (int)data.size (); i++) (*dst)[i] /= s;
+  for (int i = 0; i < (int)this->size (); i++)
+    (*this)[i] /= s;
   return *this;
 }
 
@@ -151,7 +151,8 @@ nr_type_t scalar (tvector<nr_type_t> a, tvector<nr_type_t> b) {
 // Constant assignment operation.
 template <class nr_type_t>
 tvector<nr_type_t> tvector<nr_type_t>::operator = (const nr_type_t val) {
-  for (int i = 0; i < (int)data.size (); i++) (*data)[i] = val;
+  for (int i = 0; i < (int)this->size (); i++)
+    (*this)[i] = val;
   return *this;
 }
 
@@ -159,7 +160,8 @@ tvector<nr_type_t> tvector<nr_type_t>::operator = (const nr_type_t val) {
 template <class nr_type_t>
 nr_type_t sum (tvector<nr_type_t> a) {
   nr_type_t res = 0;
-  for (int i = 0; i < a.size (); i++) res += a(i);
+  for (int i = 0; i < a.size (); i++)
+    res += a(i);
   return res;
 }
 
@@ -268,8 +270,8 @@ tvector<nr_type_t> conj (tvector<nr_type_t> a) {
 // Checks validity of vector.
 template <class nr_type_t>
 int tvector<nr_type_t>::isFinite (void) {
-  for (int i = 0; i < (int)data.size (); i++)
-    if (!std::isfinite (real ((*data)[i]))) return 0;
+  for (int i = 0; i < (int)this->size (); i++)
+    if (!std::isfinite (real ((*this)[i]))) return 0;
   return 1;
 }
 
@@ -277,15 +279,16 @@ int tvector<nr_type_t>::isFinite (void) {
 template <class nr_type_t>
 void tvector<nr_type_t>::reorder (int * idx) {
   tvector<nr_type_t> old = *this;
-  for (int i = 0; i < (int)data.size (); i++)
-    (*data)[i] = old(idx[i]);
+  for (int i = 0; i < (int)this->size (); i++)
+    (*this)[i] = old(idx[i]);
 }
 
 #ifdef DEBUG
 // Debug function: Prints the vector object.
 template <class nr_type_t>
+
 void tvector<nr_type_t>::print (void) {
-  for (int r = 0; r < (int)data.size (); r++) {
+  for (int r = 0; r < (int)this->size (); r++) {
     fprintf (stderr, "%+.2e%+.2ei\n", (double) real ((*this)(r)),
 	     (double) imag ((*this)(r)));
   }

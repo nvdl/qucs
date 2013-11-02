@@ -74,7 +74,7 @@ class tvector
 {
  public:
   tvector () = default;
-  tvector (const std::size_t i) : data(i) {};
+  tvector (const std::size_t i) : data_(i) {};
   tvector (const tvector &) = default;
   ~tvector () = default;
   void set (int, nr_type_t) = delete;
@@ -85,14 +85,14 @@ class tvector
   }
   void set (nr_type_t, int, int) = delete;
   void set (tvector, int, int) = delete;
-  std::size_t  size (void) const { return data.size (); }
-  nr_type_t * getData (void) { return data.data(); }
+  std::size_t  size (void) const { return data_.size (); }
+  nr_type_t * data (void) { return data_.data(); }
   void setZero() { 
     if(this->size() > 0)
       for (unsigned int i = 0;i < this->size(); ++i)
 	(*this)(i) = 0;
   }
-
+ 
   void exchangeRows (int, int);
   int  isFinite (void);
   void print (void);
@@ -137,20 +137,19 @@ class tvector
 
   // easy accessor operators
   nr_type_t  operator () (int i) const {
-    return data.at(i);
+    return data_.at(i);
   }
   nr_type_t& operator () (int i) {
-    return data.at(i); }
-   nr_type_t  operator [] (int i) const {
-    return data[i];
+    return data_.at(i); }
+  nr_type_t  operator [] (int i) const {
+    return data_[i];
   }
   nr_type_t& operator [] (int i) {
-    return data[i];
+    return data_[i];
   }
 
  protected:
-  std::vector<nr_type_t> data;
-
+  std::vector<nr_type_t> data_;
 };
 
   

@@ -144,7 +144,6 @@ void tridiag<nr_type_t>::solve_ns (void) {
   e = &belo->front(); // belo->getData ();
   b = c = x = &rhs->front(); //rhs->getData ();
   int i, n = (int)diag->size(); //diag->getSize ();
-
   // factorize A = LU
   al[0] = d[0];
   ga[0] = f[0] / al[0];

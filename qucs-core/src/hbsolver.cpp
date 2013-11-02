@@ -1103,7 +1103,7 @@ void hbsolver::VectorFFT (tvector<nr_complex_t> * V, int isign) {
   int n = nlfreqs;
   int nd = dfreqs.size ();
   int nodes = V->size () / n;
-  nr_double_t * d = (double *)V->getData ();
+  nr_double_t * d = (nr_double_t *)V->data ();
 
   if (nd == 1) {
     // for each node a single 1d-FFT
