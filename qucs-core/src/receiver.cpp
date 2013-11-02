@@ -91,7 +91,6 @@ vector * emi::receiver (nr_double_t * ida, nr_double_t duration, int ilength) {
   int i, n, points;
   nr_double_t fres;
   vector * ed = new vector ();
-
   points = ilength;
 
   /* ilength must be a power of 2 - write wrapper later on */
@@ -106,12 +105,12 @@ vector * emi::receiver (nr_double_t * ida, nr_double_t duration, int ilength) {
   /* calculate frequency step */
   fres = 1.0 / duration;
 
-  /* generate data vector; inplace calculation of magnitudes */
+  /* generate data ::vector; inplace calculation of magnitudes */
   nr_double_t * d = ida;
   for (n = 0, i = 0; i < points / 2; i++, n += 2){
     /* abs value of complex number */
     d[i] = xhypot (ida[n], ida[n + 1]);
-    /* vector contains complex values; thus every second value */
+    /* ::vector contains complex values; thus every second value */
   }
 
   points /= 2;
@@ -204,7 +203,7 @@ vector * emi::receiver (vector * da, vector * dt, int len) {
   inter->rvectors (da, dt);
   inter->prepare (INTERPOL_CUBIC, REPEAT_NO, DATA_RECTANGULAR);
 
-  // adjust the time domain vector using interpolation
+  // adjust the time domain ::vector using interpolation
   nr_double_t * ida = new nr_double_t[2 * nlen];
   nr_double_t tstep = duration / (nlen - 1);
   for (i = 0; i < nlen; i++) {

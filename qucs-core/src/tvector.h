@@ -27,12 +27,15 @@
 
 #include <vector>
 #include <assert.h>
-
 #include <limits>
+
+#include <Eigen/Core>
 
 #include "precision.h"
 
+
 namespace qucs {
+
 
 template <class nr_type_t>
 class tvector;
@@ -72,9 +75,11 @@ bool operator > (tvector<nr_type_t>, tvector<nr_type_t>);
 template <class nr_type_t>
 class tvector
 {
+ private:
+  Eigen::Matrix<nr_type_t,Eigen::Dynamic,1> v;
  public:
   tvector () = default;
-  tvector (const std::size_t i) : data_(i) {};
+  tvector (const std::size_t n) : v(Eigen::Matrix<nr_type_t,Eigen::Dynamic,1>::Zero(n,1)) {};
   tvector (const tvector &) = default;
   ~tvector () = default;
   void set (int, nr_type_t) = delete;
@@ -85,14 +90,14 @@ class tvector
   }
   void set (nr_type_t, int, int) = delete;
   void set (tvector, int, int) = delete;
-  std::size_t  size (void) const { return data_.size (); }
-  nr_type_t * data (void) { return data_.data(); }
   void setZero() { 
     if(this->size() > 0)
       for (unsigned int i = 0;i < this->size(); ++i)
 	(*this)(i) = 0;
   }
- 
+  auto size (void) const -> decltype (v.size()) { return this->v.size(); }
+  nr_type_t * data (void) { return this->v.data(); }
+  void setData (nr_type_t *, int) = delete; 
   void exchangeRows (int, int);
   int  isFinite (void);
   void print (void);
@@ -136,19 +141,16 @@ class tvector
 
   // easy accessor operators
   nr_type_t  operator () (int i) const {
-    return data_.at(i);
+    return this->v(i);
   }
   nr_type_t& operator () (int i) {
-    return data_.at(i); }
+    return this->v(i); }
   nr_type_t  operator [] (int i) const {
-    return data_[i];
+    return this->v[i];
   }
   nr_type_t& operator [] (int i) {
-    return data_[i];
+    return this->v[i];
   }
-
- protected:
-  std::vector<nr_type_t> data_;
 };
 
   
