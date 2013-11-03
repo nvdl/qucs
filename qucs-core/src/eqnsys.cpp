@@ -909,7 +909,7 @@ void eqnsys<nr_type_t>::factorize_qrh (void) {
       }
     }
     if (pivot != c) {
-      A->exchangeCols (pivot, c);
+      A->col(pivot).swap(A->col(c));
       Swap (int, cMap[pivot], cMap[c]);
       Swap (nr_double_t, nPvt[pivot], nPvt[c]);
     }
@@ -974,7 +974,7 @@ void eqnsys<nr_type_t>::factorize_qr_householder (void) {
 	MaxPivot = s;
       }
     if (pivot != c) {
-      A->exchangeCols (pivot, c);
+      A->col(pivot).swap(A->col(c));
       Swap (int, cMap[pivot], cMap[c]);
       Swap (nr_double_t, nPvt[pivot], nPvt[c]);
     }
