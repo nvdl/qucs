@@ -38,7 +38,7 @@ namespace qucs {
 
 
 
-# if 0
+# if 1
 template <typename nr_type_t>
 using tvector = Eigen::Matrix<nr_type_t,Eigen::Dynamic,1>;
 
@@ -65,7 +65,7 @@ tvector<nr_type_t> operator * (const tvector<nr_type_t>&, const nr_type_t&);
 template <class nr_type_t>
 tvector<nr_type_t> operator * (const nr_type_t&, const tvector<nr_type_t>&);
 template <class nr_type_t>
-tvector<nr_type_t> operator * (tvector<nr_type_t>, tvector<nr_type_t>);
+tvector<nr_type_t> operator * (tvector<nr_type_t>, tvector<nr_type_t>) = delete;
 template <class nr_type_t>
 tvector<nr_type_t> operator - (tvector<nr_type_t>);
 template <class nr_type_t>
@@ -174,9 +174,10 @@ class tvector
 };
 
   
-} // namespace qucs
+
   
 #include "tvector.cpp"
 #endif
+} // namespace qucs
 
 #endif /* __TVECTOR_H__ */

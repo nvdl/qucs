@@ -211,7 +211,7 @@ void eqnsys<nr_type_t>::solve_gauss (void) {
     assert (MaxPivot != 0);
     if (i != pivot) {
       A->exchangeRows (i, pivot);
-      B->exchangeRows (i, pivot);
+      B->row(i).swap(B->row(pivot));
     }
     // compute new rows and columns
     for (r = i + 1; r < N; r++) {
@@ -251,7 +251,7 @@ void eqnsys<nr_type_t>::solve_gauss_jordan (void) {
     assert (MaxPivot != 0);
     if (i != pivot) {
       A->exchangeRows (i, pivot);
-      B->exchangeRows (i, pivot);
+      B->row(i).swap(B->row(pivot));
     }
 
     // compute current row
@@ -727,7 +727,7 @@ void eqnsys<nr_type_t>::ensure_diagonal_MNA (void) {
 	pairs = countPairs (i, pivot1, pivot2);
 	if (pairs == 1) { /* lone pair found, substitute rows */
 	  A->exchangeRows (i, pivot1);
-	  B->exchangeRows (i, pivot1);
+	  B->row(i).swap(B->row(pivot1));
 	  exchanged = 1;
 	}
 	else if ((pairs > 1) && !restart) {
@@ -743,7 +743,7 @@ void eqnsys<nr_type_t>::ensure_diagonal_MNA (void) {
 	if (A_(i, i) == 0) {
 	  pairs = countPairs (i, pivot1, pivot2);
 	  A->exchangeRows (i, pivot1);
-	  B->exchangeRows (i, pivot1);
+	  B->row(i).swap(B->row(pivot1));
 	  exchanged = 1;
 	}
       }
@@ -791,7 +791,7 @@ void eqnsys<nr_type_t>::preconditioner (void) {
     // swap matrix rows if possible
     if (i != pivot) {
       A->exchangeRows (i, pivot);
-      B->exchangeRows (i, pivot);
+      B->row(i).swap(B->row(pivot));
     }
   }
 }

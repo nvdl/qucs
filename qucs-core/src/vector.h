@@ -39,7 +39,6 @@
 namespace qucs {
 
 class strlist;
-class vector;
 
 qucs::vector linspace (nr_double_t, nr_double_t, int);
 qucs::vector logspace (nr_double_t, nr_double_t, int);
