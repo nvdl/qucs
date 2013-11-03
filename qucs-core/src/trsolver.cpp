@@ -547,6 +547,7 @@ void trsolver::predictEuler (void)
     }
 }
 
+
 /* The function predicts the successive solution vector using the
    explicit Gear integration formula. */
 void trsolver::predictGear (void)

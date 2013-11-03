@@ -250,9 +250,9 @@ void spline::construct (void) {
     }
     else {
       tridiag<nr_double_t> sys;
-      ::std::vector<nr_double_t> o (n);
-      ::std::vector<nr_double_t> d (n);
-      ::std::vector<nr_double_t> b(&z[1],&z[n]);
+      std::vector<nr_double_t> o (n);
+      std::vector<nr_double_t> d (n);
+      std::vector<nr_double_t> b(&z[1],&z[n]);
       //b.setData (&z[1], n);
       for (i = 0; i < n - 1; i++) {
         o[i] = h[i+1];
