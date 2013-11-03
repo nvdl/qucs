@@ -219,7 +219,10 @@ void acsolver::solve_noise (void) {
     zn = *x;                    // save transimpedance vector
 
     // compute actual noise voltage
-    (*xn)(i) =  sqrt (real (dot (zn * (*C), conjugate (zn))));
+    /* TODO replace by adjoint product 
+       replace by (*xn)(i) = sqrt(real(zn.transpose()*(*C)*zn.conjugate()))
+     */
+    (*xn)(i) = sqrt(real ( (zn * (*C)).dot(zn)));
   }
 
   // restore usual AC results

@@ -1034,7 +1034,7 @@ void nasolver<nr_type_t>::applyAttenuation (void)
     }
 
     // apply damped solution vector
-    *x = *xprev + alpha * dx;
+    *x = *xprev + nr_type_t(alpha) * dx;
 }
 
 /* This is damped Newton-Raphson using nested iterations in order to
@@ -1056,7 +1056,7 @@ void nasolver<nr_type_t>::lineSearch (void)
     do
     {
         // apply current damping factor and see what happens
-        *x = *xprev + alpha * dx;
+        *x = *xprev + nr_type_t(alpha) * dx;
 
         // recalculate Jacobian and right hand side
         saveSolution ();
@@ -1089,7 +1089,7 @@ void nasolver<nr_type_t>::lineSearch (void)
 
     // apply final damping factor
     assert (alpha > 0 && alpha <= 1);
-    *x = *xprev + alpha * dx;
+    *x = *xprev +  nr_type_t(alpha) * dx;
 }
 
 /* The function looks for the optimal gradient for the right hand side
@@ -1109,7 +1109,7 @@ void nasolver<nr_type_t>::steepestDescent (void)
     do
     {
         // apply current damping factor and see what happens
-        *x = *xprev + alpha * dx;
+        *x = *xprev + nr_type_t(alpha) * dx;
 
         // recalculate Jacobian and right hand side
         saveSolution ();
@@ -1118,14 +1118,14 @@ void nasolver<nr_type_t>::steepestDescent (void)
 
         // check gradient criteria, ThinkME: Is this correct?
         dz = *z - *zprev;
-        sl = real (sum (dz * -dz));
+        sl = real (dz.dot(-dz));
         if (norm (*z) < n + alpha * sl) break;
         alpha *= 0.7;
     }
     while (alpha > 0.001);
 
     // apply final damping factor
-    *x = *xprev + alpha * dx;
+    *x = *xprev + nr_type_t(alpha) * dx;
 }
 
 /* The function checks whether the iterative algorithm for linearizing

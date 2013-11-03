@@ -42,15 +42,9 @@ class tvector;
 
 // Forward declarations of friend functions.
 template <class nr_type_t>
-nr_type_t   dot (const tvector<nr_type_t>&, const tvector<nr_type_t>&);
-template <class nr_type_t>
 nr_double_t maxnorm (tvector<nr_type_t>);
 template <class nr_type_t>
 nr_double_t norm (tvector<nr_type_t>);
-template <class nr_type_t>
-nr_type_t   sum (tvector<nr_type_t>);
-template <class nr_type_t>
-tvector<nr_type_t> conjugate (const tvector<nr_type_t>&);
 template <class nr_type_t>
 tvector<nr_type_t> operator + (tvector<nr_type_t>, tvector<nr_type_t>);
 template <class nr_type_t>
@@ -60,9 +54,9 @@ tvector<nr_type_t> operator + (nr_type_t, tvector<nr_type_t>);
 template <class nr_type_t>
 tvector<nr_type_t> operator - (tvector<nr_type_t>, tvector<nr_type_t>);
 template <class nr_type_t>
-tvector<nr_type_t> operator * (tvector<nr_type_t>, nr_double_t);
+tvector<nr_type_t> operator * (const tvector<nr_type_t>&, const nr_type_t&);
 template <class nr_type_t>
-tvector<nr_type_t> operator * (nr_double_t, tvector<nr_type_t>);
+tvector<nr_type_t> operator * (const nr_type_t&, const tvector<nr_type_t>&);
 template <class nr_type_t>
 tvector<nr_type_t> operator * (tvector<nr_type_t>, tvector<nr_type_t>);
 template <class nr_type_t>
@@ -81,12 +75,14 @@ class tvector
   tvector () = default;
   tvector (const std::size_t n) : v(Eigen::Matrix<nr_type_t,Eigen::Dynamic,1>::Zero(n,1)) {};
   tvector (const tvector &) = default;
+  tvector (const Eigen::Matrix<nr_type_t,Eigen::Dynamic,1> &n):
+    v(n) {};
+  tvector (Eigen::Matrix<nr_type_t,Eigen::Dynamic,1> &&n):
+    v(std::move(n)) {};
   ~tvector () = default;
   void set (int, nr_type_t) = delete;
   void setConstant (nr_type_t c) {
-    if(this->size() > 0)
-      for (unsigned int i = 0; i < this->size(); ++i)
-	(*this)(i) = c;
+    this->v.setConstant(c);
   }
   void set (nr_type_t, int, int) = delete;
   void set (tvector, int, int) = delete;
@@ -96,11 +92,27 @@ class tvector
 	(*this)(i) = 0;
   }
   auto size (void) const -> decltype (v.size()) { return this->v.size(); }
+  auto transpose() -> decltype(v.transpose()) { return this->v.transpose(); }
+  auto adjoint() -> decltype(v.adjoint()) { return this->v.adjoint(); }
+  tvector<nr_type_t> conjugate() const {
+    auto res = tvector(this->v.conjugate());
+    return res;
+  }
+
+  nr_type_t dot(const tvector<nr_type_t> &s) const {
+    return this->v.dot(s.v);
+  }
+  
+  nr_type_t sum() const {
+    return this->v.sum();
+  }
+
   nr_type_t * data (void) { return this->v.data(); }
-  void setData (nr_type_t *, int) = delete; 
   void exchangeRows (int, int);
-  int  isFinite (void);
-  void print (void);
+  bool  isFinite (void) const {
+    return this->v.isFinite();
+  }
+  void print ();
   void reorder (int *);
   int  contains (nr_type_t, nr_double_t eps = std::numeric_limits<nr_double_t>::epsilon());
 
@@ -108,8 +120,8 @@ class tvector
 #ifndef _MSC_VER
   friend tvector operator +<> (tvector, tvector);
   friend tvector operator -<> (tvector, tvector);
-  friend tvector operator *<> (tvector, nr_double_t);
-  friend tvector operator *<> (nr_double_t, tvector);
+  friend tvector operator *<> (const tvector&, const nr_type_t&);
+  friend tvector operator *<> (const nr_type_t&, const tvector&);
   friend tvector operator *<> (tvector, tvector);
   friend tvector operator -<> (tvector);
   friend tvector operator +<> (tvector, nr_type_t);
@@ -120,9 +132,6 @@ class tvector
 #ifndef _MSC_VER
   friend nr_double_t norm<> (tvector);
   friend nr_double_t maxnorm<> (tvector);
-  friend nr_type_t   sum<> (tvector);
-  friend nr_type_t   dot<> (const tvector&, const tvector&);
-  friend tvector     conjugate<> (const tvector&);
 #endif
 
   // comparisons
