@@ -225,7 +225,8 @@ void acsolver::solve_noise (void) {
     /* TODO replace by adjoint product 
        replace by (*xn)(i) = sqrt(real(zn.transpose()*(*C)*zn.conjugate()))
      */
-    (*xn)(i) = sqrt(real ( (zn * (*C)).dot(zn)));
+     Eigen::Matrix<nr_double_t,1,1> tmp= (zn.adjoint()*(*C)*zn).real();
+    (*xn)(i) =  sqrt (tmp(0,0));
   }
 
   // restore usual AC results

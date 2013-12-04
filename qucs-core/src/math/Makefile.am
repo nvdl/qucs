@@ -33,8 +33,6 @@ pkginclude_HEADERS =    \
     complex.h           \
     real.h
 
-noinst_TEMPLATES = tmatrix.cpp
-
 noinst_HEADERS =        \
     fspecial.h          \
     matrix.h            \
@@ -51,6 +49,7 @@ libqucsmath_la_SOURCES =  \
     fspecial.cpp          \
     matrix.cpp            \
     real.cpp
+
 
 
 CLEANFILES = *~ *.orig *.rej *.output

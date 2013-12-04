@@ -25,14 +25,7 @@
 #ifndef __TVECTOR_H__
 #define __TVECTOR_H__
 
-#include <vector>
-#include <assert.h>
-#include <limits>
-
 #include <Eigen/Core>
-
-#include "precision.h"
-
 
 namespace qucs {
 
