@@ -1,0 +1,53 @@
+/home/bastien/Documents/Personnel/soft/debian/science/qucs/git/qucs-core/src/qucsator
+parsing netlist...
+checking netlist...
+checker notice, variable `I.I' in equation `assertI' not yet defined
+checker notice, variable `U.V' in equation `assertV' not yet defined
+subcircuit root
+  Vdc:V1 _net0 gnd U="1V"
+  DC:DC1 Temp="26.85" reltol="0.001" abstol="1e-12A" vntol="1e-06V" saveOPs="no" MaxIter="150" saveAll="no" convHelper="none" Solver="CroutLU"
+  IProbe:I _net0 _net1
+  R:R1 _net1 _net2 R="1Ohm" Temp="26.85" Tc1="0" Tc2="0" Tnom="26.85"
+  VProbe:U _net2 gnd
+  C:C1 _net2 gnd C="1F"
+netlist content
+      1 IProbe instances
+      1 C instances
+      1 DC instances
+      1 VProbe instances
+      1 R instances
+      1 Vdc instances
+creating netlist...
+checker notice, variable `I.I' in equation `assertI' not yet defined
+checker notice, variable `U.V' in equation `assertV' not yet defined
+NOTIFY: DC1: creating node list for DC analysis
+NOTIFY: DC1: solving DC netlist
+project location: 
+modules to load: 0
+factorycreate.size() is 0
+factorycreate has registered:
+<Qucs Dataset 0.0.19>
+<indep assertV 1>
+  +1.00000000000000000000e+00
+</indep>
+<indep assertI 1>
+  +1.00000000000000000000e+00
+</indep>
+<indep U.V 1>
+  +1.00000000000000000000e+00
+</indep>
+<indep V1.I 1>
+  +0.00000000000000000000e+00
+</indep>
+<indep I.I 1>
+  +0.00000000000000000000e+00
+</indep>
+<indep _net2.V 1>
+  +1.00000000000000000000e+00
+</indep>
+<indep _net1.V 1>
+  +1.00000000000000000000e+00
+</indep>
+<indep _net0.V 1>
+  +1.00000000000000000000e+00
+</indep>
