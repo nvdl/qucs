@@ -26,6 +26,7 @@
 #define __NET_H__
 
 #include <string>
+#include <vector>
 #include "ptrlist.h"
 
 namespace qucs {
@@ -41,7 +42,21 @@ class environment;
 
 class net : public object
 {
- public:
+ private:
+  nodeset * nset;
+  circuit * drop;
+  circuit * root;
+  std::vector<analysis *> actions;
+  ptrlist<analysis> * orgacts;
+  environment * env;
+  int nPorts;
+  int nSources;
+  int nCircuits;
+  int reduced;
+  int inserted;
+  int insertedNodes;
+  nr_double_t srcFactor;
+   public:
   net ();
   net (const std::string &);
   net (net &);
@@ -75,7 +90,7 @@ class net : public object
   const char * getChild (analysis *) const;
   void orderAnalysis (void);
   analysis * findLastOrder (analysis *);
-  ptrlist<analysis> * findLastOrderChildren (analysis *);
+  const auto findLastOrderChildren (analysis * a)  -> decltype(actions) &;
   void sortChildAnalyses (analysis *);
   int  containsAnalysis (analysis *, int);
   environment * getEnv (void) { return env; }
@@ -89,21 +104,6 @@ class net : public object
   void setSrcFactor (nr_double_t f) { srcFactor = f; }
   nr_double_t getSrcFactor (void) { return srcFactor; }
   void setActionNetAll(net *);
-
- private:
-  nodeset * nset;
-  circuit * drop;
-  circuit * root;
-  ptrlist<analysis> * actions;
-  ptrlist<analysis> * orgacts;
-  environment * env;
-  int nPorts;
-  int nSources;
-  int nCircuits;
-  int reduced;
-  int inserted;
-  int insertedNodes;
-  nr_double_t srcFactor;
 };
 
 } // namespace qucs

@@ -34,9 +34,8 @@
 # include <config.h>
 #endif
 
-//#include <stdio.h>
-//#include <stdlib.h>
 #include <string.h>
+#include <algorithm>
 
 #include "object.h"
 #include "complex.h"
@@ -50,22 +49,21 @@
 namespace qucs {
 
 //Constructor. Creates an unnamed instance of the analysis class.
-analysis::analysis () : object () {
+  analysis::analysis () : object (), actions() {
   data = NULL;
   subnet = NULL;
   env = NULL;
-  actions = NULL;
   type = ANALYSIS_UNKNOWN;
   runs = 0;
   progress = true;
 }
 
 // Constructor creates a named instance of the analysis class.
-analysis::analysis (const std::string &n) : object (n) {
+// TODO: strange copy why removing actions
+  analysis::analysis (const std::string &n) : object (n), actions() {
   data = NULL;
   subnet = NULL;
   env = NULL;
-  actions = NULL;
   type = ANALYSIS_UNKNOWN;
   runs = 0;
   progress = true;
@@ -73,7 +71,7 @@ analysis::analysis (const std::string &n) : object (n) {
 
 // Destructor deletes the analysis class object.
 analysis::~analysis () {
-  if (actions) delete actions;
+ 
 }
 
 /* The copy constructor creates a new instance of the analysis class
@@ -82,7 +80,7 @@ analysis::analysis (analysis & a) : object (a) {
   data = a.data;
   subnet = a.subnet;
   env = a.env;
-  actions = a.actions ? new ptrlist<analysis> (*a.actions) : NULL;
+  actions = a.actions;
   type = a.type;
   runs = a.runs;
   progress = a.progress;
@@ -91,16 +89,13 @@ analysis::analysis (analysis & a) : object (a) {
 /* This function adds the given analysis to the actions being
    associated with the current analysis object. */
 void analysis::addAnalysis (analysis * a) {
-  if (!actions) actions = new ptrlist<analysis> ();
-  actions->push_front (a);
+  actions.insert (actions.begin(),a);
 }
 
 /* This function deletes the given analysis from the actions being
    associated with the current analysis object. */
 void analysis::delAnalysis (analysis * a) {
-  if (actions != nullptr) {
-    actions->remove (a);
-  }
+  actions.erase(std::remove(actions.begin(),actions.end(), a), actions.end());
 }
 
 /* The following function creates a sweep object depending on the
