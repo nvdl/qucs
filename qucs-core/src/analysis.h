@@ -31,8 +31,9 @@
 #ifndef __ANALYSIS_H__
 #define __ANALYSIS_H__
 
+#include <vector>
+
 #include "object.h"
-#include "ptrlist.h"
 
 #define SAVE_OPS 1 // save operating points
 #define SAVE_ALL 2 // also save subcircuit nodes and operating points
@@ -187,16 +188,6 @@ public:
         env = e;
     }
 
-    ptrlist<analysis> * getAnalysis (void)
-    {
-        return actions;
-    }
-
-    void setAnalysis (ptrlist<analysis> * a)
-    {
-        actions = a;
-    }
-
     /*! \fn addAnalysis
      * \param analysis pointer to existing analysis object
      *
@@ -213,7 +204,7 @@ public:
      */
     void delAnalysis (analysis *);
 
-    int  getType (void)
+    int  getType (void) const
     {
         return type;
     }
@@ -266,14 +257,13 @@ public:
     {
         progress = p;
     }
-
+     std::vector<analysis *> actions;
 protected:
     int runs;
     int type;
     net * subnet;
     dataset * data;
     environment * env;
-    ptrlist<analysis> * actions;
     bool progress;
 };
 

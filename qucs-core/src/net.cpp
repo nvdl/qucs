@@ -54,11 +54,10 @@
 namespace qucs {
 
 // Constructor creates an unnamed instance of the net class.
-net::net () : object () {
+  net::net () : object (), actions() {
   root = drop = NULL;
   nPorts = nCircuits = nSources = 0;
   insertedNodes = inserted = reduced = 0;
-  actions = new ptrlist<analysis> ();
   orgacts = new ptrlist<analysis> ();
   env = NULL;
   nset = NULL;
@@ -66,11 +65,10 @@ net::net () : object () {
 }
 
 // Constructor creates a named instance of the net class.
-net::net (const std::string &n) : object (n) {
+  net::net (const std::string &n) : object (n), actions() {
   root = drop = NULL;
   nPorts = nCircuits = nSources = 0;
   insertedNodes = inserted = reduced = 0;
-  actions = new ptrlist<analysis> ();
   orgacts = new ptrlist<analysis> ();
   env = NULL;
   nset = NULL;
@@ -94,7 +92,6 @@ net::~net () {
   delete orgacts;
   // delete nodeset
   delNodeset ();
-  delete actions;
 }
 
 /* The copy constructor creates a new instance of the net class based
@@ -103,7 +100,7 @@ net::net (net & n) : object (n) {
   root = drop = NULL;
   nPorts = nCircuits = nSources = 0;
   insertedNodes = inserted = reduced = 0;
-  actions = n.actions ? new ptrlist<analysis> (*n.actions) : NULL;
+  actions = n.actions;
   orgacts = new ptrlist<analysis> ();
   env = n.env;
   nset = NULL;
@@ -186,47 +183,46 @@ int net::containsCircuit (circuit * cand) {
    analyses. */
 void net::insertAnalysis (analysis * a) {
   orgacts->push_front (a);
-  actions->push_front (a);
+  actions.insert (actions.begin(),a);
 }
 
 /* The function removes the given analysis from the list of registered
    analyses. */
 void net::removeAnalysis (analysis * a) {
-  actions->remove(a);
+  actions.erase(std::remove(actions.begin(),actions.end(), a), actions.end());
 }
 
 /* The function returns the analysis associated with the netlist
    object specified by the given instance name and returns NULL if
    there is no such analysis. */
 analysis * net::findAnalysis (const std::string &n) const {
-  for (auto *a : *actions) {
-    if (a->getName ()== n)
-      return a;
+  const auto &it = std::find_if(actions.cbegin(),actions.cend(),
+				[n](decltype(*std::begin(actions)) action) { return action->getName() == n; });
+  if (it == actions.cend()) {
+    return nullptr;
   }
-  return NULL;
+  return (*it);
 }
 
 /* The function returns the analysis associated with the netlist
    object specified by the given type of analysis and returns NULL if
    there is no such analysis. */
 analysis * net::findAnalysis (int type) {
-  for (auto *a: *actions) {
-    if (a->getType () == type)
-      return a;
+  const auto &it = std::find_if(actions.cbegin(),actions.cend(),
+				[type](decltype(*actions.cbegin())&action) { return action->getType() == type; });
+  if (it == actions.cend()) {
+    return nullptr;
   }
-  return NULL;
+  return (*it);
 }
 
 /* Looks recursively for a type of analysis. */
 int net::containsAnalysis (analysis * child, int type) {
-  ptrlist<analysis> * alist = child->getAnalysis ();
-  if(alist != nullptr) {
-    for (auto *a : *alist) {
-      if (a->getType () == type)
-	return 1;
-      else if (a->getType () == ANALYSIS_SWEEP)
-	return containsAnalysis (a, type);
-    }
+  for (auto *a : child->actions) {
+    if (a->getType () == type)
+      return 1;
+    else if (a->getType () == ANALYSIS_SWEEP)
+      return containsAnalysis (a, type);
   }
   return 0;
 }
@@ -237,7 +233,7 @@ dataset * net::runAnalysis (int &err) {
   dataset * out = new dataset ();
 
   // apply some data to all analyses
-  for (auto *a : *actions) {
+  for (auto * a : actions) {
     if (!a->isExternal ())
     {
       a->setNet (this);
@@ -249,7 +245,7 @@ dataset * net::runAnalysis (int &err) {
   orderAnalysis ();
 
   // initialize analyses
-  for (auto *a: * actions) {
+  for (auto *a: actions) {
     if (!a->isExternal ())
     {
       err |= a->initialize ();
@@ -257,7 +253,7 @@ dataset * net::runAnalysis (int &err) {
   }
 
   // solve the analyses
-  for (auto *a: * actions) {
+  for (auto *a: actions) {
     if (!a->isExternal ())
     {
       a->getEnv()->runSolver ();
@@ -266,7 +262,7 @@ dataset * net::runAnalysis (int &err) {
   }
 
   // cleanup analyses
-  for (auto *a: *actions) {
+  for (auto *a: actions) {
     if (!a->isExternal ())
     {
         err |= a->cleanup ();
@@ -280,7 +276,7 @@ dataset * net::runAnalysis (int &err) {
    there is no recursive sweep it returns NULL. */
 analysis * net::findSecondOrder (void) {
   analysis * parent = NULL;
-  for (auto *a : *actions) {
+  for (auto *a : actions) {
     // parameter sweeps are potential parent sweeps
     if (a->getType () == ANALYSIS_SWEEP) {
       // find the appropriate sub analysis
@@ -315,8 +311,7 @@ void net::orderAnalysis (void) {
       child = getChildAnalysis (parent);
       removeAnalysis (child);
       // apply sub-analysis to each parent analysis if any
-      if (actions != nullptr) {
-	for (auto *a: *actions) {
+      for (auto *a: actions) {
 	  const char * cn = getChild (a);
 	  if (cn != NULL && !strcmp (cn, child->getName ())) {
 	    a->addAnalysis (child);
@@ -330,9 +325,8 @@ void net::orderAnalysis (void) {
 	    }
 	  }
 	}
-      }
       // sort the sub-analysis of each parent
-      for (auto *a: *actions) {
+      for (auto *a: actions) {
 	sortChildAnalyses (a);
       }
     }
@@ -340,22 +334,19 @@ void net::orderAnalysis (void) {
 
   // sort the parent analyses
   parent = new analysis ();
-  parent->setAnalysis (actions);
+  parent->actions = actions;
   sortChildAnalyses (parent);
-  actions = new ptrlist<analysis> (*(parent->getAnalysis ()));
+  actions = parent->actions;
   delete parent;
 }
 
 // This function sorts the analyses of the given parent analysis.
 void net::sortChildAnalyses (analysis * parent) {
-  ptrlist<analysis> * alist = parent->getAnalysis ();
-  if (alist != nullptr) {
-    for (auto *a: *alist) {
-      if (a->getType () == ANALYSIS_DC
-	  || containsAnalysis (a, ANALYSIS_DC)) {
-	parent->delAnalysis (a);
-	parent->addAnalysis (a);
-      }
+  for (auto *a: parent->actions) {
+    if (a->getType () == ANALYSIS_DC
+	|| containsAnalysis (a, ANALYSIS_DC)) {
+      parent->delAnalysis (a);
+      parent->addAnalysis (a);
     }
   }
 }
@@ -375,8 +366,7 @@ analysis * net::getChildAnalysis (analysis * parent) {
 
 // Returns the last order sweep being not an parameter sweep.
 analysis * net::findLastOrder (analysis * a) {
-  ptrlist<analysis> * alist = a->getAnalysis ();
-  analysis * child = alist ? alist->front() : NULL;
+  analysis * child = a->actions.empty() ? a->actions.front() : nullptr;
   if (child != NULL && child->getType () == ANALYSIS_SWEEP) {
     return findLastOrder (child);
   }
@@ -384,13 +374,12 @@ analysis * net::findLastOrder (analysis * a) {
 }
 
 // Returns the last order sweep being not an parameter sweep.
-ptrlist<analysis> * net::findLastOrderChildren (analysis * a) {
-  ptrlist<analysis> * alist = a->getAnalysis ();
-  analysis * child = alist ? alist->front() : NULL;
+const auto net::findLastOrderChildren (analysis * a)  -> decltype(actions) & {
+  analysis * child = a->actions.empty() ? a->actions.front() : nullptr;
   if (child != NULL && child->getType () == ANALYSIS_SWEEP) {
     return findLastOrderChildren (child);
   }
-  return alist;
+  return actions;
 }
 
 /* The function re-shifts all circuits in the drop list to the actual
@@ -561,7 +550,7 @@ void net::delNodeset (void) {
 
 void net::setActionNetAll(net  * subnet)
 {
-  for (auto *a : *(this->actions))
+  for (auto *a : this->actions)
     a->setNet(subnet);
 }
 
