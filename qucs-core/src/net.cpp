@@ -207,7 +207,7 @@ analysis * net::findAnalysis (const std::string &n) const {
 /* The function returns the analysis associated with the netlist
    object specified by the given type of analysis and returns NULL if
    there is no such analysis. */
-analysis * net::findAnalysis (int type) {
+analysis * net::findAnalysis (analysis::analysis_type type) {
   const auto &it = std::find_if(actions.cbegin(),actions.cend(),
 				[type](decltype(*actions.cbegin())&action) { return action->getType() == type; });
   if (it == actions.cend()) {
@@ -217,11 +217,11 @@ analysis * net::findAnalysis (int type) {
 }
 
 /* Looks recursively for a type of analysis. */
-int net::containsAnalysis (analysis * child, int type) {
+int net::containsAnalysis (analysis * child, analysis::analysis_type type) {
   for (auto *a : child->actions) {
     if (a->getType () == type)
       return 1;
-    else if (a->getType () == ANALYSIS_SWEEP)
+    else if (a->getType () == analysis::analysis_type::ANALYSIS_SWEEP)
       return containsAnalysis (a, type);
   }
   return 0;
@@ -278,12 +278,12 @@ analysis * net::findSecondOrder (void) {
   analysis * parent = NULL;
   for (auto *a : actions) {
     // parameter sweeps are potential parent sweeps
-    if (a->getType () == ANALYSIS_SWEEP) {
+    if (a->getType () == analysis::analysis_type::ANALYSIS_SWEEP) {
       // find the appropriate sub analysis
       analysis * child = getChildAnalysis (a);
       if (child != NULL) {
 	// check if child is not another variable sweep
-	if (child->getType () != ANALYSIS_SWEEP) {
+	if (child->getType () != analysis::analysis_type::ANALYSIS_SWEEP) {
 	  parent = a;
 	  break;
 	}
@@ -303,7 +303,7 @@ analysis * net::findSecondOrder (void) {
    a certain order. */
 void net::orderAnalysis (void) {
   analysis * parent, * child;
-  analysis * dc = findAnalysis (ANALYSIS_DC);
+  analysis * dc = findAnalysis (analysis::analysis_type::ANALYSIS_DC);
   int dcApplied = 0;
   do {
     // get second order sweep
@@ -316,8 +316,8 @@ void net::orderAnalysis (void) {
 	  if (cn != NULL && !strcmp (cn, child->getName ())) {
 	    a->addAnalysis (child);
 	    // apply DC analysis if necessary
-	    if (child->getType () != ANALYSIS_DC &&
-		child->getType () != ANALYSIS_SWEEP && dc != NULL) {
+	    if (child->getType () != analysis::analysis_type::ANALYSIS_DC &&
+		child->getType () != analysis::analysis_type::ANALYSIS_SWEEP && dc != NULL) {
 	      if (!dcApplied)
 		removeAnalysis (dc);
 	      a->addAnalysis (dc);
@@ -343,8 +343,8 @@ void net::orderAnalysis (void) {
 // This function sorts the analyses of the given parent analysis.
 void net::sortChildAnalyses (analysis * parent) {
   for (auto *a: parent->actions) {
-    if (a->getType () == ANALYSIS_DC
-	|| containsAnalysis (a, ANALYSIS_DC)) {
+    if (a->getType () == analysis::analysis_type::ANALYSIS_DC
+	|| containsAnalysis (a, analysis::analysis_type::ANALYSIS_DC)) {
       parent->delAnalysis (a);
       parent->addAnalysis (a);
     }
@@ -354,7 +354,7 @@ void net::sortChildAnalyses (analysis * parent) {
 // Returns the instance name of the given parents child analysis.
 const char * net::getChild (analysis * parent) const {
   const char * child = NULL;
-  if (parent != NULL && parent->getType () == ANALYSIS_SWEEP)
+  if (parent != NULL && parent->getType () == analysis::analysis_type::ANALYSIS_SWEEP)
     child = parent->getPropertyString ("Sim");
   return child;
 }
@@ -367,7 +367,7 @@ analysis * net::getChildAnalysis (analysis * parent) {
 // Returns the last order sweep being not an parameter sweep.
 analysis * net::findLastOrder (analysis * a) {
   analysis * child = a->actions.empty() ? a->actions.front() : nullptr;
-  if (child != NULL && child->getType () == ANALYSIS_SWEEP) {
+  if (child != NULL && child->getType () == analysis::analysis_type::ANALYSIS_SWEEP) {
     return findLastOrder (child);
   }
   return child ? child : a;
@@ -376,7 +376,7 @@ analysis * net::findLastOrder (analysis * a) {
 // Returns the last order sweep being not an parameter sweep.
 const auto net::findLastOrderChildren (analysis * a)  -> decltype(actions) & {
   analysis * child = a->actions.empty() ? a->actions.front() : nullptr;
-  if (child != NULL && child->getType () == ANALYSIS_SWEEP) {
+  if (child != NULL && child->getType () == analysis::analysis_type::ANALYSIS_SWEEP) {
     return findLastOrderChildren (child);
   }
   return actions;

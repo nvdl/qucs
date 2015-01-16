@@ -84,7 +84,7 @@ e_trsolver::e_trsolver ()
     : trsolver ()
 {
     //swp = NULL;
-    type = ANALYSIS_E_TRANSIENT;
+    type = analysis::analysis_type::ANALYSIS_E_TRANSIENT;
     //setDescription ("m-transient");
     //for (int i = 0; i < 8; i++) solution[i] = NULL;
     //tHistory = NULL;
@@ -108,7 +108,7 @@ e_trsolver::e_trsolver (char * n)
     : trsolver (n)
 {
     //swp = NULL;
-    type = ANALYSIS_E_TRANSIENT;
+    type = analysis::analysis_type::ANALYSIS_E_TRANSIENT;
     //setDescription ("m-transient");
     //for (int i = 0; i < 8; i++) solution[i] = NULL;
     //tHistory = NULL;

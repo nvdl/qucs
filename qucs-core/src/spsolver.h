@@ -40,7 +40,7 @@ class spsolver : public analysis
 {
  public:
   ACREATOR (spsolver);
-  spsolver (char *);
+  spsolver (const std::string &);
   spsolver (spsolver &);
   ~spsolver ();
   void calc (nr_double_t);

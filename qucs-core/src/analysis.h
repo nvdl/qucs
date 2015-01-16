@@ -53,23 +53,7 @@ class environment;
 class sweep;
 class vector;
 
-/*! \enum analysis_type
- * \brief enumerates the analysis types available.
- *
- * Enumerates the analysis types available.
- *
- */
-enum analysis_type
-{
-    ANALYSIS_UNKNOWN = -1,
-    ANALYSIS_SWEEP,
-    ANALYSIS_DC,
-    ANALYSIS_AC,
-    ANALYSIS_HBALANCE,
-    ANALYSIS_TRANSIENT,
-    ANALYSIS_SPARAMETER,
-    ANALYSIS_E_TRANSIENT
-};
+
 
 /*! \class analysis
  * \brief class for performing circuit analyses.
@@ -83,6 +67,23 @@ enum analysis_type
 class analysis : public object
 {
 public:
+    /*! \enum analysis_type
+     * \brief enumerates the analysis types available.
+     *
+     * Enumerates the analysis types available.
+     *
+     */
+    enum class analysis_type
+    {
+     ANALYSIS_UNKNOWN = 0,
+     ANALYSIS_SWEEP,
+     ANALYSIS_DC,
+     ANALYSIS_AC,
+     ANALYSIS_HBALANCE,
+     ANALYSIS_TRANSIENT,
+     ANALYSIS_SPARAMETER,
+     ANALYSIS_E_TRANSIENT
+    };
 
     /*! \fn analysis
     * \brief Constructor (Unnamed)
@@ -111,7 +112,7 @@ public:
     *
     * Destructor. Destroys an analysis object.
     */
-    ~analysis ();
+    ~analysis () = default;
 
     /*! \fn solve
     * \brief placehoder for solution function
@@ -204,12 +205,12 @@ public:
      */
     void delAnalysis (analysis *);
 
-    int  getType (void) const
+    analysis_type  getType (void) const
     {
         return type;
     }
 
-    void setType (int t)
+    void setType (analysis_type t)
     {
         type = t;
     }
@@ -259,8 +260,10 @@ public:
     }
      std::vector<analysis *> actions;
 protected:
+    /*! constructor : initialise kind of class must be run by children */
+    analysis (const std::string &n, const analysis_type t);
     int runs;
-    int type;
+    analysis_type type;
     net * subnet;
     dataset * data;
     environment * env;

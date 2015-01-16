@@ -65,7 +65,7 @@ trsolver::trsolver ()
     : nasolver<nr_double_t> (), states<nr_double_t> ()
 {
     swp = NULL;
-    type = ANALYSIS_TRANSIENT;
+    type = analysis_type::ANALYSIS_TRANSIENT;
     setDescription ("transient");
     for (int i = 0; i < 8; i++) solution[i] = NULL;
     tHistory = NULL;
@@ -78,7 +78,7 @@ trsolver::trsolver (const std::string &n)
     : nasolver<nr_double_t> (n), states<nr_double_t> ()
 {
     swp = NULL;
-    type = ANALYSIS_TRANSIENT;
+    type = analysis_type::ANALYSIS_TRANSIENT;
     setDescription ("transient");
     for (int i = 0; i < 8; i++) solution[i] = NULL;
     tHistory = NULL;

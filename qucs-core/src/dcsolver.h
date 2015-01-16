@@ -33,7 +33,7 @@ class dcsolver : public nasolver<nr_double_t>
 {
  public:
   ACREATOR (dcsolver);
-  dcsolver (char *);
+  dcsolver (const std::string &n);
   dcsolver (dcsolver &);
   ~dcsolver ();
   int  solve (void);

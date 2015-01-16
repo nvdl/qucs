@@ -36,7 +36,7 @@ class acsolver : public nasolver<nr_complex_t>
 {
  public:
   ACREATOR (acsolver);
-  acsolver (char *);
+  acsolver (const std::string &n);
   acsolver (acsolver &);
   ~acsolver ();
   int  solve (void);

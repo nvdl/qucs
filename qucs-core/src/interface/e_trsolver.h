@@ -34,9 +34,12 @@
 #ifndef __E_TRSOLVER_H__
 #define __E_TRSOLVER_H__
 
+#include <vector>
+
+#include "analysis.h"
 #include "qucs_interface.h"
 #include "trsolver.h"
-#include <vector>
+
 
 namespace qucs {
 

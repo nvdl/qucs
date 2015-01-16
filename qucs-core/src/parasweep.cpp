@@ -53,7 +53,7 @@ parasweep::parasweep () : analysis () {
   var = NULL;
   swp = NULL;
   eqn = NULL;
-  type = ANALYSIS_SWEEP;
+  type = analysis_type::ANALYSIS_SWEEP;
 }
 
 // Constructor creates a named instance of the parasweep class.
@@ -61,7 +61,7 @@ parasweep::parasweep (char * n) : analysis (n) {
   var = NULL;
   swp = NULL;
   eqn = NULL;
-  type = ANALYSIS_SWEEP;
+  type = analysis_type::ANALYSIS_SWEEP;
 }
 
 // Destructor deletes the parasweep class object.

@@ -49,39 +49,41 @@
 namespace qucs {
 
 //Constructor. Creates an unnamed instance of the analysis class.
-  analysis::analysis () : object (), actions() {
+  analysis::analysis () : object (), actions(), type(analysis_type::ANALYSIS_UNKNOWN) {
   data = NULL;
   subnet = NULL;
   env = NULL;
-  type = ANALYSIS_UNKNOWN;
+  runs = 0;
+  progress = true;
+}
+
+
+//Constructor. Creates an unnamed instance of the analysis class.
+analysis::analysis (const std::string &n, const analysis_type t) : object (n), actions(), type(t) {
+  data = NULL;
+  subnet = NULL;
+  env = NULL;
   runs = 0;
   progress = true;
 }
 
 // Constructor creates a named instance of the analysis class.
-// TODO: strange copy why removing actions
-  analysis::analysis (const std::string &n) : object (n), actions() {
+analysis::analysis (const std::string &n) : object (n), actions(), type(analysis_type::ANALYSIS_UNKNOWN) {
   data = NULL;
   subnet = NULL;
   env = NULL;
-  type = ANALYSIS_UNKNOWN;
   runs = 0;
   progress = true;
 }
 
-// Destructor deletes the analysis class object.
-analysis::~analysis () {
- 
-}
 
 /* The copy constructor creates a new instance of the analysis class
    based on the given analysis object. */
-analysis::analysis (analysis & a) : object (a) {
+  analysis::analysis (analysis & a) : object (a), type(a.type) {
   data = a.data;
   subnet = a.subnet;
   env = a.env;
   actions = a.actions;
-  type = a.type;
   runs = a.runs;
   progress = a.progress;
 }

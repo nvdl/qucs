@@ -27,6 +27,8 @@
 
 #include <string>
 #include <vector>
+
+#include "analysis.h"
 #include "ptrlist.h"
 
 namespace qucs {
@@ -84,7 +86,7 @@ class net : public object
   int  getVoltageSources (void) { return nSources; }
   void setVoltageSources (int n) { nSources = n; }
   analysis * findAnalysis (const std::string &) const;
-  analysis * findAnalysis (int);
+  analysis * findAnalysis (analysis::analysis_type);
   analysis * findSecondOrder (void);
   analysis * getChildAnalysis (analysis *);
   const char * getChild (analysis *) const;
@@ -92,7 +94,7 @@ class net : public object
   analysis * findLastOrder (analysis *);
   const auto findLastOrderChildren (analysis * a)  -> decltype(actions) &;
   void sortChildAnalyses (analysis *);
-  int  containsAnalysis (analysis *, int);
+  int  containsAnalysis (analysis *, analysis::analysis_type);
   environment * getEnv (void) { return env; }
   void setEnv (environment * e) { env = e; }
   int  countPorts (void);

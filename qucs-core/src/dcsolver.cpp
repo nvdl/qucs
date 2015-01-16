@@ -42,14 +42,14 @@ namespace qucs {
 // Constructor creates an unnamed instance of the dcsolver class.
 dcsolver::dcsolver () : nasolver<nr_double_t> () {
   saveOPs = 0;
-  type = ANALYSIS_DC;
+  type = analysis_type::ANALYSIS_DC;
   setDescription ("DC");
 }
 
 // Constructor creates a named instance of the dcsolver class.
-dcsolver::dcsolver (char * n) : nasolver<nr_double_t> (n) {
+dcsolver::dcsolver (const std::string &n) : nasolver<nr_double_t> (n) {
   saveOPs = 0;
-  type = ANALYSIS_DC;
+  type = analysis_type::ANALYSIS_DC;
   setDescription ("DC");
 }
 

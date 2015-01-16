@@ -224,7 +224,7 @@ void trsolver_interface::getETR()
     // get a pointer to the external transient solver interface
     // the pointer will be to the supclass of e_trsolver, analysis
     // so we must perform a dynamic cast to convert it to an e_trsolver
-    etr = dynamic_cast<e_trsolver *>(subnet->findAnalysis (ANALYSIS_E_TRANSIENT));
+    etr = dynamic_cast<e_trsolver *>(subnet->findAnalysis (analysis::analysis_type::ANALYSIS_E_TRANSIENT));
 
     if (etr)
     {

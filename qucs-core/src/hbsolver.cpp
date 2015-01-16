@@ -55,7 +55,7 @@ using namespace fourier;
 
 // Constructor creates an unnamed instance of the hbsolver class.
 hbsolver::hbsolver () : analysis () {
-  type = ANALYSIS_HBALANCE;
+  type = analysis_type::ANALYSIS_HBALANCE;
   frequency = 0;
   nlnodes = lnnodes = banodes = nanodes = NULL;
   Y = Z = A = NULL;
@@ -68,7 +68,7 @@ hbsolver::hbsolver () : analysis () {
 
 // Constructor creates a named instance of the hbsolver class.
 hbsolver::hbsolver (char * n) : analysis (n) {
-  type = ANALYSIS_HBALANCE;
+  type = analysis_type::ANALYSIS_HBALANCE;
   frequency = 0;
   nlnodes = lnnodes = banodes = nanodes = NULL;
   Y = Z = A = NULL;

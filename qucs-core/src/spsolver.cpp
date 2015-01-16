@@ -64,8 +64,7 @@
 namespace qucs {
 
 // Constructor creates an unnamed instance of the spsolver class.
-spsolver::spsolver () : analysis () {
-  type = ANALYSIS_SPARAMETER;
+spsolver::spsolver () : analysis ("",analysis::analysis_type::ANALYSIS_SPARAMETER) {
   swp = NULL;
   saveCVs = 0;
   noise = 0;
@@ -75,8 +74,7 @@ spsolver::spsolver () : analysis () {
 }
 
 // Constructor creates a named instance of the spsolver class.
-spsolver::spsolver (char * n) : analysis (n) {
-  type = ANALYSIS_SPARAMETER;
+spsolver::spsolver (const std::string &n) : analysis (n,analysis::analysis_type::ANALYSIS_SPARAMETER) {
   swp = NULL;
   saveCVs = 0;
   noise = 0;

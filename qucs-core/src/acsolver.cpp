@@ -44,16 +44,16 @@ namespace qucs {
 // Constructor creates an unnamed instance of the acsolver class.
 acsolver::acsolver () : nasolver<nr_complex_t> () {
   swp = NULL;
-  type = ANALYSIS_AC;
+  type = analysis_type::ANALYSIS_AC;
   setDescription ("AC");
   xn = NULL;
   noise = 0;
 }
 
 // Constructor creates a named instance of the acsolver class.
-acsolver::acsolver (char * n) : nasolver<nr_complex_t> (n) {
+acsolver::acsolver (const std::string& n) : nasolver<nr_complex_t> (n) {
   swp = NULL;
-  type = ANALYSIS_AC;
+  type = analysis_type::ANALYSIS_AC;
   setDescription ("AC");
   xn = NULL;
   noise = 0;
