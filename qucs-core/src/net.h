@@ -49,7 +49,7 @@ class net : public object
   circuit * drop;
   circuit * root;
   std::vector<analysis *> actions;
-  ptrlist<analysis> * orgacts;
+  std::vector<analysis *> orgacts;
   environment * env;
   int nPorts;
   int nSources;

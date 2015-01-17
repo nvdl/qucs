@@ -54,22 +54,20 @@
 namespace qucs {
 
 // Constructor creates an unnamed instance of the net class.
-  net::net () : object (), actions() {
+  net::net () : object (), actions(), orgacts() {
   root = drop = NULL;
   nPorts = nCircuits = nSources = 0;
   insertedNodes = inserted = reduced = 0;
-  orgacts = new ptrlist<analysis> ();
   env = NULL;
   nset = NULL;
   srcFactor = 1;
 }
 
 // Constructor creates a named instance of the net class.
-  net::net (const std::string &n) : object (n), actions() {
+  net::net (const std::string &n) : object (n), actions(), orgacts() {
   root = drop = NULL;
   nPorts = nCircuits = nSources = 0;
   insertedNodes = inserted = reduced = 0;
-  orgacts = new ptrlist<analysis> ();
   env = NULL;
   nset = NULL;
   srcFactor = 1;
@@ -84,24 +82,25 @@ net::~net () {
     delete c;
   }
   // delete original actions 
-  for(auto * element : *orgacts) {
+  for(auto * element : orgacts) {
     delete element;
     element = nullptr;
   }
 
-  delete orgacts;
+  orgacts.clear();
   // delete nodeset
   delNodeset ();
 }
 
 /* The copy constructor creates a new instance of the net class based
-   on the given net object. */
-net::net (net & n) : object (n) {
+   on the given net object. 
+   TODO: why clearing orgacts ?
+*/
+  net::net (net & n) : object (n), orgacts() {
   root = drop = NULL;
   nPorts = nCircuits = nSources = 0;
   insertedNodes = inserted = reduced = 0;
   actions = n.actions;
-  orgacts = new ptrlist<analysis> ();
   env = n.env;
   nset = NULL;
   srcFactor = 1;
@@ -182,8 +181,8 @@ int net::containsCircuit (circuit * cand) {
 /* This function prepends the given analysis to the list of registered
    analyses. */
 void net::insertAnalysis (analysis * a) {
-  orgacts->push_front (a);
-  actions.insert (actions.begin(),a);
+  orgacts.insert(orgacts.begin(),a);
+  actions.insert(actions.begin(),a);
 }
 
 /* The function removes the given analysis from the list of registered
