@@ -105,7 +105,7 @@ public:
     * Constructor. Creates an instance of the analysis class
     * from an existing analysis object.
     */
-    analysis (analysis &);
+    analysis (analysis &) = default;
 
     /*! \fn ~analysis
     * \brief Destructor

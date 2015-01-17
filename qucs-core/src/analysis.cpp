@@ -76,18 +76,6 @@ analysis::analysis (const std::string &n) : object (n), actions(), type(analysis
   progress = true;
 }
 
-
-/* The copy constructor creates a new instance of the analysis class
-   based on the given analysis object. */
-  analysis::analysis (analysis & a) : object (a), type(a.type) {
-  data = a.data;
-  subnet = a.subnet;
-  env = a.env;
-  actions = a.actions;
-  runs = a.runs;
-  progress = a.progress;
-}
-
 /* This function adds the given analysis to the actions being
    associated with the current analysis object. */
 void analysis::addAnalysis (analysis * a) {
