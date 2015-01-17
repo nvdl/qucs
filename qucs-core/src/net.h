@@ -63,16 +63,15 @@ class net : public object
   net (const std::string &);
   net (net &);
   ~net ();
-  circuit * getRoot (void) { return root; }
+  circuit * getRoot (void) const { return root; }
   void setRoot (circuit * c) { root = c; }
   void insertCircuit (circuit *);
   void removeCircuit (circuit *, int dropping = 1);
-  int  containsCircuit (circuit *);
-  int  checkCircuitChain (void);
+  int  containsCircuit (circuit *) const;
   void list (void);
   void reducedCircuit (circuit *);
-  node * findConnectedNode (node *);
-  node * findConnectedCircuitNode (node *);
+  node * findConnectedNode (node *) const;
+  node * findConnectedCircuitNode (node *) const;
   void insertedCircuit (circuit *);
   void insertedNode (node *);
   void insertAnalysis (analysis *);
@@ -80,31 +79,31 @@ class net : public object
   dataset * runAnalysis (int &);
   void getDroppedCircuits (nodelist * nodes = NULL);
   void deleteUnusedCircuits (nodelist * nodes = NULL);
-  int  getPorts (void) { return nPorts; }
-  int  getReduced (void) { return reduced; }
+  int  getPorts (void) const { return nPorts; }
+  int  getReduced (void) const { return reduced; }
   void setReduced (int r) { reduced = r; }
-  int  getVoltageSources (void) { return nSources; }
+  int  getVoltageSources (void) const { return nSources; }
   void setVoltageSources (int n) { nSources = n; }
   analysis * findAnalysis (const std::string &) const;
-  analysis * findAnalysis (analysis::analysis_type);
-  analysis * findSecondOrder (void);
-  analysis * getChildAnalysis (analysis *);
+  analysis * findAnalysis (analysis::analysis_type) const;
+  analysis * findSecondOrder (void) const;
+  analysis * getChildAnalysis (analysis *) const;
   const char * getChild (analysis *) const;
   void orderAnalysis (void);
-  analysis * findLastOrder (analysis *);
-  const auto findLastOrderChildren (analysis * a)  -> decltype(actions) &;
+  analysis * findLastOrder (analysis *) const;
+  auto findLastOrderChildren (analysis * a)  const -> const decltype(actions) &;
   void sortChildAnalyses (analysis *);
-  int  containsAnalysis (analysis *, analysis::analysis_type);
-  environment * getEnv (void) { return env; }
+  int  containsAnalysis (analysis *, analysis::analysis_type) const;
+  environment * getEnv (void) const { return env; }
   void setEnv (environment * e) { env = e; }
-  int  countPorts (void);
-  int  countNodes (void);
-  int  isNonLinear (void);
+  int  countPorts (void) const;
+  int  countNodes (void) const;
+  int  isNonLinear (void) const;
   void addNodeset (nodeset *);
   void delNodeset (void);
   nodeset * getNodeset (void) { return nset; }
   void setSrcFactor (nr_double_t f) { srcFactor = f; }
-  nr_double_t getSrcFactor (void) { return srcFactor; }
+  nr_double_t getSrcFactor (void) const { return srcFactor; }
   void setActionNetAll(net *);
 };
 

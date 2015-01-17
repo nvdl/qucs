@@ -172,7 +172,7 @@ void net::removeCircuit (circuit * c, int dropping) {
 
 /* The function returns non-zero if the given circuit is already part
    of the netlist. It returns zero if not. */
-int net::containsCircuit (circuit * cand) {
+int net::containsCircuit (circuit * cand) const {
   for (circuit * c = root; c != NULL; c = (circuit *) c->getNext ())
     if (c == cand) return 1;
   return 0;
@@ -206,7 +206,7 @@ analysis * net::findAnalysis (const std::string &n) const {
 /* The function returns the analysis associated with the netlist
    object specified by the given type of analysis and returns NULL if
    there is no such analysis. */
-analysis * net::findAnalysis (analysis::analysis_type type) {
+analysis * net::findAnalysis (analysis::analysis_type type) const {
   const auto &it = std::find_if(actions.cbegin(),actions.cend(),
 				[type](decltype(*actions.cbegin())&action) { return action->getType() == type; });
   if (it == actions.cend()) {
@@ -216,7 +216,7 @@ analysis * net::findAnalysis (analysis::analysis_type type) {
 }
 
 /* Looks recursively for a type of analysis. */
-int net::containsAnalysis (analysis * child, analysis::analysis_type type) {
+int net::containsAnalysis (analysis * child, analysis::analysis_type type) const {
   for (auto *a : child->actions) {
     if (a->getType () == type)
       return 1;
@@ -273,7 +273,7 @@ dataset * net::runAnalysis (int &err) {
 
 /* The function returns the analysis with the second lowest order.  If
    there is no recursive sweep it returns NULL. */
-analysis * net::findSecondOrder (void) {
+analysis * net::findSecondOrder (void) const {
   analysis * parent = NULL;
   for (auto *a : actions) {
     // parameter sweeps are potential parent sweeps
@@ -359,12 +359,12 @@ const char * net::getChild (analysis * parent) const {
 }
 
 // Returns the child analysis of the given parent if possible.
-analysis * net::getChildAnalysis (analysis * parent) {
+analysis * net::getChildAnalysis (analysis * parent) const {
   return findAnalysis (getChild (parent));
 }
 
 // Returns the last order sweep being not an parameter sweep.
-analysis * net::findLastOrder (analysis * a) {
+analysis * net::findLastOrder (analysis * a) const {
   analysis * child = a->actions.empty() ? a->actions.front() : nullptr;
   if (child != NULL && child->getType () == analysis::analysis_type::ANALYSIS_SWEEP) {
     return findLastOrder (child);
@@ -373,12 +373,12 @@ analysis * net::findLastOrder (analysis * a) {
 }
 
 // Returns the last order sweep being not an parameter sweep.
-const auto net::findLastOrderChildren (analysis * a)  -> decltype(actions) & {
+auto net::findLastOrderChildren (analysis * a) const  -> const decltype(actions) & {
   analysis * child = a->actions.empty() ? a->actions.front() : nullptr;
   if (child != NULL && child->getType () == analysis::analysis_type::ANALYSIS_SWEEP) {
     return findLastOrderChildren (child);
   }
-  return actions;
+  return this->actions;
 }
 
 /* The function re-shifts all circuits in the drop list to the actual
@@ -409,7 +409,7 @@ void net::deleteUnusedCircuits (nodelist * nodes) {
 /* Returns the first node in the list of real circuit objects
    connected to the given node.  If there is no such node (unconnected
    node) the function returns NULL. */
-node * net::findConnectedCircuitNode (node * n) {
+node * net::findConnectedCircuitNode (node * n) const {
 
   const char * _name = n->getName ();
   node * _node;
@@ -434,7 +434,7 @@ node * net::findConnectedCircuitNode (node * n) {
 /* Returns the first node in the list of circuit objects (including
    signals) connected to the given node.  If there is no such node
    (unconnected node) the function returns NULL. */
-node * net::findConnectedNode (node * n) {
+node * net::findConnectedNode (node * n) const {
 
   const char * _name = n->getName ();
   node * _node;
@@ -476,31 +476,10 @@ void net::insertedNode (node * c) {
   c->setName (n);
 }
 
-/* This helper function checks whether the circuit chain of the
-   netlist is properly working.  It returns the number of errors or
-   zero if there are no errors. */
-int net::checkCircuitChain (void) {
-  int error = 0;
-  for (circuit * c = root; c != NULL; c = (circuit *) c->getNext ()) {
-    if (c->getPrev ())
-      if (c->getPrev()->getNext () != c) {
-	error++;
-	logprint (LOG_ERROR, "ERROR: prev->next != circuit '%s'\n",
-		  c->getName ());
-      }
-    if (c->getNext ())
-      if (c->getNext()->getPrev () != c) {
-	error++;
-	logprint (LOG_ERROR, "ERROR: next->prev != circuit '%s'\n",
-		  c->getName ());
-      }
-  }
-  return error;
-}
 
 /* This function counts the number of signals (ports) within the list
    of registerd circuits. */
-int net::countPorts (void) {
+int net::countPorts (void) const {
   int count = 0;
   for (circuit * c = root; c != NULL; c = (circuit *) c->getNext ()) {
     if (c->getPort ()) count++;
@@ -510,7 +489,7 @@ int net::countPorts (void) {
 
 /* This function counts the number of circuits within the list of
    registered circuits. */
-int net::countNodes (void) {
+int net::countNodes (void) const {
   int count = 0;
   for (circuit * c = root; c != NULL; c = (circuit *) c->getNext ()) {
     if (!c->getPort ()) count += c->getSize ();
@@ -520,7 +499,7 @@ int net::countNodes (void) {
 
 /* The function returns the number of non-linear circuits within the
    list of registered circuits. */
-int net::isNonLinear (void) {
+int net::isNonLinear (void) const {
   int count = 0;
   for (circuit * c = root; c != NULL; c = (circuit *) c->getNext ()) {
     if (c->isNonLinear ()) count++;
