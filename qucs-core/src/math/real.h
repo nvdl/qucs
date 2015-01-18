@@ -171,8 +171,8 @@ inline nr_double_t sqrt (const nr_double_t d) {
   return std::sqrt (d);
 }
 
-#ifdef HAVE_STD_HYPOT
-inline nr_double_t xhypot (const nr_double_t, const nr_double_t ) {
+#ifdef HAVE_CXX_STD_NUMERICAL_HYPOT
+inline nr_double_t xhypot (const nr_double_t a, const nr_double_t b) {
   return std::hypot(a,b);
 }
 #else
@@ -200,7 +200,7 @@ inline nr_double_t ceil(const nr_double_t arg) {
 inline nr_double_t floor(const nr_double_t arg) {
   return std::floor(arg);
 }
-#ifdef HAVE_STD_FMOD
+#ifdef HAVE_CXX_STD_NUMERICAL_FMOD
 inline nr_double_t fmod(const nr_double_t arg1,const nr_double_t arg2) {
   return std::fmod(arg1,arg2);
 }

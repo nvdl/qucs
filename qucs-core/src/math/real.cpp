@@ -147,7 +147,7 @@ nr_double_t trunc( nr_double_t arg) {
 #endif
 }
 #endif
-#ifndef HAVE_STD_ROUND
+#ifndef HAVE_CXX_STD_NUMERICAL_ROUND
 nr_double_t round( nr_double_t arg) {
 #if HAVE_ROUND
   return ::round (arg);
