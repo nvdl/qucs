@@ -116,7 +116,7 @@ namespace qucs {
     };
     /*! check if all flags are set */
     bool all() const noexcept {
-      return this.bit.all();
+      return this->bit.all();
     };
     /*! set all flags */
     flags<T>& set(void) noexcept {
