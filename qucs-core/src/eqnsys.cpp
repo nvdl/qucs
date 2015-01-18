@@ -535,7 +535,7 @@ void eqnsys<nr_type_t>::solve_iterative (void) {
   // normalize the equation system to have ones on its diagonal
   for (r = 0; r < N; r++) {
     f = A_(r, r);
-    assert (f != 0); // singular matrix
+    assert (f != 0.0); // singular matrix
     for (c = 0; c < N; c++) A_(r, c) /= f;
     B_(r) /= f;
   }
@@ -624,7 +624,7 @@ void eqnsys<nr_type_t>::solve_sor (void) {
   // normalize the equation system to have ones on its diagonal
   for (r = 0; r < N; r++) {
     f = A_(r, r);
-    assert (f != 0); // singular matrix
+    assert (f != 0.0); // singular matrix
     for (c = 0; c < N; c++) A_(r, c) /= f;
     B_(r) /= f;
   }
@@ -723,7 +723,7 @@ void eqnsys<nr_type_t>::ensure_diagonal_MNA (void) {
     restart = exchanged = 0;
     /* search for zero diagonals with lone pairs */
     for (i = begin; i < N; i++) {
-      if (A_(i, i) == 0) {
+      if (A_(i, i) == 0.0) {
 	pairs = countPairs (i, pivot1, pivot2);
 	if (pairs == 1) { /* lone pair found, substitute rows */
 	  A->exchangeRows (i, pivot1);
@@ -740,7 +740,7 @@ void eqnsys<nr_type_t>::ensure_diagonal_MNA (void) {
     /* all lone pairs are gone, look for zero diagonals with multiple pairs */
     if (restart) {
       for (i = begin; !exchanged && i < N; i++) {
-	if (A_(i, i) == 0) {
+	if (A_(i, i) == 0.0) {
 	  pairs = countPairs (i, pivot1, pivot2);
 	  A->exchangeRows (i, pivot1);
 	  B->exchangeRows (i, pivot1);
@@ -1029,7 +1029,7 @@ void eqnsys<nr_type_t>::substitute_qr_householder (void) {
 
   // form the new right hand side Q'B
   for (c = 0; c < N; c++) {
-    if (T_(c) != 0) {
+    if (T_(c) != 0.0) {
       // scalar product u' * B
       for (f = B_(c), r = c + 1; r < N; r++) f += cond_conj (A_(r, c)) * B_(r);
       // z - T * f * u
@@ -1068,7 +1068,7 @@ void eqnsys<nr_type_t>::substitute_qr_householder_ls (void) {
 
   // compute the least square solution QX
   for (c = N - 1; c >= 0; c--) {
-    if (T_(c) != 0) {
+    if (T_(c) != 0.0) {
       // scalar product u' * B
       for (f = B_(c), r = c + 1; r < N; r++) f += cond_conj (A_(r, c)) * B_(r);
       // z - T * f * u_k
@@ -1094,7 +1094,7 @@ nr_type_t eqnsys<nr_type_t>::householder_create_left (int c) {
   nr_type_t a, b, t;
   nr_double_t s, g;
   s = euclidian_c (c, c + 1);
-  if (s == 0 && imag (A_(c, c)) == 0) {
+  if (s == 0.0 && imag (A_(c, c)) == 0.0) {
     // no reflection necessary
     t = 0;
   }
@@ -1120,7 +1120,7 @@ nr_type_t eqnsys<nr_type_t>::householder_left (int c) {
   // compute householder vector
   nr_type_t t = householder_create_left (c);
   // apply householder transformation to remaining columns if necessary
-  if (t != 0) {
+  if (t != 0.0) {
     householder_apply_left (c, t);
   }
   return t;
@@ -1135,7 +1135,7 @@ nr_type_t eqnsys<nr_type_t>::householder_right (int r) {
   // compute householder vector
   nr_type_t t = householder_create_right (r);
   // apply householder transformation to remaining rows if necessary
-  if (t != 0) {
+  if (t != 0.0) {
     householder_apply_right (r, t);
   }
   return t;
@@ -1152,7 +1152,7 @@ nr_type_t eqnsys<nr_type_t>::householder_create_right (int r) {
   nr_type_t a, b, t;
   nr_double_t s, g;
   s = euclidian_r (r, r + 2);
-  if (s == 0 && imag (A_(r, r + 1)) == 0) {
+  if (s == 0.0 && imag (A_(r, r + 1)) == 0.0) {
     // no reflection necessary
     t = 0;
   }

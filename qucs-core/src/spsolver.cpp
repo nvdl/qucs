@@ -122,7 +122,7 @@ circuit * spsolver::interconnectJoin (node * n1, node * n2) {
     s->getS (k, k) * s->getS (l, l);
 
   // avoid singularity when two full reflective ports are interconnected
-  nr_double_t tiny1 = (d == 0) ? 1.0 - TINYS : 1.0;
+  nr_double_t tiny1 = (d == 0.0) ? 1.0 - TINYS : 1.0;
   nr_double_t tiny2 = tiny1 * tiny1;
   nr_double_t tiny3 = tiny1 * tiny2;
   d = (1.0 - s->getS (k, l) * tiny1) * (1.0 - s->getS (l, k) * tiny1) -
@@ -184,7 +184,7 @@ circuit * spsolver::connectedJoin (node * n1, node * n2) {
   nr_complex_t d = 1.0 - s->getS (k, k) * t->getS (l, l);
 
   // avoid singularity when two full reflective ports are connected
-  nr_double_t tiny1 = (d == 0) ? 1.0 - TINYS : 1.0;
+  nr_double_t tiny1 = (d == 0.0) ? 1.0 - TINYS : 1.0;
   nr_double_t tiny2 = tiny1 * tiny1;
   nr_double_t tiny3 = tiny1 * tiny2;
   d = 1.0 - s->getS (k, k) * t->getS (l, l) * tiny2;
@@ -285,7 +285,7 @@ void spsolver::noiseInterconnect (circuit * result, node * n1, node * n2) {
     c->getS (k, k) * c->getS (l, l);
 
   // avoid singularity when two full reflective ports are interconnected
-  nr_double_t tiny1 = (t == 0) ? 1.0 - TINYS : 1.0;
+  nr_double_t tiny1 = (t == 0.0) ? 1.0 - TINYS : 1.0;
   nr_double_t tiny2 = tiny1 * tiny1;
   t = (1.0 - c->getS (k, l) * tiny1) * (1.0 - c->getS (l, k) * tiny1) -
     c->getS (k, k) * c->getS (l, l) * tiny2;
@@ -351,7 +351,7 @@ void spsolver::noiseConnect (circuit * result, node * n1, node * n2) {
   nr_complex_t t = 1.0 - c->getS (k, k) * d->getS (l, l);
 
   // avoid singularity when two full reflective ports are connected
-  nr_double_t tiny1 = (t == 0) ? 1.0 - TINYS : 1.0;
+  nr_double_t tiny1 = (t == 0.0) ? 1.0 - TINYS : 1.0;
   nr_double_t tiny2 = tiny1 * tiny1;
   nr_double_t tiny3 = tiny1 * tiny2;
   nr_double_t tiny4 = tiny1 * tiny3;

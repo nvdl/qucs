@@ -46,244 +46,82 @@
 
 namespace qucs {
 
-//
-// trigonometric complex
-//
-
-/*! \brief Compute complex cosine
-    \param[in] z complex angle
-    \return cosine of z
-*/
-nr_complex_t cos (const nr_complex_t z) {
-    return std::cos (z);
-}
-
-
-/*! \brief Compute complex sine
-    \param[in] z complex angle
-    \return sine of z
-*/
-nr_complex_t sin (const nr_complex_t z) {
-    return std::sin (z);
-}
-
-
-/*! \brief Compute complex tangent
-    \param[in] z complex angle
-    \return tangent of z
-*/
-nr_complex_t tan (const nr_complex_t z) {
-    return std::tan (z);
-}
-
-
+#ifndef HAVE_CXX_COMPLEX_ACOS
 /*! \brief Compute complex arc cosine
     \param[in] z complex arc
     \return arc cosine of z
 */
 nr_complex_t acos (const nr_complex_t z) {
-#ifdef HAVE_CXX_COMPLEX_ACOS
-    return std::acos (z);
-#else
     // missing on OSX 10.6
     nr_double_t r = real (z);
     nr_double_t i = imag (z);
     nr_complex_t y = sqrt (z * z - 1.0);
     if (r * i < 0.0) y = -y;
     return nr_complex_t (0, -1.0) * log (z + y);
-#endif
 }
+#endif
 
-
+#ifndef HAVE_CXX_COMPLEX_ASIN
 /*! \brief Compute complex arc sine
     \param[in] z complex arc
     \return arc sine of z
 */
 nr_complex_t asin (const nr_complex_t z) {
-#ifdef HAVE_CXX_COMPLEX_ASIN
-    return std::asin (z);
-#else
     // missing on OSX 10.6
     nr_double_t r = real (z);
     nr_double_t i = imag (z);
     return nr_complex_t (0.0, -1.0) * log (nr_complex_t (-i, r) + sqrt (1.0 - z * z));
-#endif
 }
+#endif
 
+#ifndef HAVE_CXX_COMPLEX_ATAN
 /*! \brief Compute complex arc tangent
     \param[in] z complex arc
     \return arc tangent of z
 */
 nr_complex_t atan (const nr_complex_t z) {
-#ifdef HAVE_CXX_COMPLEX_ATAN
-    return std::atan (z);
-#else
     // missing on OSX 10.6
     return nr_complex_t (0.0, -0.5) * log (nr_complex_t (0, 2) / (z + nr_complex_t (0, 1)) - 1.0);
-#endif
 }
-
+#endif
 
 //
 // hyperbolic complex
 //
 
-/*! \brief Compute complex hyperbolic cosine
-    \param[in] z complex arc
-    \return hyperbolic cosine of z
-*/
-nr_complex_t cosh (const nr_complex_t z) {
-    return std::cosh (z);
-}
-
-
-/*! \brief Compute complex hyperbolic sine
-    \param[in] z complex arc
-    \return hyperbolic sine of z
-*/
-nr_complex_t sinh (const nr_complex_t z) {
-    return std::sinh (z);
-}
-
-
-/*! \brief Compute complex hyperbolic tangent
-    \param[in] z complex arc
-    \return hyperbolic tangent of z
-*/
-nr_complex_t tanh (const nr_complex_t z) {
-    return std::tanh (z);
-}
-
-
+#ifndef HAVE_CXX_COMPLEX_ACOSH
 /*! \brief Compute complex arc hyperbolic cosine
     \param[in] z complex arc
     \return arc hyperbolic cosine of z
 */
 nr_complex_t acosh (const nr_complex_t z) {
-#ifdef HAVE_CXX_COMPLEX_ACOSH
-    return std::acosh (z);
-#else
     return log (z + sqrt (z * z - 1.0));
-#endif
 }
+#endif
 
-
+#ifndef HAVE_CXX_COMPLEX_ASINH
 /*! \brief Compute complex arc hyperbolic sine
     \param[in] z complex arc
     \return arc hyperbolic sine of z
 */
 nr_complex_t asinh (const nr_complex_t z) {
-#ifdef HAVE_CXX_COMPLEX_ACOSH
-    return std::asinh (z);
-#else
     return log (z + sqrt (z * z + 1.0));
-#endif
 }
+#endif
 
-
+#ifndef HAVE_CXX_COMPLEX_ATANH
 /*! \brief Compute complex arc hyperbolic tangent
     \param[in] z complex arc
     \return arc hyperbolic tangent of z
 */
 nr_complex_t atanh (const nr_complex_t z) {
-#ifdef HAVE_CXX_COMPLEX_ATANH
-    return std::atanh (z);
-#else
     return 0.5 * log ( 2.0 / (1.0 - z) - 1.0);
-#endif
 }
-
+#endif
 
 //
 // transcendentals overloads
 //
-
-/*! \brief Compute complex exponential
-    \param[in] z complex number
-    \return exponential of z
-*/
-nr_complex_t exp (const nr_complex_t z)
-{
-    nr_double_t mag = exp (real (z));
-    return nr_complex_t (mag * cos (imag (z)), mag * sin (imag (z)));
-}
-
-/*! \brief Compute principal value of natural logarithm of z
-    \param[in] z complex number
-    \return principal value of natural logarithm of z
-*/
-nr_complex_t log (const nr_complex_t z)
-{
-    nr_double_t phi = arg (z);
-    return nr_complex_t (log (abs (z)), phi);
-}
-
-/*! \brief Compute principal value of decimal logarithm of z
-    \param[in] z complex number
-    \return principal value of decimal logarithm of z
-*/
-nr_complex_t log10 (const nr_complex_t z)
-{
-    nr_double_t phi = arg (z);
-    return nr_complex_t (log10 (abs (z)), phi * M_LOG10E);
-}
-
-
-/*!\brief Compute power function with real exponent
-
-   \param[in] z complex mantisse
-   \param[in] d real exponent
-   \return z power d (\f$z^d\f$)
-*/
-nr_complex_t pow (const nr_complex_t z, const nr_double_t d) {
-    return std::pow (z, d);
-}
-
-/*!\brief Compute power function with complex exponent but real mantisse
-
-   \param[in] d real mantisse
-   \param[in] z complex exponent
-   \return d power z (\f$d^z\f$)
-*/
-nr_complex_t pow (const nr_double_t d, const nr_complex_t z) {
-    return std::pow (d, z);
-}
-
-/*!\brief Compute complex power function
-
-   \param[in] z1 complex mantisse
-   \param[in] z2 complex exponent
-   \return d power z (\f$z_1^{z_2}\f$)
-*/
-nr_complex_t pow (const nr_complex_t z1, const nr_complex_t z2) {
-    return std::pow (z1, z2);
-}
-
-
-/*!\brief Compute principal value of square root
-
-    Compute the square root of a given complex number (except negative
-    real), and with a branch cut along the negative real  axis.
-
-   \param[in] z complex number
-   \return principal value of square root z
-*/
-nr_complex_t sqrt (const nr_complex_t z)
-{
-    return std::sqrt (z);
-}
-
-
-/*!\brief Compute euclidian norm of complex number
-
-   Compute \f$(\Re\mathrm{e}\;z )^2+ (\Im\mathrm{m}\;z)^2=|z|^2\f$
-   \param[in] z Complex number
-   \return Euclidian norm of z
-*/
-nr_double_t norm (const nr_complex_t z)
-{
-    return std::norm (z);
-}
 
 
 //
@@ -404,7 +242,7 @@ nr_complex_t log2 (const nr_complex_t z)
 
     compute \f[
     \mathrm{signum}\;z= \mathrm{signum} (re^{i\theta})
-                     = \begin{cases}
+		     = \begin{cases}
 		       0 & \text{if } z=0 \\
 		       e^{i\theta} & \text{else}
 		       \end{cases}
@@ -423,7 +261,7 @@ nr_complex_t signum (const nr_complex_t z)
 
     compute \f[
     \mathrm{sign}\;z= \mathrm{sign} (re^{i\theta})
-                     = \begin{cases}
+		     = \begin{cases}
 		       1 & \text{if } z=0 \\
 		       e^{i\theta} & \text{else}
 		       \end{cases}
@@ -467,11 +305,11 @@ nr_double_t xhypot (const nr_complex_t a, const nr_complex_t b)
     nr_double_t c = norm (a);
     nr_double_t d = norm (b);
     if (c > d)
-        return abs (a) * std::sqrt (1.0 + d / c);
+	return abs (a) * std::sqrt (1.0 + d / c);
     else if (d == 0.0)
-        return 0.0;
+	return 0.0;
     else
-        return abs (b) * std::sqrt (1.0 + c / d);
+	return abs (b) * std::sqrt (1.0 + c / d);
 }
 
 /*!\brief Euclidean distance function for a double b complex */
@@ -542,7 +380,7 @@ nr_complex_t limexp (const nr_complex_t z)
   return nr_complex_t (mag * cos (imag (z)), mag * sin (imag (z)));
 }
 
-
+#ifndef HAVE_CXX_COMPLEX_POLAR
 /*!\brief Construct a complex number using polar notation
    \param[in] mag Magnitude
    \param[in] ang Angle
@@ -550,12 +388,9 @@ nr_complex_t limexp (const nr_complex_t z)
 */
 nr_complex_t polar (const nr_double_t mag, const nr_double_t ang )
 {
-#ifdef HAVE_CXX_COMPLEX_POLAR_COMPLEX
-    return std::polar (mag, ang);
-#else
     return nr_complex_t (mag * cos (ang), mag * sin (ang));
-#endif
 }
+#endif
 
 /*!\brief Extension of polar construction to complex
    \param[in] a Magnitude
@@ -693,17 +528,17 @@ nr_complex_t step (const nr_complex_t z)
     nr_double_t x = real (z);
     nr_double_t y = imag (z);
     if (x < 0.0)
-        x = 0.0;
+	x = 0.0;
     else if (x > 0.0)
-        x = 1.0;
+	x = 1.0;
     else
-        x = 0.5;
+	x = 0.5;
     if (y < 0.0)
-        y = 0.0;
+	y = 0.0;
     else if (y > 0.0)
-        y = 1.0;
+	y = 1.0;
     else
-        y = 0.5;
+	y = 0.5;
     return nr_complex_t (x, y);
 }
 
@@ -845,28 +680,6 @@ nr_complex_t operator%(const nr_double_t r1, const nr_complex_t z2)
 }
 
 
-/*!\brief Equality of two complex
-  \todo Why not inline
-  \note Like equality of double this test
-        is meaningless in finite precision
-	Use instead fabs(x-x0) < tol
-*/
-bool operator==(const nr_complex_t z1, const nr_complex_t z2)
-{
-    return (std::real (z1) == std::real (z2)) && (std::imag (z1) == std::imag (z2));
-}
-
-/*!\brief Inequality of two complex
-  \todo Why not inline
-  \note Like inequality of double this test
-        is meaningless in finite precision
-	Use instead fabs(x-x0) > tol
-*/
-bool operator!=(const nr_complex_t z1, const nr_complex_t z2)
-{
-    return (std::real (z1) != std::real (z2)) || (std::imag (z1) != std::imag (z2));
-}
-
 /*!\brief Superior of equal
    \todo Why not inline
 */
@@ -900,4 +713,3 @@ bool operator<(const nr_complex_t z1, const nr_complex_t z2)
 }
 
 } // namespace qucs
-

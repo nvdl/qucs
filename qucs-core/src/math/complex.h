@@ -37,40 +37,107 @@ typedef std::complex<nr_double_t> nr_complex_t;
 
 namespace qucs {
 
-// see http://www.cplusplus.com/reference/complex/
+  // see http://www.cplusplus.com/reference/complex/
 
-//
-// trigonometric complex
-//
-nr_complex_t     cos (const nr_complex_t);
-nr_complex_t     sin (const nr_complex_t);
-nr_complex_t     tan (const nr_complex_t);
-nr_complex_t    acos (const nr_complex_t); //c++11
-nr_complex_t    asin (const nr_complex_t); //c++11
-nr_complex_t    atan (const nr_complex_t); //c++11
+  //
+  // trigonometric complex
+  //
+  inline nr_complex_t     cos (const nr_complex_t z) {
+    return std::cos(z);
+  };
+  inline nr_complex_t     sin (const nr_complex_t z) {
+    return std::sin(z);
+  }
+  inline nr_complex_t     tan (const nr_complex_t z) {
+    return std::tan(z);
+  };
+#ifdef HAVE_CXX_COMPLEX_ACOS
+  inline nr_complex_t    acos (const nr_complex_t z) {
+    return std::acos (z);
+  };
+#else
+  nr_complex_t     acos (const nr_complex_t z);
+#endif
+
+#ifdef HAVE_CXX_COMPLEX_ASIN
+  inline nr_complex_t    asin (const nr_complex_t z) {
+    return std::asin (z);
+  };
+#else
+  nr_complex_t    asin (const nr_complex_t z);
+#endif
+#ifdef HAVE_CXX_COMPLEX_ATAN
+  inline nr_complex_t    atan (const nr_complex_t z) {
+    return std::atan (z);
+  }
+#else
+  nr_complex_t    atan (const nr_complex_t z);
+#endif
 
 //
 // hyperbolic complex
 //
-nr_complex_t    cosh (const nr_complex_t);
-nr_complex_t    sinh (const nr_complex_t);
-nr_complex_t    tanh (const nr_complex_t);
-nr_complex_t   acosh (const nr_complex_t); //c++11
-nr_complex_t   asinh (const nr_complex_t); //c++11
-nr_complex_t   atanh (const nr_complex_t); //c++11
+  inline nr_complex_t    cosh (const nr_complex_t z) {
+    return std::cosh (z);
+  }
+  inline nr_complex_t    sinh (const nr_complex_t z) {
+    return std::sinh (z);
+  }
+  inline nr_complex_t    tanh (const nr_complex_t z) {
+    return std::tanh (z);
+  }
+#ifdef HAVE_CXX_COMPLEX_ACOSH
+  inline nr_complex_t   acosh (const nr_complex_t z) {
+    return std::acosh (z);
+  }
+#else
+  nr_complex_t   acosh (const nr_complex_t z);
+#endif
+#ifdef  HAVE_CXX_COMPLEX_ASINH
+  inline nr_complex_t   asinh (const nr_complex_t z) {
+    return std::asinh(z);
+  }
+#else
+  nr_complex_t   asinh (const nr_complex_t z);
+#endif
+#ifdef HAVE_CXX_COMPLEX_ATANH
+  inline nr_complex_t   atanh (const nr_complex_t z) {
+    return std::atanh (z);
+  }
+#else
+  nr_complex_t atanh (const nr_complex_t z);
+#endif
+
+
 
 //
 // transcendentals overloads
 //
-nr_complex_t     exp (const nr_complex_t);
-nr_complex_t     log (const nr_complex_t);
-nr_complex_t   log10 (const nr_complex_t);
-nr_complex_t     pow (const nr_complex_t, const nr_double_t);
-nr_complex_t     pow (const nr_double_t, const nr_complex_t);
-nr_complex_t     pow (const nr_complex_t, const nr_complex_t);
-nr_complex_t    sqrt (const nr_complex_t);
+  inline nr_complex_t     exp (const nr_complex_t z) {
+    return std::exp(z);
+  }
+  inline nr_complex_t     log (const nr_complex_t z) {
+    return std::log(z);
+  }
+  inline nr_complex_t   log10 (const nr_complex_t z) {
+    return std::log10(z);
+  }
+  inline nr_complex_t     pow (const nr_complex_t z, const nr_double_t d) {
+    return std::pow(z,d);
+  }
+  inline nr_complex_t     pow (const nr_double_t d, const nr_complex_t z) {
+    return std::pow(d,z);
+  }
+  inline nr_complex_t     pow (const nr_complex_t z1, const nr_complex_t z2) {
+    return std::pow(z1,z2);
+  }
+  inline nr_complex_t    sqrt (const nr_complex_t z) {
+    return std::sqrt(z);
+  }
 
-nr_double_t     norm (const nr_complex_t);
+  inline nr_double_t     norm (const nr_complex_t z) {
+    return std::norm(z);
+  }
 
 
 //
@@ -104,8 +171,13 @@ nr_complex_t trunc (const nr_complex_t);
 nr_double_t dB (const nr_complex_t);
 
 nr_complex_t limexp (const nr_complex_t);
-
-nr_complex_t   polar (const nr_double_t mag, const nr_double_t theta = 0.0);
+#ifdef HAVE_CXX_COMPLEX_POLAR
+  inline nr_complex_t   polar (const nr_double_t mag, const nr_double_t theta = 0.0) {
+    return std::polar(mag,theta);
+  }
+#else
+  nr_complex_t   polar (const nr_double_t mag, const nr_double_t theta = 0.0);
+#endif
 /// \bug are these needed/used?
 //nr_complex_t   polar (const nr_double_t a, const nr_complex_t p);
 //nr_complex_t   polar (const nr_complex_t a, const nr_double_t p = 0.0);
@@ -147,9 +219,6 @@ nr_complex_t operator % (const nr_complex_t, const nr_complex_t);
 nr_complex_t operator % (const nr_complex_t, const nr_double_t);
 nr_complex_t operator % (const nr_double_t, const nr_complex_t);
 
-// comparisons
-bool operator == (const nr_complex_t, const nr_complex_t);
-bool operator != (const nr_complex_t, const nr_complex_t);
 bool operator >= (const nr_complex_t, const nr_complex_t);
 bool operator <= (const nr_complex_t, const nr_complex_t);
 bool operator >  (const nr_complex_t, const nr_complex_t);
