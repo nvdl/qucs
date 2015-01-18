@@ -39,57 +39,189 @@ namespace qucs {
 //
 // trigonometric
 //
-nr_double_t    cos (const nr_double_t);
-nr_double_t    sin (const nr_double_t);
-nr_double_t    tan (const nr_double_t);
-nr_double_t   acos (const nr_double_t);
-nr_double_t   asin (const nr_double_t);
-nr_double_t   atan (const nr_double_t);
-nr_double_t  atan2 (const nr_double_t, const nr_double_t); //not used?, only for complex
+/*! \brief Compute cosine of an angle
+    \param[in] z angle in radians
+    \return cosine of z
+*/
+inline nr_double_t    cos (const nr_double_t arg) {
+  return std::cos(arg);
+}
+/*! \brief Compute sine of an angle
+    \param[in] z angle in radians
+    \return sine of z
+*/
+inline nr_double_t    sin (const nr_double_t arg) {
+   return std::sin (arg);
+};
 
+/*! \brief Compute tangent of an angle
+    \param[in] z angle in radians
+    \return tangent of z
+*/
+inline nr_double_t  tan (const nr_double_t arg) {
+  return std::tan (arg);
+}
+
+/*! \brief Compute arc cosine
+    \param[in] z arc
+    \return arc cosine of z
+*/
+inline nr_double_t  acos (const nr_double_t arg) {
+  return std::acos (arg);
+}
+
+/*! \brief Compute arc sine
+    \param[in] z arc
+    \return arc sine of z
+*/
+inline nr_double_t  asin (const nr_double_t arg) {
+  return std::asin (arg);
+}
+
+/*! \brief Compute arc tangent
+    \param[in] z arc
+    \return arc tangent of z
+*/
+inline nr_double_t  atan (const nr_double_t arg) {
+  return std::atan (arg);
+}
+
+/*! \brief Compute arc tangent with two parameters (fortran like function)
+    \param[in] x proportion of x-coordinate
+    \param[in] y proportion of y-coordinate
+    \return principal value of the arc tangent of y/x, expressed in radians.
+*/
+inline nr_double_t  atan2 (const nr_double_t x, const nr_double_t y) {
+  return std::atan2 (x,y);
+}
 
 //
 // hyperbolic
 //
-nr_double_t   cosh (const nr_double_t);
-nr_double_t   sinh (const nr_double_t);
-nr_double_t   tanh (const nr_double_t);
-nr_double_t  acosh (const nr_double_t); // c++11
-nr_double_t  asinh (const nr_double_t); // c++11
-nr_double_t  atanh (const nr_double_t); // c++11, not used?, only for complex
+/*! \brief Compute hyperbolic cosine
+    \param[in] z arc
+    \return hyperbolic cosine of z
+*/
+inline nr_double_t  cosh (const nr_double_t arg) {
+  return std::cosh (arg);
+}
+
+/*! \brief Compute hyperbolic sine
+    \param[in] z arc
+    \return hyperbolic sine of z
+*/
+inline nr_double_t  sinh (const nr_double_t arg) {
+  return std::sinh (arg);
+}
+
+/*! \brief Compute hyperbolic tangent
+    \param[in] z arc
+    \return hyperbolic tangent of z
+*/
+inline nr_double_t  tanh (const nr_double_t arg) {
+  return std::tanh (arg);
+}
+
+#ifdef HAVE_STD_ACOSH
+inline nr_double_t  acosh (const nr_double_t arg) {
+  return std::acosh (arg);
+}
+#else
+nr_double_t  acosh (const nr_double_t);
+#endif
+
+#ifdef HAVE_STD_ASINH
+inline nr_double_t  asinh (const nr_double_t arg) {
+  return std::asinh (arg);
+}
+#else
+ nr_double_t  asinh (const nr_double_t arg);
+ #endif
+
+#ifdef HAVE_STD_ATANH
+inline nr_double_t  atanh (const nr_double_t arg) {
+  return std::atanh (arg);
+}
+#else
+ nr_double_t  atanh (const nr_double_t arg);
+#endif
 
 
 //
 // exponential and logarithmic functions
 //
-nr_double_t exp (const nr_double_t);
-nr_double_t log (const nr_double_t);
-nr_double_t log10 (const nr_double_t);
+inline nr_double_t exp (const nr_double_t arg) {
+  return std::exp (arg);
+}
+inline nr_double_t log (const nr_double_t arg) {
+   return std::log(arg);
+}
+inline nr_double_t log10 (const nr_double_t arg) {
+  return std::log10(arg);
+}
 
 
 //
 // power functions
 //
-nr_double_t pow (const nr_double_t, const nr_double_t );
-nr_double_t sqrt (const nr_double_t );
-nr_double_t xhypot (const nr_double_t, const nr_double_t ); // same hypot in c++11?
+inline nr_double_t pow (const nr_double_t a, const nr_double_t b) {
+  return std::pow(a,b);
+}
+inline nr_double_t sqrt (const nr_double_t d) {
+  return std::sqrt (d);
+}
 
+#ifdef HAVE_STD_HYPOT
+inline nr_double_t xhypot (const nr_double_t, const nr_double_t ) {
+  return std::hypot(a,b);
+}
+#else
+ nr_double_t xhypot (const nr_double_t, const nr_double_t );
+#endif
 
 //
 // error functions
 //
-nr_double_t erf(const nr_double_t );
+#ifdef HAVE_STD_ERF
+ inline nr_double_t erf(const nr_double_t arg) {
+   return std::erf (arg);
+}
+#else
+nr_double_t erf(const nr_double_t arg);
+#endif
 
 
 //
 // rounding and remainder functions
 //
-nr_double_t ceil(const nr_double_t );
-nr_double_t floor(const nr_double_t );
-nr_double_t fmod(const nr_double_t ); //FIXME
-nr_double_t trunc(const nr_double_t ); // c++11
-nr_double_t round(const nr_double_t ); // c++11
+inline nr_double_t ceil(const nr_double_t arg) {
+  return std::ceil(arg);
+}
+inline nr_double_t floor(const nr_double_t arg) {
+  return std::floor(arg);
+}
+#ifdef HAVE_STD_FMOD
+inline nr_double_t fmod(const nr_double_t arg1,const nr_double_t arg2) {
+  return std::fmod(arg1,arg2);
+}
+#else
+nr_double_t fmod(const nr_double_t arg1,const nr_double_t arg2);
+#endif
 
+#ifdef HAVE_STD_TRUNC
+ inline nr_double_t trunc(const nr_double_t arg) {
+   return std::trunc(arg);
+ }
+#else
+ nr_double_t trunc(const nr_double_t arg);
+#endif
+#ifdef HAVE_STD_ROUND
+ inline nr_double_t round(const nr_double_t arg) {
+   return std::round(arg);
+ }
+#else
+ nr_double_t round(const nr_double_t arg);
+#endif
 //
 // Qucs extra trigonometric helper
 //
@@ -124,11 +256,11 @@ unsigned int factorial (unsigned int);
 //
 // overload complex manipulations on reals
 //
-nr_double_t   real (const nr_double_t);
-nr_double_t   imag (const nr_double_t);
+ inline nr_double_t   real (const nr_double_t d) { return d; };
+ inline nr_double_t   imag (const nr_double_t d) { (void) d;return 0.0; };
 nr_double_t   norm (const nr_double_t);
-nr_double_t   conj (const nr_double_t);
-nr_double_t   abs (const nr_double_t);
+inline nr_double_t   conj (const nr_double_t d) { return d; };
+ inline nr_double_t   abs (const nr_double_t d) { return std::abs(d); }
 
 } // namespace qucs
 
