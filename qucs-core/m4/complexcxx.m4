@@ -83,6 +83,45 @@ AC_CHECK_CXX_COMPLEX_FUNC($ac_func,
 done
 ])
 
+dnl equivalent of AC_CHECK_FUNC
+AC_DEFUN([AC_CHECK_CXX_STD_NUMERICAL_FUNC],
+[AS_VAR_PUSHDEF([ac_var], [ac_cv_cpp_std_numerical_func_$1])dnl
+ AC_CACHE_CHECK([for std::$1], [ac_var],
+[AC_LANG_PUSH([C++])
+ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+	              #include <cmath>
+                      #ifdef log2
+                      #undef log2
+                      #endif
+                      ]],
+                      [[
+                      double a=1;
+                      std::$1(a);
+                      return 0;  ]])],
+                   [AS_VAR_SET([ac_var], [yes])],
+                   [AS_VAR_SET([ac_var], [no])])
+  AC_LANG_POP([C++])
+  ])
+ AS_VAR_IF([ac_var], [yes], [$2], [$3])dnl
+ AS_VAR_POPDEF([ac_var])dnl
+])
+
+
+m4_define([_AH_CHECK_CXX_STD_NUMERICAL_FUNCS],
+[m4_foreach_w([AC_Func], [$1],
+   [AH_TEMPLATE(AS_TR_CPP([HAVE_CXX_STD_NUMERICAL_]m4_defn([AC_Func])),
+      [Define to 1 if you have the `]m4_defn([AC_Func])[' function in std namespace.])])])
+
+dnl equivalent of AC_CHECK_FUNCS
+AC_DEFUN([AC_CHECK_CXX_STD_NUMERICAL_FUNCS],
+[_AH_CHECK_CXX_STD_NUMERICAL_FUNCS([$1])dnl
+for ac_func in $1; do
+AC_CHECK_CXX_STD_NUMERICAL_FUNC($ac_func,
+              [AC_DEFINE_UNQUOTED(AS_TR_CPP([HAVE_CXX_STD_NUMERICAL_$ac_func])) $2],
+              [$3]);dnl
+done
+])
+
 dnl equivalent of AC_CHECK_FUNC, but for checking for
 dnl complex functions in the
 AC_DEFUN([AC_CHECK_CXX_COMPLEX_POW],
@@ -164,6 +203,57 @@ AS_VAR_IF([ac_var], [yes],
      [])dnl
 AS_VAR_POPDEF([ac_var])dnl
 ])
+
+dnl equivalent of AC_CHECK_FUNC
+AC_DEFUN([AC_CHECK_CXX_STD_NUMERICAL_FMOD],
+[AS_VAR_PUSHDEF([ac_var], [ac_cv_cpp_std_numerical_func_fmod])dnl
+ AC_CACHE_CHECK([for std::fmod], [ac_var],
+ [AC_LANG_PUSH(C++)
+  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+                       # include <cmath>
+                       ]],
+                       [[
+                       double x=1.0,y=1.0;
+                       (void)fmod(x,double(2.0));
+                       (void)fmod(x, y);
+                       (void)fmod(double(2.0), x);
+                       return 0;  ]])],
+                    [AS_VAR_SET([ac_var], [yes])],
+                    [AS_VAR_SET([ac_var], [no])])
+     AC_LANG_POP(C++)
+     ])
+AS_VAR_IF([ac_var], [yes],
+     [AC_DEFINE(HAVE_CXX_STD_NUMERICAL_FMOD, 1,
+                [Define to 1 if you have the std::fmod function.])],
+     [])dnl
+AS_VAR_POPDEF([ac_var])dnl
+])
+
+dnl equivalent of AC_CHECK_FUNC
+AC_DEFUN([AC_CHECK_CXX_STD_NUMERICAL_HYPOT],
+[AS_VAR_PUSHDEF([ac_var], [ac_cv_cpp_std_numerical_func_hypot])dnl
+ AC_CACHE_CHECK([for std::hypot], [ac_var],
+ [AC_LANG_PUSH(C++)
+  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+                       # include <cmath>
+                       ]],
+                       [[
+                       double x=1.0,y=1.0;
+                       (void) hypot(x,double(2.0));
+                       (void) hypot(x, y);
+                       (void) hypot(double(2.0), x);
+                       return 0;  ]])],
+                    [AS_VAR_SET([ac_var], [yes])],
+                    [AS_VAR_SET([ac_var], [no])])
+     AC_LANG_POP(C++)
+     ])
+AS_VAR_IF([ac_var], [yes],
+     [AC_DEFINE(HAVE_CXX_STD_NUMERICAL_HYPOT, 1,
+                [Define to 1 if you have the std::hypot function.])],
+     [])dnl
+AS_VAR_POPDEF([ac_var])dnl
+])
+
 
 
 dnl equivalent of AC_CHECK_FUNC

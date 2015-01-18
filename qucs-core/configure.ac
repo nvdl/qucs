@@ -798,61 +798,18 @@ AC_CHECK_CXX_COMPLEX_FMOD
 AC_CHECK_CXX_COMPLEX_POLAR
 AC_CHECK_CXX_COMPLEX_POLAR_COMPLEX
 
+AC_CHECK_CXX_STD_NUMERICAL_FUNCS([ \
+    acosh \
+    asinh \
+    atanh \
+    trunc \
+    round \
+    erf   \
+    erfc \
+])
 
-dnl Depending on the implementation, funcions may or may not be included on the std namespace
-AC_MSG_NOTICE([Check for functions in std:: namespace])
- for f in std::acosh std::asinh std::atanh std::hypot std::trunc std::round std::erf std::erfc; do
-    AC_MSG_CHECKING([for $f])
-    AC_LANG_PUSH([C++])
-    AC_LINK_IFELSE([AC_LANG_SOURCE(
-				  [[
-				  #include <cmath>
-				  int main() { return $f(0.7) ? 1 : 0; }
-				  ]])],
-      [AC_MSG_RESULT([yes])
-       if test $f = "std::acosh"; then
-	 AC_DEFINE(HAVE_STD_ACOSH, 1,
-		     [Define to 1 if you have the `std::acosh` function.])
-
-       elif test $f = "std::asinh"; then
-	 AC_DEFINE(HAVE_STD_ASINH, 1,
-	       [Define to 1 if you have the `std::asinh` function.])
-
-       elif test $f = "std::atanh"; then
-	 AC_DEFINE(HAVE_STD_ATANH, 1,
-	       [Define to 1 if you have the `std::atanh` function.])
-
-       elif test $f = "std::hypot"; then
-	 AC_DEFINE(HAVE_STD_HYPOT, 1,
-	       [Define to 1 if you have the `std::hypot` function.])
-
-       elif test $f = "std::fmod"; then
-	 AC_DEFINE(HAVE_STD_FMOD, 1,
-	 [Define to 1 if you have the `std::fmod` function.])
-
-       elif test $f = "std::trund"; then
-	 AC_DEFINE(HAVE_STD_TRUNC, 1,
-	 [Define to 1 if you have the `std::trunc` function.])
-
-       elif test $f = "std::round"; then
-	 AC_DEFINE(HAVE_STD_ROUND, 1,
-		     [Define to 1 if you have the `std::round` function.])
-
-       elif test $f = "std::erf"; then
-	 AC_DEFINE(HAVE_STD_ERF, 1,
-	       [Define to 1 if you have the `std::erf` function.])
-
-       elif test $f = "std::erfc"; then
-	 AC_DEFINE(HAVE_STD_ERFC, 1,
-	       [Define to 1 if you have the `std::erfc` function.])
-       fi],
-      [AC_MSG_RESULT([no])
-  ])
-  AC_LANG_POP([C++])
-  done
-
-
-
+AC_CHECK_CXX_STD_NUMERICAL_HYPOT
+AC_CHECK_CXX_STD_NUMERICAL_FMOD
 
 dnl Setup Google Test support
 dnl * copy of gtest source into qucs-core/lib/gtest/
@@ -946,7 +903,7 @@ dnl The release package should also keep it on the config.h
 AC_PATH_PROG([GIT],[git],[git])
 AS_IF([test -d "../.git"],
       [AS_IF([test X"$GIT" != "X"],
-             [AC_MSG_CHECKING([for git tree revision])
+	     [AC_MSG_CHECKING([for git tree revision])
 	      GIT_REVISION=`git log --pretty=format:'%h' -n 1u`
 	      AC_DEFINE([GIT_REVISION], ["GIT_REVISION"], [Git short revision hash.])
 	      AC_MSG_RESULT($GIT_REVISION)])])

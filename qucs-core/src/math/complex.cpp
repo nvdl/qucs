@@ -600,7 +600,7 @@ nr_complex_t i0 (const nr_complex_t z)
 */
 nr_complex_t erf (const nr_complex_t z)
 {
-#ifdef HAVE_STD_ERF
+#ifdef HAVE_CXX_STD_NUMERICAL_ERF
   nr_double_t zerf = std::erf (std::real (z)); // c++11
 #elif HAVE_ERF
   nr_double_t zerf = ::erf (std::real (z));
@@ -618,7 +618,7 @@ nr_complex_t erf (const nr_complex_t z)
 */
 nr_complex_t erfc (const nr_complex_t z)
 {
-#ifdef HAVE_STD_ERF
+#ifdef HAVE_CXX_STD_NUMERICAL_ERFC
   nr_double_t zerfc = std::erfc (std::real (z)); // c++11
 #elif HAVE_ERFC
   nr_double_t zerfc = ::erfc (std::real (z));

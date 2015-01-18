@@ -41,7 +41,7 @@ namespace qucs {
 // hyperbolic
 //
 
-#ifndef HAVE_STD_ACOSH
+#ifndef HAVE_CXX_STD_NUMERICAL_ACOSH
 /*! \brief Compute arc hyperbolic cosine
     \param[in] z arc
     \return arc hyperbolic cosine of z
@@ -55,7 +55,7 @@ nr_double_t  acosh (const nr_double_t arg) {
 }
 #endif
 
-#ifndef HAVE_STD_ASINH
+#ifndef HAVE_CXX_STD_NUMERICAL_ASINH
 /*! \brief Compute arc hyperbolic sine
     \param[in] z arc
     \return arc hyperbolic sine of z
@@ -70,7 +70,7 @@ nr_double_t asinh (const nr_double_t arg)
 }
 #endif
 
-#ifndef HAVE_STD_ATANH
+#ifndef HAVE_CXX_STD_NUMERICAL_ATANH
 /*! \brief Compute arc hyperbolic tangent
     \param[in] z arc
     \return arc hyperbolic tangent of z
@@ -85,7 +85,7 @@ nr_double_t atanh (const nr_double_t arg)
 }
 #endif
 
-#ifndef HAVE_STD_HYPOT
+#ifndef HAVE_CXX_STD_NUMERICAL_HYPOT
 /*!\brief Euclidean distance function
 
    The xhypot() function returns \f$\sqrt{a^2+b^2}\f$.
@@ -98,6 +98,9 @@ nr_double_t atanh (const nr_double_t arg)
    \return Euclidean distance from (0,0) to (a,b): \f$\sqrt{a^2+b^2}\f$
 */
 nr_double_t xhypot (const nr_double_t a, const nr_double_t b) {
+#ifdef HAVE_HYPOT
+  return ::hypot(a,b);
+#else
   nr_double_t c = fabs (a);
   nr_double_t d = fabs (b);
   if (c > d) {
@@ -112,12 +115,12 @@ nr_double_t xhypot (const nr_double_t a, const nr_double_t b) {
   }
 #endif
 }
-
+#endif
 //
 // error functions
 //
 /*! \todo proper fallback */
-#ifndef HAVE_STD_ERF
+#ifndef HAVE_CXX_STD_NUMERICAL_ERF
 nr_double_t erf( nr_double_t arg) {
 #if HAVE_ERF
   return ::erf (arg);
@@ -125,16 +128,17 @@ nr_double_t erf( nr_double_t arg) {
 }
 #endif
 
-
- nr_double_t fmod( nr_double_t arg1, nr_double_t arg2) {
+#ifndef HAVE_CXX_STD_NUMERICAL_FMOD
+nr_double_t fmod( nr_double_t arg1, nr_double_t arg2) {
 #ifdef HAVE_STD_FMOD
    return std::fmod(arg1, arg2);
 #else
    return ::fmod(arg1,arg2);
 #endif
 }
+#endif
 
-#ifndef HAVE_STD_TRUNC
+#ifndef HAVE_CXX_STD_NUMERICAL_TRUNC
 nr_double_t trunc( nr_double_t arg) {
 #if HAVE_TRUNC
   return ::trunc (arg);

@@ -122,7 +122,7 @@ inline nr_double_t  tanh (const nr_double_t arg) {
   return std::tanh (arg);
 }
 
-#ifdef HAVE_STD_ACOSH
+#ifdef HAVE_CXX_STD_NUMERICAL_ACOSH
 inline nr_double_t  acosh (const nr_double_t arg) {
   return std::acosh (arg);
 }
@@ -130,7 +130,7 @@ inline nr_double_t  acosh (const nr_double_t arg) {
 nr_double_t  acosh (const nr_double_t);
 #endif
 
-#ifdef HAVE_STD_ASINH
+#ifdef HAVE_CXX_STD_NUMERICAL_ASINH
 inline nr_double_t  asinh (const nr_double_t arg) {
   return std::asinh (arg);
 }
@@ -138,7 +138,7 @@ inline nr_double_t  asinh (const nr_double_t arg) {
  nr_double_t  asinh (const nr_double_t arg);
  #endif
 
-#ifdef HAVE_STD_ATANH
+#ifdef HAVE_CXX_STD_NUMERICAL_ATANH
 inline nr_double_t  atanh (const nr_double_t arg) {
   return std::atanh (arg);
 }
@@ -182,7 +182,7 @@ inline nr_double_t xhypot (const nr_double_t, const nr_double_t ) {
 //
 // error functions
 //
-#ifdef HAVE_STD_ERF
+#ifdef HAVE_CXX_STD_NUMERICAL_ERF
  inline nr_double_t erf(const nr_double_t arg) {
    return std::erf (arg);
 }
@@ -208,14 +208,14 @@ inline nr_double_t fmod(const nr_double_t arg1,const nr_double_t arg2) {
 nr_double_t fmod(const nr_double_t arg1,const nr_double_t arg2);
 #endif
 
-#ifdef HAVE_STD_TRUNC
+#ifdef HAVE_CXX_STD_NUMERICAL_TRUNC
  inline nr_double_t trunc(const nr_double_t arg) {
    return std::trunc(arg);
  }
 #else
  nr_double_t trunc(const nr_double_t arg);
 #endif
-#ifdef HAVE_STD_ROUND
+#ifdef HAVE_CXX_STD_NUMERICAL_ROUND
  inline nr_double_t round(const nr_double_t arg) {
    return std::round(arg);
  }
