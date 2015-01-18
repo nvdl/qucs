@@ -36,79 +36,41 @@
 
 namespace qucs {
 
-// Constructor creates an unnamed instance of the tvector class.
-template <class nr_type_t>
-tvector<nr_type_t>::tvector () {
-  data = new std::vector <nr_type_t> (0);
-}
-
-/* Constructor creates an unnamed instance of the tvector class with a
-   certain length. */
-template <class nr_type_t>
-tvector<nr_type_t>::tvector (int s)  {
-  data = new std::vector <nr_type_t> (0);
-  if (s > 0) {
-    data->resize(s, 0.0);
-  }
-}
-
-/* The copy constructor creates a new instance based on the given
-   tvector object. */
-template <class nr_type_t>
-tvector<nr_type_t>::tvector (const tvector & v) {
-  if ((int)v.data->size () > 0) {
-    data = new std::vector <nr_type_t> (*v.data);
-  }
-}
-
-/* The assignment copy constructor creates a new instance based on the
-   given tvector object. */
 template <class nr_type_t>
 const tvector<nr_type_t>&
 tvector<nr_type_t>::operator=(const tvector<nr_type_t> & v) {
   if (&v != this) {
-    if (data) {delete data;}
-    data = new std::vector <nr_type_t> (*v.data); //new nr_type_t[size];
+    data = v.data;
   }
   return *this;
 }
 
-// Destructor deletes a tvector object.
-template <class nr_type_t>
-tvector<nr_type_t>::~tvector () {
-  if (data) delete data;
-}
-
-// Returns the tvector element at the given position.
-template <class nr_type_t>
-nr_type_t tvector<nr_type_t>::get (int i) {
-  assert (i >= 0 && i < (int)data->size ());
-  return (*data)[i];
-}
-
+  
 // Sets the tvector element at the given position.
 template <class nr_type_t>
 void tvector<nr_type_t>::set (int i, nr_type_t z) {
-  assert (i >= 0 && i < (int)data->size ());
-  (*data)[i] = z;
+  assert (i >= 0 && i < (int)data.size ());
+  (data)[i] = z;
 }
 
 // Sets all the tvector elements to the given value.
 template <class nr_type_t>
 void tvector<nr_type_t>::set (nr_type_t z) {
-  for (int i = 0; i < (int)data->size (); i++) (*data)[i] = z;
+  for (int i = 0; i < (int)data.size (); i++)
+    (data)[i] = z;
 }
 
 // Sets the specified tvector elements to the given value.
 template <class nr_type_t>
 void tvector<nr_type_t>::set (nr_type_t z, int start, int stop) {
-  for (int i = start; i < stop; i++) (*data)[i] = z;
+  for (int i = start; i < stop; i++)
+    (data)[i] = z;
 }
 
 // Appends the given value to the tvector.
 template <class nr_type_t>
 void tvector<nr_type_t>::add (nr_type_t z) {
-  data->push_back (z);
+  data.push_back (z);
 }
 
 // Rejects the given number of values from the start of the tvector.
@@ -133,7 +95,7 @@ void tvector<nr_type_t>::truncate (int n) {
 // Sets size to zero.  Does not reduce the capacity.
 template <class nr_type_t>
 void tvector<nr_type_t>::clear (void) {
-  data->clear ();
+  data.clear ();
   //size = 0;
 }
 
@@ -142,7 +104,7 @@ void tvector<nr_type_t>::clear (void) {
 template <class nr_type_t>
 int tvector<nr_type_t>::contains (nr_type_t val, nr_double_t eps) {
   int count = 0;
-  for (int i = 0; i < (int)data->size (); i++) if (abs ((*data)[i] - val) <= eps) count++;
+  for (int i = 0; i < (int)data.size (); i++) if (abs ((data)[i] - val) <= eps) count++;
   return count;
 }
 
@@ -155,10 +117,10 @@ void tvector<nr_type_t>::set (tvector<nr_type_t> a, int start, int stop) {
 // The function swaps the given rows with each other.
 template <class nr_type_t>
 void tvector<nr_type_t>::exchangeRows (int r1, int r2) {
-  assert (r1 >= 0 && r2 >= 0 && r1 < (int)data->size () && r2 < (int)data->size ());
-  nr_type_t s = (*data)[r1];
-  (*data)[r1] = (*data)[r2];
-  (*data)[r2] = s;
+  assert (r1 >= 0 && r2 >= 0 && r1 < (int)data.size () && r2 < (int)data.size ());
+  nr_type_t s = data[r1];
+  (data)[r1] = data[r2];
+  (data)[r2] = s;
 }
 
 // Addition.

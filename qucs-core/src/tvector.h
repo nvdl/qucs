@@ -26,7 +26,7 @@
 #define __TVECTOR_H__
 
 #include <vector>
-#include <assert.h>
+#include <cassert>
 
 #include <limits>
 
@@ -34,58 +34,67 @@
 
 namespace qucs {
 
-template <class nr_type_t>
+template <class T>
 class tvector;
 
 // Forward declarations of friend functions.
-template <class nr_type_t>
-nr_type_t   scalar (tvector<nr_type_t>, tvector<nr_type_t>);
-template <class nr_type_t>
-nr_double_t maxnorm (tvector<nr_type_t>);
-template <class nr_type_t>
-nr_double_t norm (tvector<nr_type_t>);
-template <class nr_type_t>
-nr_type_t   sum (tvector<nr_type_t>);
-template <class nr_type_t>
-tvector<nr_type_t> conj (tvector<nr_type_t>);
-template <class nr_type_t>
-tvector<nr_type_t> operator + (tvector<nr_type_t>, tvector<nr_type_t>);
-template <class nr_type_t>
-tvector<nr_type_t> operator + (tvector<nr_type_t>, nr_type_t);
-template <class nr_type_t>
-tvector<nr_type_t> operator + (nr_type_t, tvector<nr_type_t>);
-template <class nr_type_t>
-tvector<nr_type_t> operator - (tvector<nr_type_t>, tvector<nr_type_t>);
-template <class nr_type_t>
-tvector<nr_type_t> operator * (tvector<nr_type_t>, nr_double_t);
-template <class nr_type_t>
-tvector<nr_type_t> operator * (nr_double_t, tvector<nr_type_t>);
-template <class nr_type_t>
-tvector<nr_type_t> operator * (tvector<nr_type_t>, tvector<nr_type_t>);
-template <class nr_type_t>
-tvector<nr_type_t> operator - (tvector<nr_type_t>);
-template <class nr_type_t>
-bool operator < (tvector<nr_type_t>, tvector<nr_type_t>);
-template <class nr_type_t>
-bool operator > (tvector<nr_type_t>, tvector<nr_type_t>);
+template <class T>
+T   scalar (tvector<T>, tvector<T>);
+template <class T>
+nr_double_t maxnorm (tvector<T>);
+template <class T>
+nr_double_t norm (tvector<T>);
+template <class T>
+T   sum (tvector<T>);
+template <class T>
+tvector<T> conj (tvector<T>);
+template <class T>
+tvector<T> operator + (tvector<T>, tvector<T>);
+template <class T>
+tvector<T> operator + (tvector<T>, T);
+template <class T>
+tvector<T> operator + (T, tvector<T>);
+template <class T>
+tvector<T> operator - (tvector<T>, tvector<T>);
+template <class T>
+tvector<T> operator * (tvector<T>, nr_double_t);
+template <class T>
+tvector<T> operator * (nr_double_t, tvector<T>);
+template <class T>
+tvector<T> operator * (tvector<T>, tvector<T>);
+template <class T>
+tvector<T> operator - (tvector<T>);
+template <class T>
+bool operator < (tvector<T>, tvector<T>);
+template <class T>
+bool operator > (tvector<T>, tvector<T>);
 
-template <class nr_type_t>
+template <class T>
 class tvector
 {
+ private:
+  std::vector<T> data;
  public:
-  tvector ();
-  tvector (int);
-  tvector (const tvector &);
+  // Constructor creates an unnamed instance of the tvector class.
+  tvector () = default;
+  tvector (const tvector &c) = default;
+  ~tvector () = default;
+  /* Constructor creates an unnamed instance of the tvector class with a
+     certain length */
+  explicit tvector (const std::size_t n) : data(n) {};
   const tvector& operator = (const tvector &);
-  ~tvector ();
-  nr_type_t get (int);
-  void set (int, nr_type_t);
-  void set (nr_type_t);
-  void set (nr_type_t, int, int);
+  /* Returns the tvector element at the given position. */
+  T get (std::size_t i) {
+    assert (i >= 0 && i < data.size ());
+    return data[i];
+  }
+  void set (int, T);
+  void set (T);
+  void set (T, int, int);
   void set (tvector, int, int);
-  int  getSize (void) { return (int)data->size (); }
-  std::vector<nr_type_t> * getData (void) { return data; }
-  void add (nr_type_t);
+  int  getSize (void) { return (int)data.size (); }
+  const std::vector<T> * getData (void) const { return &data; }
+  void add (T);
   void clear (void);
   void drop (int);
   void truncate (int);
@@ -93,7 +102,7 @@ class tvector
   int  isFinite (void);
   void print (void);
   void reorder (int *);
-  int  contains (nr_type_t, nr_double_t eps = std::numeric_limits<nr_double_t>::epsilon());
+  int  contains (T, nr_double_t eps = std::numeric_limits<nr_double_t>::epsilon());
 
   // some basic vector operations
 #ifndef _MSC_VER
@@ -103,16 +112,16 @@ class tvector
   friend tvector operator *<> (nr_double_t, tvector);
   friend tvector operator *<> (tvector, tvector);
   friend tvector operator -<> (tvector);
-  friend tvector operator +<> (tvector, nr_type_t);
-  friend tvector operator +<> (nr_type_t, tvector);
+  friend tvector operator +<> (tvector, T);
+  friend tvector operator +<> (T, tvector);
 #endif
 
   // other operations
 #ifndef _MSC_VER
   friend nr_double_t norm<> (tvector);
   friend nr_double_t maxnorm<> (tvector);
-  friend nr_type_t   sum<> (tvector);
-  friend nr_type_t   scalar<> (tvector, tvector);
+  friend T   sum<> (tvector);
+  friend T   scalar<> (tvector, tvector);
   friend tvector     conj<> (tvector);
 #endif
 
@@ -129,17 +138,13 @@ class tvector
   tvector operator /= (nr_double_t);
 
   // assignment operators
-  tvector operator = (const nr_type_t);
+  tvector operator = (const T);
 
   // easy accessor operators
-  nr_type_t  operator () (int i) const {
-    assert (i >= 0 && i < (int)data->size ()); return (*data)[i]; }
-  nr_type_t& operator () (int i) {
-    assert (i >= 0 && i < (int)data->size ()); return (*data)[i]; }
-
- private:
-  std::vector<nr_type_t> * data;
-
+  T  operator () (int i) const {
+    assert (i >= 0 && i < (int)data.size ()); return (data)[i]; }
+  T& operator () (int i) {
+    assert (i >= 0 && i < (int)data.size ()); return (data)[i]; }
 };
 
 } // namespace qucs
