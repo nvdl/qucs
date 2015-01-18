@@ -803,8 +803,10 @@ dnl Depending on the implementation, funcions may or may not be included on the 
 AC_MSG_NOTICE([Check for functions in std:: namespace])
  for f in std::acosh std::asinh std::atanh std::hypot std::trunc std::round std::erf std::erfc; do
     AC_MSG_CHECKING([for $f])
+    AC_LANG_PUSH([C++])
     AC_LINK_IFELSE([AC_LANG_SOURCE(
-				  [[#include <cmath>
+				  [[
+				  #include <cmath>
 				  int main() { return $f(0.7) ? 1 : 0; }
 				  ]])],
       [AC_MSG_RESULT([yes])
@@ -844,8 +846,12 @@ AC_MSG_NOTICE([Check for functions in std:: namespace])
 	 AC_DEFINE(HAVE_STD_ERFC, 1,
 	       [Define to 1 if you have the `std::erfc` function.])
        fi],
-      [AC_MSG_RESULT([no])])
+      [AC_MSG_RESULT([no])
+  ])
+  AC_LANG_POP([C++])
   done
+
+
 
 
 dnl Setup Google Test support
