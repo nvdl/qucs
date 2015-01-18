@@ -46,9 +46,6 @@
 #define VSRC_4 3
 #define VSRC_5 4
 
-#define MODFLAG(val,bit) if (val) flag |= (bit); else flag &= ~(bit);
-#define RETFLAG(bit)     ((flag & (bit)) != 0)
-
 #define CREATOR(val) \
   val (); \
   static qucs::circuit * create (void) { return new val (); } \
@@ -57,23 +54,13 @@
 
 #include <map>
 #include <string>
+#include <cstdint>
 
+#include "flags.h"
 #include "integrator.h"
 #include "valuelist.h"
 
 namespace qucs {
-
-enum circuit_flag {
-  CIRCUIT_ENABLED     = 1,
-  CIRCUIT_LINEAR      = 2,
-  CIRCUIT_ORIGINAL    = 4,
-  CIRCUIT_VSOURCE     = 8,
-  CIRCUIT_ISOURCE     = 16,
-  CIRCUIT_INTVSOURCE  = 32,
-  CIRCUIT_VARSIZE     = 64,
-  CIRCUIT_PROBE       = 128,
-  CIRCUIT_HISTORY     = 256,
-};
 
 class node;
 class property;
@@ -94,6 +81,21 @@ class history;
  */
 class circuit : public object, public integrator
 {
+ public:
+  enum struct circuit_flag : int {
+    ENABLED,
+    LINEAR,
+    ORIGINAL,
+    VSOURCE,
+    ISOURCE,
+    INTVSOURCE,
+    VARSIZE,
+    PROBE,
+    HISTORY,
+    _end,
+ };
+ private:
+  qucs::flags<circuit_flag> flag;
  public:
   circuit * getNext (void) const { return this->next; }
   void setNext (circuit * const o) { this->next = o; }
@@ -169,18 +171,18 @@ class circuit : public object, public integrator
    * Returns true if the circuit element is enabled or false
    * otherwise.
    */
-  bool   isEnabled (void) { return RETFLAG (CIRCUIT_ENABLED); }
+  bool   isEnabled (void) const { return flag[circuit_flag::ENABLED]; }
   /*! \fn setEnabled
    * \brief Set a circuit element to be enabled or diabled.
    * \param e boolean indicating whether to enable or disable
    *
    * Sets the circuit element to be enabled or disabled.
    */
-  void   setEnabled (bool e) { MODFLAG (e, CIRCUIT_ENABLED); }
-  bool   isVariableSized (void) { return RETFLAG (CIRCUIT_VARSIZE); }
-  void   setVariableSized (bool v) { MODFLAG (v, CIRCUIT_VARSIZE); }
-  bool   isProbe (void) { return RETFLAG (CIRCUIT_PROBE); }
-  void   setProbe (bool p) { MODFLAG (p, CIRCUIT_PROBE); }
+  void   setEnabled (const bool e = true) { flag[circuit_flag::ENABLED] = e; }
+  bool   isVariableSized (void) const { return flag[circuit_flag::VARSIZE]; }
+  void   setVariableSized (const bool v = true) { flag[circuit_flag::VARSIZE]=v; }
+  bool   isProbe (void) const { return flag[circuit_flag::PROBE]; }
+  void   setProbe (const bool p = true) { flag[circuit_flag::PROBE]=p; }
   void   setNet (net * n) { subnet = n; }
   net *  getNet (void) { return subnet; }
 
@@ -193,17 +195,17 @@ class circuit : public object, public integrator
   void setEnv (environment * e) { env = e; }
 
   // nodal analyses helpers
-  void setInternalVoltageSource (bool i) { MODFLAG (i, CIRCUIT_INTVSOURCE); }
-  bool isInternalVoltageSource (void) { return RETFLAG (CIRCUIT_INTVSOURCE); }
+  void setInternalVoltageSource (const bool i = true) { flag[circuit_flag::INTVSOURCE]=i; }
+  bool isInternalVoltageSource (void) const { return flag[circuit_flag::INTVSOURCE]; }
   void setVoltageSource (int s) { vsource = s; }
   int  getVoltageSource (void) { return vsource; }
   int  getVoltageSources (void);
   void setVoltageSources (int);
   void voltageSource (int, int, int, nr_double_t value = 0.0);
-  bool isVSource (void) { return RETFLAG (CIRCUIT_VSOURCE); }
-  void setVSource (bool v) { MODFLAG (v, CIRCUIT_VSOURCE); }
-  bool isISource (void) { return RETFLAG (CIRCUIT_ISOURCE); }
-  void setISource (bool i) { MODFLAG (i, CIRCUIT_ISOURCE); }
+  bool isVSource (void) const { return flag[circuit_flag::VSOURCE]; }
+  void setVSource (const bool v=true) { flag[circuit_flag::VSOURCE]=v;}
+  bool isISource (void) const { return flag[circuit_flag::ISOURCE]; }
+  void setISource (const bool i=true) { flag[circuit_flag::ISOURCE]=i;}
   int  getNoiseSources (void);
   void setNoiseSources (int);
 
@@ -221,8 +223,8 @@ class circuit : public object, public integrator
   nr_double_t * getDelta (void) { return deltas; }
 
   // history specific functionality
-  bool hasHistory (void) { return RETFLAG (CIRCUIT_HISTORY); }
-  void setHistory (bool h) { MODFLAG (h, CIRCUIT_HISTORY); }
+  bool hasHistory (void) const { return flag[circuit_flag::HISTORY]; }
+  void setHistory (const bool h=true) { flag[circuit_flag::HISTORY]=h; }
   void initHistory (nr_double_t);
   void deleteHistory (void);
   void truncateHistory (nr_double_t);
@@ -241,8 +243,8 @@ class circuit : public object, public integrator
   void setPort (int p) { pacport = p; }
   int  getInserted (void) { return inserted; }
   void setInserted (int i) { inserted = i; }
-  bool isOriginal (void) { return RETFLAG (CIRCUIT_ORIGINAL); }
-  void setOriginal (bool o) { MODFLAG (o, CIRCUIT_ORIGINAL); }
+  bool isOriginal (void) const { return flag[circuit_flag::ORIGINAL]; }
+  void setOriginal (const bool o=true) { flag[circuit_flag::ORIGINAL]=o; }
 
   // microstrip helpers
   substrate * getSubstrate (void);
@@ -307,8 +309,8 @@ class circuit : public object, public integrator
   valuelist<characteristic> & getCharacteristics (void) { return charac; }
 
   // differentiate between linear and non-linear circuits
-  void setNonLinear (bool l) { MODFLAG (!l, CIRCUIT_LINEAR); }
-  bool isNonLinear (void) { return !RETFLAG (CIRCUIT_LINEAR); }
+  void setNonLinear (const bool l=true) { flag[circuit_flag::LINEAR]=!l; }
+  bool isNonLinear (void) const { return !flag[circuit_flag::LINEAR]; }
 
   // miscellaneous functionality
   void print (void);
@@ -342,7 +344,6 @@ class circuit : public object, public integrator
   int vsources;
   int nsources;
   int inserted;
-  int flag;
   nr_complex_t * MatrixS;
   nr_complex_t * MatrixN;
   nr_complex_t * MatrixY;

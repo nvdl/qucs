@@ -63,7 +63,8 @@ circuit::circuit () : object (), integrator () {
   nodes = NULL;
   pacport = 0;
   pol = 1;
-  flag = CIRCUIT_ORIGINAL | CIRCUIT_LINEAR;
+  flag[circuit_flag::ORIGINAL] = 1;
+  flag[circuit_flag::LINEAR] = 1;
   subst = NULL;
   vsource = -1;
   vsources = 0;
@@ -91,7 +92,8 @@ circuit::circuit (int s) : object (), integrator () {
   VectorCV = VectorGV = NULL;
   pacport = 0;
   pol = 1;
-  flag = CIRCUIT_ORIGINAL | CIRCUIT_LINEAR;
+  flag[circuit_flag::ORIGINAL] = 1;
+  flag[circuit_flag::LINEAR] = 1;
   subst = NULL;
   vsource = -1;
   vsources = 0;
