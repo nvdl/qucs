@@ -77,7 +77,7 @@ class tvector
   tvector (const std::size_t i) : data(i) {};
   tvector (const tvector &) = default;
   ~tvector () = default;
-  nr_type_t get (int);
+  nr_type_t get (int) const;
   void set (int, nr_type_t);
   void set (nr_type_t);
   void set (nr_type_t, int, int);
