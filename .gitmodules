@@ -4,3 +4,6 @@
 [submodule "qucs-core/tests/qucs-test"]
 	path = qucs-core/tests/qucs-test
 	url = https://github.com/Qucs/qucs-test
+[submodule "qucs-core/deps/eigen"]
+	path = qucs-core/deps/eigen
+	url = https://github.com/RLovelett/eigen

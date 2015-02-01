@@ -625,6 +625,25 @@ dnl subdirectories autoconf will recurse into as it has its
 dnl own configure.ac and Makefile.am
 AM_COND_IF([USE_INTERNAL_ADMS], [AC_CONFIG_SUBDIRS([deps/adms/])])
 
+# enable extra test
+AC_ARG_WITH([internal-libeigen3],
+  [AS_HELP_STRING([--with-internal-libeigen3], [Enable internal libeigen3])],
+  [with_internal_libeigen3=$withval],
+  [with_internal_libeigen3=no])
+AC_MSG_CHECKING([Use internal libeigen])
+AC_MSG_RESULT($with_internal_libeigen3)
+
+AS_IF([test "X$with_internal_libeigen3" = Xno],
+      [
+       PKG_CHECK_MODULES([EIGEN3],[eigen3 >= 3.2],
+                         [],
+			 [AC_MSG_ERROR([Missing libeigen3 you could use --with-internal-libeigen3])])
+      ],
+      [
+       EIGEN3_CFLAGS="-Ideps/eigen/"
+       AC_SUBST([EIGEN3_CFLAGS])
+      ])
+
 dnl Checks for libraries.
 AC_CHECK_LIB(m, sin)
 

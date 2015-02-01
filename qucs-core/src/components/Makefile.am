@@ -54,7 +54,9 @@ noinst_HEADERS = attenuator.h dcblock.h open.h vccs.h biastee.h circulator.h \
 	hybrid.h ctline.h ecvs.h \
 	component.h components.h component_id.h
 
-AM_CPPFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/src/math
+AM_CPPFLAGS = $(EIGEN3_CFLAGS) \
+              -I$(top_srcdir)/src \
+              -I$(top_srcdir)/src/math
 
 CLEANFILES = *~ *.orig *.rej
 
