@@ -40,8 +40,10 @@ namespace qucs {
 
 // Returns the tvector element at the given position.
 template <class nr_type_t>
-nr_type_t tvector<nr_type_t>::get (int i) {
-  return data.at(i);
+inline
+nr_type_t tvector<nr_type_t>::get (int i) const {
+  assert (i >= 0 && i < size());
+  return data[i];
 }
 
 // Sets the tvector element at the given position.

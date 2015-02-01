@@ -29,6 +29,8 @@
 #ifndef __MATRIX_H__
 #define __MATRIX_H__
 
+#include <Eigen/Dense>
+
 namespace qucs {
 
 class vector;
@@ -215,6 +217,7 @@ class matrix
   int rows;
   /*! Matrix data */
   nr_complex_t * data;
+  Eigen::Matrix<nr_complex_t, Eigen::Dynamic, Eigen::Dynamic> m;
 };
 
 } // namespace qucs
