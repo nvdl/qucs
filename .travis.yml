@@ -119,6 +119,12 @@ install:
   # Grab tip of Qucs-Test
   - git clone --depth=1 --branch=master git://github.com/Qucs/qucs-test.git qucs-test
 
+  # install libeigen
+  - wget http://bitbucket.org/eigen/eigen/get/3.2.4.tar.gz  -O /tmp/eigen.tar.gz;
+  - cd qucs-core/deps/eigen
+  - tar -xzvf /tmp/eigen.tar.gz --strip 1
+  - cd ../../..
+
 script:
   - uname -a
   - $CXX --version
@@ -161,12 +167,12 @@ script:
   # Only collect coverage for GCC (LINUX)
   # `make check-code-coverage` is failing due to old lcov
   - if [[ $GCC ]]; then
-      ./configure --enable-maintainer-mode --prefix=/usr --with-mkadms=`which admsXml` --disable-dependency-tracking --enable-debug --enable-code-coverage  --with-gcov=gcov-4.8 --with-gtest;
+      ./configure --enable-maintainer-mode --prefix=/usr --with-mkadms=`which admsXml` --disable-dependency-tracking --enable-debug --enable-code-coverage  --with-gcov=gcov-4.8 --with-gtest --with-internal-libeigen3;
       make && sudo make install && make check;
     fi
 
   - if [[ $CLANG ]]; then
-      ./configure --enable-maintainer-mode --prefix=/usr --with-mkadms=`which admsXml` --disable-dependency-tracking --with-gtest;
+      ./configure --enable-maintainer-mode --prefix=/usr --with-mkadms=`which admsXml` --disable-dependency-tracking --with-gtest --with-internal-libeigen3;
       make && sudo make install && make check;
     fi
   - cd ..

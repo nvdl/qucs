@@ -166,9 +166,13 @@ VA_INCLUDES = constants.vams disciplines.vams
 
 EXTRA_DIST = $(VERILOG_FILES) $(XML_FILES) $(MAKE_FILES)
 
-AM_CPPFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/src/math \
-  -I$(top_srcdir)/src/components -I$(top_srcdir)/src/components/devices \
-  -I$(builddir)
+AM_CPPFLAGS = $(EIGEN3_CFLAGS) \
+              -I$(top_srcdir)/src \
+              -I$(top_srcdir)/src/math \
+              -I$(top_srcdir)/src/components \
+              -I$(top_srcdir)/src/components/devices \
+              -I$(builddir)
+
 
 if MAINTAINER_MODE
 ## configure determines if we want to build and use the
