@@ -41,7 +41,8 @@ noinst_HEADERS =        \
     precision.h         \
     complex.h           \
     real.h              \
-    tmatrix.h
+    tmatrix.h           \
+    tvector.h
 
 noinst_LTLIBRARIES = libqucsmath.la
 
