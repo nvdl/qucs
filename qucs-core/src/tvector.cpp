@@ -66,12 +66,6 @@ void tvector<nr_type_t>::set (nr_type_t z, int start, int stop) {
     data[i] = z;
 }
 
-// Sets size to zero.  Does not reduce the capacity.
-template <class nr_type_t>
-void tvector<nr_type_t>::clear (void) {
-  data.clear ();
-  //size = 0;
-}
 
 /* The function returns the number of entries with the given value
    deviating no more than the given epsilon. */

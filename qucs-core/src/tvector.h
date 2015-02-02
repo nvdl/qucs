@@ -84,7 +84,6 @@ class tvector
   void set (tvector, int, int);
   std::size_t  size (void) const { return data.size (); }
   nr_type_t * getData (void) { return data.data(); }
-  void clear (void);
   void exchangeRows (int, int);
   int  isFinite (void);
   void print (void);
@@ -144,14 +143,6 @@ class tvector
   std::vector<nr_type_t> data;
 
 };
-
-  /*
-  int  contains (nr_type_t val, nr_double_t eps = std::numeric_limits<nr_double_t>::epsilon()) {
-    int count = 0;
-    for (int i = 0; i < (int)data.size (); i++) if (abs ((data)[i] - val) <= eps) count++;
-    return count;
-    }*/
-
 
   
 } // namespace qucs
