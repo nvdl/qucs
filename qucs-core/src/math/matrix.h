@@ -112,7 +112,8 @@ class matrix
   void set(int r, int c, const nr_complex_t v) = delete;
   int cols (void) const { return m.cols(); }
   int rows (void) const { return m.rows(); }
-  nr_complex_t * getData (void) { return m.data(); }
+  nr_complex_t * getData (void) = delete;
+  auto data(void) -> decltype(m.data()) { return m.data(); }
   void print (void);
   void exchangeRows (int, int);
   void exchangeCols (int, int);

@@ -646,7 +646,7 @@ void circuit::setMatrixS (matrix s) {
   int c = s.cols ();
   // copy matrix elements
   if (r > 0 && c > 0 && r * c == size * size) {
-    memcpy (MatrixS, s.getData (), sizeof (nr_complex_t) * r * c);
+    memcpy (MatrixS, s.data (), sizeof (nr_complex_t) * r * c);
   }
 }
 
@@ -667,7 +667,7 @@ void circuit::setMatrixN (matrix n) {
   int c = n.cols ();
   // copy matrix elements
   if (r > 0 && c > 0 && r * c == size * size) {
-    memcpy (MatrixN, n.getData (), sizeof (nr_complex_t) * r * c);
+    memcpy (MatrixN, n.data (), sizeof (nr_complex_t) * r * c);
   }
 }
 
@@ -688,7 +688,7 @@ void circuit::setMatrixY (matrix y) {
   int c = y.cols ();
   // copy matrix elements
   if (r > 0 && c > 0 && r * c == size * size) {
-    memcpy (MatrixY, y.getData (), sizeof (nr_complex_t) * r * c);
+    memcpy (MatrixY, y.data (), sizeof (nr_complex_t) * r * c);
   }
 }
 
