@@ -74,14 +74,14 @@ matrix mutual::calcMatrixY (nr_double_t frequency) {
   nr_complex_t y3 = nr_complex_t (0, k / (o * std::sqrt (l1 * l2) * a));
 
   matrix y = matrix (4);
-  y.set (NODE_1, NODE_1, +1.0 / z1); y.set (NODE_4, NODE_4, +1.0 / z1);
-  y.set (NODE_1, NODE_4, -1.0 / z1); y.set (NODE_4, NODE_1, -1.0 / z1);
-  y.set (NODE_2, NODE_2, +1.0 / z2); y.set (NODE_3, NODE_3, +1.0 / z2);
-  y.set (NODE_2, NODE_3, -1.0 / z2); y.set (NODE_3, NODE_2, -1.0 / z2);
-  y.set (NODE_1, NODE_3, -y3); y.set (NODE_3, NODE_1, -y3);
-  y.set (NODE_2, NODE_4, -y3); y.set (NODE_4, NODE_2, -y3);
-  y.set (NODE_1, NODE_2, +y3); y.set (NODE_2, NODE_1, +y3);
-  y.set (NODE_3, NODE_4, +y3); y.set (NODE_4, NODE_3, +y3);
+  y(NODE_1, NODE_1)= +1.0 / z1; y(NODE_4, NODE_4)= +1.0 / z1;
+  y(NODE_1, NODE_4)= -1.0 / z1; y(NODE_4, NODE_1)= -1.0 / z1;
+  y(NODE_2, NODE_2)= +1.0 / z2; y(NODE_3, NODE_3)= +1.0 / z2;
+  y(NODE_2, NODE_3)= -1.0 / z2; y(NODE_3, NODE_2)= -1.0 / z2;
+  y(NODE_1, NODE_3)= -y3; y(NODE_3, NODE_1)= -y3;
+  y(NODE_2, NODE_4)= -y3; y(NODE_4, NODE_2)= -y3;
+  y(NODE_1, NODE_2)= +y3; y(NODE_2, NODE_1)= +y3;
+  y(NODE_3, NODE_4)= +y3; y(NODE_4, NODE_3)= +y3;
   return y;
 }
 

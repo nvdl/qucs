@@ -100,10 +100,10 @@ matrix msgap::calcMatrixY (nr_double_t frequency) {
   nr_complex_t y11 = nr_complex_t (0.0,  2.0 * pi * frequency * (C1 + Cs));
   nr_complex_t y22 = nr_complex_t (0.0,  2.0 * pi * frequency * (C2 + Cs));
   matrix y (2);
-  y.set (0, 0, y11);
-  y.set (0, 1, y21);
-  y.set (1, 0, y21);
-  y.set (1, 1, y22);
+  y(0, 0)= y11;
+  y(0, 1)= y21;
+  y(1, 0)= y21;
+  y(1, 1)= y22;
   return y;
 }
 

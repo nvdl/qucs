@@ -109,7 +109,7 @@ class matrix
     m(std::move(n)) {};
   ~matrix () = default;
   nr_complex_t get (int r, int c) const { return (*this)(r,c); }
-  void set (int r, int c, const nr_complex_t v) { (*this)(r,c) = v; }
+  void set(int r, int c, const nr_complex_t v) = delete;
   int cols (void) const { return m.cols(); }
   int rows (void) const { return m.rows(); }
   nr_complex_t * getData (void) { return m.data(); }

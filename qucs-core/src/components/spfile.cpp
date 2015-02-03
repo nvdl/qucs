@@ -119,7 +119,7 @@ matrix spfile::getInterpolMatrixS (nr_double_t frequency) {
   for (int r = 0; r < getSize () - 1; r++) {
     for (int c = 0; c < getSize () - 1; c++) {
       int i = r * getSize () + c;
-      s.set (r, c, spara[i].interpolate (frequency));
+      s(r, c)= spara[i].interpolate (frequency);
     }
   }
 
@@ -172,26 +172,26 @@ matrix spfile::expandSParaMatrix (matrix s) {
   for (sa = 0, r = 0; r < ports - 1; r++)
     for (c = 0; c < ports - 1; c++) sa += s.get (r, c);
   ss = (2 - g - ports + sa) / (1 - ports * g - sa);
-  res.set (ports - 1, ports - 1, ss);
+  res(ports - 1,ports - 1)= ss;
   fr = (1.0 - g * ss) / (1.0 - g);
 
   // compute S'im
   for (r = 0; r < ports - 1; r++) {
     for (sc = 0, c = 0; c < ports - 1; c++) sc += s.get (r, c);
-    res.set (r, ports - 1, fr * (1.0 - sc));
+    res(r, ports - 1)= fr * (1.0 - sc);
   }
 
   // compute S'mj
   for (c = 0; c < ports - 1; c++) {
     for (sr = 0, r = 0; r < ports - 1; r++) sr += s.get (r, c);
-    res.set (ports - 1, c, fr * (1.0 - sr));
+    res(ports - 1, c)= fr * (1.0 - sr);
   }
 
   // compute S'ij
   for (r = 0; r < ports - 1; r++) {
     for (c = 0; c < ports - 1; c++) {
       fr = g * res (r, ports - 1) * res (ports - 1, c) / (1.0 - g * ss);
-      res.set (r, c, s.get (r, c) - fr);
+      res(r, c)= s.get (r, c) - fr;
     }
   }
 
@@ -210,8 +210,8 @@ matrix spfile::shrinkSParaMatrix (matrix s) {
   // compute S'ij
   for (r = 0; r < ports - 1; r++) {
     for (c = 0; c < ports - 1; c++) {
-      res.set (r, c, s (r, c) + g * s (r, ports - 1)  *
-	       s (ports - 1, c) / (1.0 - g * s (ports - 1, ports - 1)));
+      res(r, c)= s (r, c) + g * s (r, ports - 1)  *
+	       s (ports - 1, c) / (1.0 - g * s (ports - 1, ports - 1));
     }
   }
   return res;
@@ -235,18 +235,18 @@ matrix spfile::expandNoiseMatrix (matrix n, matrix s) {
   for (r = 0; r < ports - 1; r++) {
     for (c = 0; c < ports - 1; c++) {
       if (r == c)
-	k.set (r, c, 1.0 + g * (s.get (r, ports - 1) - 1.0));
+	k(r, c)= 1.0 + g * (s.get (r, ports - 1) - 1.0);
       else
-	k.set (r, c, g * s.get (r, ports - 1));
+	k(r, c)= g * s(r, ports - 1);
     }
   }
   for (c = 0; c < ports - 1; c++)
-    k.set (ports - 1, c, g * s.get (ports - 1, ports - 1) - 1.0);
+    k(ports - 1, c)= g * s(ports - 1, ports - 1) - 1.0;
 
   // create D vector
   matrix d (ports, 1);
-  for (r = 0; r < ports - 1; r++) d.set (r, 0, s.get (r, ports - 1));
-  d.set (ports - 1, 0, s.get (ports - 1, ports - 1) - 1.0);
+  for (r = 0; r < ports - 1; r++) d(r, 0)= s(r, ports - 1);
+  d(ports - 1, 0)= s(ports - 1, ports - 1) - 1.0;
 
   // expand noise correlation matrix
   matrix res (ports);
@@ -269,14 +269,14 @@ matrix spfile::shrinkNoiseMatrix (matrix n, matrix s) {
 
   // create K' matrix
   matrix k (ports - 1, ports);
-  for (r = 0; r < ports - 1; r++) k.set (r, r, 1);
+  for (r = 0; r < ports - 1; r++) k(r, r)=1;
   for (r = 0; r < ports - 1; r++)
-    k.set (r, ports - 1, g * s.get (r, ports - 1) /
-	   (1.0 - g * s.get (ports - 1, ports - 1)));
+    k(r, ports - 1)= g * s(r, ports - 1) /
+	   (1.0 - g * s(ports - 1, ports - 1));
 
   // create D' vector
   matrix d (ports - 1, 1);
-  for (r = 0; r < ports - 1; r++) d.set (r, 0, s.get (r, ports - 1));
+  for (r = 0; r < ports - 1; r++) d(r, 0)= s(r, ports - 1);
 
   // shrink noise correlation matrix
   matrix res (ports - 1);
@@ -410,12 +410,12 @@ matrix spfile::correlationMatrix (nr_double_t Fmin, nr_complex_t Sopt,
   assert (s.cols () == s.rows () && s.cols () == 2);
   matrix c (2);
   nr_complex_t Kx = 4 * Rn / z0 / norm (1.0 + Sopt);
-  c.set (0, 0, (Fmin - 1) * (norm (s.get (0, 0)) - 1) +
-	 Kx * norm (1.0 - s.get (0, 0) * Sopt));
-  c.set (1, 1, norm (s.get (1, 0)) * ((Fmin - 1) + Kx * norm (Sopt)));
-  c.set (0, 1, s.get (0, 0) / s.get (1, 0) * c.get (1, 1) -
-	 conj (s.get (1, 0)) * conj (Sopt) * Kx);
-  c.set (1, 0, conj (c.get (0, 1)));
+  c(0, 0)= (Fmin - 1) * (norm (s(0, 0)) - 1.0) +
+	 Kx * norm (1.0 - s(0, 0) * Sopt);
+  c(1, 1)= norm (s(1, 0)) * ((Fmin - 1) + Kx * norm (Sopt));
+  c(0, 1)= s(0, 0) / s(1, 0) * c(1, 1) -
+	 conj (s(1, 0)) * conj (Sopt) * Kx;
+  c(1, 0)=conj (c(0, 1));
   return c;
 }
 

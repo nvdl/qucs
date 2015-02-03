@@ -162,10 +162,10 @@ matrix tunneldiode::calcMatrixY (nr_double_t frequency) {
   nr_double_t Cd = getOperatingPoint ("Cd");
   nr_complex_t yd = nr_complex_t (gd, Cd * 2.0 * pi * frequency);
   matrix y (2);
-  y.set (NODE_A1, NODE_A1, +yd);
-  y.set (NODE_A2, NODE_A2, +yd);
-  y.set (NODE_A1, NODE_A2, -yd);
-  y.set (NODE_A2, NODE_A1, -yd);
+  y(NODE_A1, NODE_A1)= +yd;
+  y(NODE_A2, NODE_A2)= +yd;
+  y(NODE_A1, NODE_A2)= -yd;
+  y(NODE_A2, NODE_A1)= -yd;
   return y;
 }
 

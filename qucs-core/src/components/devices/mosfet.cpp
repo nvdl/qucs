@@ -72,22 +72,22 @@ matrix mosfet::calcMatrixY (nr_double_t frequency) {
 
   // build admittance matrix and convert it to S-parameter matrix
   matrix y (4);
-  y.set (NODE_G, NODE_G, Ygd + Ygs + Ygb);
-  y.set (NODE_G, NODE_D, -Ygd);
-  y.set (NODE_G, NODE_S, -Ygs);
-  y.set (NODE_G, NODE_B, -Ygb);
-  y.set (NODE_D, NODE_G, gm - Ygd);
-  y.set (NODE_D, NODE_D, Ygd + Yds + Ybd - DrainControl);
-  y.set (NODE_D, NODE_S, -Yds - SourceControl);
-  y.set (NODE_D, NODE_B, -Ybd + gmb);
-  y.set (NODE_S, NODE_G, -Ygs - gm);
-  y.set (NODE_S, NODE_D, -Yds + DrainControl);
-  y.set (NODE_S, NODE_S, Ygs + Yds + Ybs + SourceControl);
-  y.set (NODE_S, NODE_B, -Ybs - gmb);
-  y.set (NODE_B, NODE_G, -Ygb);
-  y.set (NODE_B, NODE_D, -Ybd);
-  y.set (NODE_B, NODE_S, -Ybs);
-  y.set (NODE_B, NODE_B, Ybd + Ybs + Ygb);
+  y(NODE_G, NODE_G)= Ygd + Ygs + Ygb;
+  y(NODE_G, NODE_D)= -Ygd;
+  y(NODE_G, NODE_S)= -Ygs;
+  y(NODE_G, NODE_B)= -Ygb;
+  y(NODE_D, NODE_G)= gm - Ygd;
+  y(NODE_D, NODE_D)= Ygd + Yds + Ybd - DrainControl;
+  y(NODE_D, NODE_S)= -Yds - SourceControl;
+  y(NODE_D, NODE_B)= -Ybd + gmb;
+  y(NODE_S, NODE_G)= -Ygs - gm;
+  y(NODE_S, NODE_D)= -Yds + DrainControl;
+  y(NODE_S, NODE_S)= Ygs + Yds + Ybs + SourceControl;
+  y(NODE_S, NODE_B)= -Ybs - gmb;
+  y(NODE_B, NODE_G)= -Ygb;
+  y(NODE_B, NODE_D)= -Ybd;
+  y(NODE_B, NODE_S)= -Ybs;
+  y(NODE_B, NODE_B)= Ybd + Ybs + Ygb;
 
   return y;
 }
@@ -113,10 +113,10 @@ matrix mosfet::calcMatrixCy (nr_double_t frequency) {
   /* build noise current correlation matrix and convert it to
      noise-wave correlation matrix */
   matrix cy = matrix (4);
-  cy.set (NODE_D, NODE_D, +i);
-  cy.set (NODE_S, NODE_S, +i);
-  cy.set (NODE_D, NODE_S, -i);
-  cy.set (NODE_S, NODE_D, -i);
+  cy(NODE_D, NODE_D)= +i;
+  cy(NODE_S, NODE_S)= +i;
+  cy(NODE_D, NODE_S)= -i;
+  cy(NODE_S, NODE_D)= -i;
   return cy;
 }
 

@@ -64,16 +64,16 @@ matrix iinoise::calcMatrixCy (nr_double_t frequency) {
 
   matrix cy = matrix (4);
   // entries of source 1
-  cy.set (NODE_I1P, NODE_I1P, +i1); cy.set (NODE_I1N, NODE_I1N, +i1);
-  cy.set (NODE_I1P, NODE_I1N, -i1); cy.set (NODE_I1N, NODE_I1P, -i1);
+  cy(NODE_I1P, NODE_I1P)= +i1; cy(NODE_I1N, NODE_I1N)= +i1;
+  cy(NODE_I1P, NODE_I1N)= -i1; cy(NODE_I1N, NODE_I1P)= -i1;
   // entries of source 2
-  cy.set (NODE_I2P, NODE_I2P, +i2); cy.set (NODE_I2N, NODE_I2N, +i2);
-  cy.set (NODE_I2P, NODE_I2N, -i2); cy.set (NODE_I2N, NODE_I2P, -i2);
+  cy(NODE_I2P, NODE_I2P)= +i2; cy(NODE_I2N, NODE_I2N)= +i2;
+  cy(NODE_I2P, NODE_I2N)= -i2; cy(NODE_I2N, NODE_I2P)= -i2;
   // correlation entries
-  cy.set (NODE_I1P, NODE_I2P, +ci); cy.set (NODE_I1N, NODE_I2N, +ci);
-  cy.set (NODE_I1P, NODE_I2N, -ci); cy.set (NODE_I1N, NODE_I2P, -ci);
-  cy.set (NODE_I2P, NODE_I1P, +ci); cy.set (NODE_I2N, NODE_I1N, +ci);
-  cy.set (NODE_I2P, NODE_I1N, -ci); cy.set (NODE_I2N, NODE_I1P, -ci);
+  cy(NODE_I1P, NODE_I2P)= +ci; cy(NODE_I1N, NODE_I2N)= +ci;
+  cy(NODE_I1P, NODE_I2N)= -ci; cy(NODE_I1N, NODE_I2P)= -ci;
+  cy(NODE_I2P, NODE_I1P)= +ci; cy(NODE_I2N, NODE_I1N)= +ci;
+  cy(NODE_I2P, NODE_I1N)= -ci; cy(NODE_I2N, NODE_I1P)= -ci;
   return cy;
 }
 

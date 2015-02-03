@@ -334,10 +334,10 @@ matrix bondwire::calcMatrixY (const nr_double_t f) {
   nr_complex_t yL = 1.0 / nr_complex_t (R, Lw);
 
   matrix Y (2);
-  Y.set (NODE_1, NODE_1, +yL);
-  Y.set (NODE_1, NODE_2, -yL);
-  Y.set (NODE_2, NODE_1, -yL);
-  Y.set (NODE_2, NODE_2, +yL);
+  Y(NODE_1, NODE_1)=+yL;
+  Y(NODE_1, NODE_2)=-yL;
+  Y(NODE_2, NODE_1)=-yL;
+  Y(NODE_2, NODE_2)=+yL;
   return Y;
 }
 

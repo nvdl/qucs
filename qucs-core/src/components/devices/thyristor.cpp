@@ -169,16 +169,16 @@ matrix thyristor::calcMatrixY (nr_double_t frequency) {
   nr_double_t Ci = getOperatingPoint ("Ci");
   nr_complex_t yi = nr_complex_t (gi, Ci * 2.0 * pi * frequency);
   matrix y (4);
-  y.set (NODE_A2, NODE_A2, +gd);
-  y.set (NODE_IN, NODE_IN, +gd +yi +gg);
-  y.set (NODE_A2, NODE_IN, -gd);
-  y.set (NODE_IN, NODE_A2, -gd);
-  y.set (NODE_A1, NODE_A1, +yi);
-  y.set (NODE_A1, NODE_IN, -yi);
-  y.set (NODE_IN, NODE_A1, -yi);
-  y.set (NODE_GA, NODE_GA, +gg);
-  y.set (NODE_GA, NODE_IN, -gg);
-  y.set (NODE_IN, NODE_GA, -gg);
+  y(NODE_A2, NODE_A2)= +gd;
+  y(NODE_IN, NODE_IN)= +gd +yi +gg;
+  y(NODE_A2, NODE_IN)= -gd;
+  y(NODE_IN, NODE_A2)= -gd;
+  y(NODE_A1, NODE_A1)= +yi;
+  y(NODE_A1, NODE_IN)= -yi;
+  y(NODE_IN, NODE_A1)= -yi;
+  y(NODE_GA, NODE_GA)= +gg;
+  y(NODE_GA, NODE_IN)= -gg;
+  y(NODE_IN, NODE_GA)= -gg;
   return y;
 }
 

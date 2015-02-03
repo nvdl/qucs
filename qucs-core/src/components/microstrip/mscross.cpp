@@ -152,17 +152,17 @@ matrix mscross::calcMatrixY (nr_double_t f) {
   nr_complex_t yl4 = 1.0 / nr_complex_t (0, o * L4);
   nr_complex_t yl5 = 1.0 / nr_complex_t (0, o * L5);
   matrix Y (6);
-  Y.set (NODE_1, NODE_1, yl1 + yc1);
-  Y.set (NODE_2, NODE_2, yl2 + yc2);
-  Y.set (NODE_3, NODE_3, yl3 + yc3);
-  Y.set (NODE_4, NODE_4, yl4 + yc4);
-  Y.set (NODE_1, NODE_5, -yl1); Y.set (NODE_5, NODE_1, -yl1);
-  Y.set (NODE_3, NODE_5, -yl3); Y.set (NODE_5, NODE_3, -yl3);
-  Y.set (NODE_2, NODE_6, -yl2); Y.set (NODE_6, NODE_2, -yl2);
-  Y.set (NODE_4, NODE_6, -yl4); Y.set (NODE_6, NODE_4, -yl4);
-  Y.set (NODE_5, NODE_6, -yl5); Y.set (NODE_6, NODE_5, -yl5);
-  Y.set (NODE_5, NODE_5, yl1 + yl3 + yl5);
-  Y.set (NODE_6, NODE_6, yl2 + yl4 + yl5);
+  Y(NODE_1, NODE_1)= yl1 + yc1;
+  Y(NODE_2, NODE_2)= yl2 + yc2;
+  Y(NODE_3, NODE_3)= yl3 + yc3;
+  Y(NODE_4, NODE_4)= yl4 + yc4;
+  Y(NODE_1, NODE_5)= -yl1; Y(NODE_5, NODE_1)= -yl1;
+  Y(NODE_3, NODE_5)= -yl3; Y(NODE_5, NODE_3)= -yl3;
+  Y(NODE_2, NODE_6)= -yl2; Y(NODE_6, NODE_2)= -yl2;
+  Y(NODE_4, NODE_6)= -yl4; Y(NODE_6, NODE_4)= -yl4;
+  Y(NODE_5, NODE_6)= -yl5; Y(NODE_6, NODE_5)= -yl5;
+  Y(NODE_5, NODE_5)= yl1 + yl3 + yl5;
+  Y(NODE_6, NODE_6)= yl2 + yl4 + yl5;
   return Y;
 }
 

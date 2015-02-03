@@ -63,15 +63,15 @@ matrix jfet::calcMatrixY (nr_double_t frequency) {
 
   // build admittance matrix and convert it to S-parameter matrix
   matrix y (3);
-  y.set (NODE_G, NODE_G, Ygd + Ygs);
-  y.set (NODE_G, NODE_D, -Ygd);
-  y.set (NODE_G, NODE_S, -Ygs);
-  y.set (NODE_D, NODE_G, gm - Ygd);
-  y.set (NODE_D, NODE_D, Ygd + Yds);
-  y.set (NODE_D, NODE_S, -Yds - gm);
-  y.set (NODE_S, NODE_G, -Ygs - gm);
-  y.set (NODE_S, NODE_D, -Yds);
-  y.set (NODE_S, NODE_S, Ygs + Yds + gm);
+  y(NODE_G, NODE_G)= Ygd + Ygs;
+  y(NODE_G, NODE_D)= -Ygd;
+  y(NODE_G, NODE_S)= -Ygs;
+  y(NODE_D, NODE_G)= gm - Ygd;
+  y(NODE_D, NODE_D)= Ygd + Yds;
+  y(NODE_D, NODE_S)= -Yds - gm;
+  y(NODE_S, NODE_G)= -Ygs - gm;
+  y(NODE_S, NODE_D)= -Yds;
+  y(NODE_S, NODE_S)= Ygs + Yds + gm;
   return y;
 }
 
@@ -96,10 +96,10 @@ matrix jfet::calcMatrixCy (nr_double_t frequency) {
   /* build noise current correlation matrix and convert it to
      noise-wave correlation matrix */
   matrix cy = matrix (3);
-  cy.set (NODE_D, NODE_D, +i);
-  cy.set (NODE_S, NODE_S, +i);
-  cy.set (NODE_D, NODE_S, -i);
-  cy.set (NODE_S, NODE_D, -i);
+  cy(NODE_D, NODE_D)= +i;
+  cy(NODE_S, NODE_S)= +i;
+  cy(NODE_D, NODE_S)= -i;
+  cy(NODE_S, NODE_D)= -i;
   return cy;
 }
 

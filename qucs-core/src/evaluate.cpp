@@ -4720,7 +4720,7 @@ constant * evaluate::matrix_x (constant * args) {
   qucs::vector * vn = NULL;
   for (r = 0, v = va; v != NULL; v = vn, r++) {
     for (c = 0; c < v->getSize (); c++) {
-      m->set (r, c, v->get (c));
+      (*m)(r, c) = v->get (c);
     }
     vn = (::vector *) v->getNext ();
     delete v;

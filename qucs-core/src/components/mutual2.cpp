@@ -56,24 +56,24 @@ matrix mutual2::calcMatrixY (nr_double_t frequency) {
   nr_complex_t y25 = nr_complex_t (0, (k23 - k12 * k13) / std::sqrt (l2 * l3) / a / o);
 
   matrix y = matrix (6);
-  y.set (NODE_1, NODE_1, +y11); y.set (NODE_6, NODE_6, +y11);
-  y.set (NODE_1, NODE_6, -y11); y.set (NODE_6, NODE_1, -y11);
-  y.set (NODE_2, NODE_2, +y22); y.set (NODE_3, NODE_3, +y22);
-  y.set (NODE_2, NODE_3, -y22); y.set (NODE_3, NODE_2, -y22);
-  y.set (NODE_4, NODE_4, +y44); y.set (NODE_5, NODE_5, +y44);
-  y.set (NODE_4, NODE_5, -y44); y.set (NODE_5, NODE_4, -y44);
-  y.set (NODE_1, NODE_2, +y12); y.set (NODE_2, NODE_1, +y12);
-  y.set (NODE_3, NODE_6, +y12); y.set (NODE_6, NODE_3, +y12);
-  y.set (NODE_1, NODE_3, -y12); y.set (NODE_3, NODE_1, -y12);
-  y.set (NODE_2, NODE_6, -y12); y.set (NODE_6, NODE_2, -y12);
-  y.set (NODE_1, NODE_5, +y15); y.set (NODE_5, NODE_1, +y15);
-  y.set (NODE_4, NODE_6, +y15); y.set (NODE_6, NODE_4, +y15);
-  y.set (NODE_1, NODE_4, -y15); y.set (NODE_4, NODE_1, -y15);
-  y.set (NODE_5, NODE_6, -y15); y.set (NODE_6, NODE_5, -y15);
-  y.set (NODE_2, NODE_5, +y25); y.set (NODE_5, NODE_2, +y25);
-  y.set (NODE_4, NODE_3, +y25); y.set (NODE_3, NODE_4, +y25);
-  y.set (NODE_2, NODE_4, -y25); y.set (NODE_4, NODE_2, -y25);
-  y.set (NODE_5, NODE_3, -y25); y.set (NODE_3, NODE_5, -y25);
+  y(NODE_1, NODE_1)= +y11; y(NODE_6, NODE_6)= +y11;
+  y(NODE_1, NODE_6)= -y11; y(NODE_6, NODE_1)= -y11;
+  y(NODE_2, NODE_2)= +y22; y(NODE_3, NODE_3)= +y22;
+  y(NODE_2, NODE_3)= -y22; y(NODE_3, NODE_2)= -y22;
+  y(NODE_4, NODE_4)= +y44; y(NODE_5, NODE_5)= +y44;
+  y(NODE_4, NODE_5)= -y44; y(NODE_5, NODE_4)= -y44;
+  y(NODE_1, NODE_2)= +y12; y(NODE_2, NODE_1)= +y12;
+  y(NODE_3, NODE_6)= +y12; y(NODE_6, NODE_3)= +y12;
+  y(NODE_1, NODE_3)= -y12; y(NODE_3, NODE_1)= -y12;
+  y(NODE_2, NODE_6)= -y12; y(NODE_6, NODE_2)= -y12;
+  y(NODE_1, NODE_5)= +y15; y(NODE_5, NODE_1)= +y15;
+  y(NODE_4, NODE_6)= +y15; y(NODE_6, NODE_4)= +y15;
+  y(NODE_1, NODE_4)= -y15; y(NODE_4, NODE_1)= -y15;
+  y(NODE_5, NODE_6)= -y15; y(NODE_6, NODE_5)= -y15;
+  y(NODE_2, NODE_5)= +y25; y(NODE_5, NODE_2)= +y25;
+  y(NODE_4, NODE_3)= +y25; y(NODE_3, NODE_4)= +y25;
+  y(NODE_2, NODE_4)= -y25; y(NODE_4, NODE_2)= -y25;
+  y(NODE_5, NODE_3)= -y25; y(NODE_3, NODE_5)= -y25;
   return y;
 }
 

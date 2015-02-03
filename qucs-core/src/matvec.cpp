@@ -107,7 +107,8 @@ char * matvec::getName (void) {
 void matvec::set (qucs::vector v, int r, int c) {
   assert (v.getSize () == size &&
 	  r >= 0 && r < rows && c >= 0 && c < cols);
-  for (int i = 0; i < size; i++) data[i].set (r, c, v.get (i));
+  for (int i = 0; i < size; i++)
+    (data[i])(r, c)= v.get (i);
 }
 
 /* The function returns the vector specified by the given matrix

@@ -100,8 +100,8 @@ matrix diode::calcMatrixCy (nr_double_t frequency) {
   matrix cy (2);
   nr_double_t i = 2 * (Id + 2 * Is) * QoverkB / T0 +    // shot noise
     Kf * qucs::pow (fabs (Id), Af) / qucs::pow (frequency, Ffe) / kB / T0; // flicker noise
-  cy.set (NODE_C, NODE_C, +i); cy.set (NODE_A, NODE_A, +i);
-  cy.set (NODE_A, NODE_C, -i); cy.set (NODE_C, NODE_A, -i);
+  cy(NODE_C, NODE_C)= +i; cy(NODE_A, NODE_A)= +i;
+  cy(NODE_A, NODE_C)= -i; cy(NODE_C, NODE_A)= -i;
   return cy;
 }
 

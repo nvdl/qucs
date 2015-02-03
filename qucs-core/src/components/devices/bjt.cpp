@@ -88,39 +88,39 @@ matrix bjt::calcMatrixY (nr_double_t frequency) {
   matrix y (4);
 #if NEWSGP
   // for some reason this small signal equivalent can't be used
-  y.set (NODE_B, NODE_B, Ybc + Ybe + Ybebc);
-  y.set (NODE_B, NODE_C, -Ybc - Ybebc);
-  y.set (NODE_B, NODE_E, -Ybe);
-  y.set (NODE_B, NODE_S, 0);
-  y.set (NODE_C, NODE_B, -Ybc + gmf + gmr);
-  y.set (NODE_C, NODE_C, Ybc - gmr + Ycs);
-  y.set (NODE_C, NODE_E, -gmf);
-  y.set (NODE_C, NODE_S, -Ycs);
-  y.set (NODE_E, NODE_B, -Ybe - gmf - gmr - Ybebc);
-  y.set (NODE_E, NODE_C, gmr + Ybebc);
-  y.set (NODE_E, NODE_E, Ybe + gmf);
-  y.set (NODE_E, NODE_S, 0);
-  y.set (NODE_S, NODE_B, 0);
-  y.set (NODE_S, NODE_C, -Ycs);
-  y.set (NODE_S, NODE_E, 0);
-  y.set (NODE_S, NODE_S, Ycs);
+  y(NODE_B, NODE_B)= +Ybc + Ybe + Ybebc;
+  y(NODE_B, NODE_C)= -Ybc - Ybebc;
+  y(NODE_B, NODE_E)= -Ybe;
+  y(NODE_B, NODE_S)= 0;
+  y(NODE_C, NODE_B)= -Ybc + gmf + gmr;
+  y(NODE_C, NODE_C)= Ybc - gmr + Ycs;
+  y(NODE_C, NODE_E)= -gmf;
+  y(NODE_C, NODE_S)= -Ycs;
+  y(NODE_E, NODE_B)= -Ybe - gmf - gmr - Ybebc;
+  y(NODE_E, NODE_C)= gmr + Ybebc;
+  y(NODE_E, NODE_E)= Ybe + gmf;
+  y(NODE_E, NODE_S)= 0;
+  y(NODE_S, NODE_B)= 0;
+  y(NODE_S, NODE_C)= -Ycs;
+  y(NODE_S, NODE_E)= 0;
+  y(NODE_S, NODE_S)= Ycs;
 #else /* !NEWSGP */
-  y.set (NODE_B, NODE_B, Ybc + Ybe + Ybebc);
-  y.set (NODE_B, NODE_C, -Ybc - Ybebc);
-  y.set (NODE_B, NODE_E, -Ybe);
-  y.set (NODE_B, NODE_S, 0);
-  y.set (NODE_C, NODE_B, -Ybc + gmf);
-  y.set (NODE_C, NODE_C, Ybc + Ycs + go);
-  y.set (NODE_C, NODE_E, -gmf - go);
-  y.set (NODE_C, NODE_S, -Ycs);
-  y.set (NODE_E, NODE_B, -Ybe - gmf - Ybebc);
-  y.set (NODE_E, NODE_C, -go + Ybebc);
-  y.set (NODE_E, NODE_E, Ybe + gmf + go);
-  y.set (NODE_E, NODE_S, 0);
-  y.set (NODE_S, NODE_B, 0);
-  y.set (NODE_S, NODE_C, -Ycs);
-  y.set (NODE_S, NODE_E, 0);
-  y.set (NODE_S, NODE_S, Ycs);
+  y(NODE_B, NODE_B)= +Ybc + Ybe + Ybebc;
+  y(NODE_B, NODE_C)= -Ybc - Ybebc;
+  y(NODE_B, NODE_E)= -Ybe;
+  y(NODE_B, NODE_S)= 0;
+  y(NODE_C, NODE_B)= -Ybc + gmf;
+  y(NODE_C, NODE_C)= Ybc + Ycs + go;
+  y(NODE_C, NODE_E)= -gmf - go;
+  y(NODE_C, NODE_S)= -Ycs;
+  y(NODE_E, NODE_B)= -Ybe - gmf - Ybebc;
+  y(NODE_E, NODE_C)= -go + Ybebc;
+  y(NODE_E, NODE_E)= Ybe + gmf + go;
+  y(NODE_E, NODE_S)= 0;
+  y(NODE_S, NODE_B)= 0;
+  y(NODE_S, NODE_C)= -Ycs;
+  y(NODE_S, NODE_E)= 0;
+  y(NODE_S, NODE_S)= Ycs;
 #endif /* !NEWSGP */
   return y;
 }
@@ -152,13 +152,13 @@ matrix bjt::calcMatrixCy (nr_double_t frequency) {
   /* build noise current correlation matrix and convert it to
      noise-wave correlation matrix */
   matrix cy = matrix (4);
-  cy.set (NODE_B, NODE_B, ib);
-  cy.set (NODE_B, NODE_E, -ib);
-  cy.set (NODE_C, NODE_C, ic);
-  cy.set (NODE_C, NODE_E, -ic);
-  cy.set (NODE_E, NODE_B, -ib);
-  cy.set (NODE_E, NODE_C, -ic);
-  cy.set (NODE_E, NODE_E, ic + ib);
+  cy(NODE_B, NODE_B)= +ib;
+  cy(NODE_B, NODE_E)= -ib;
+  cy(NODE_C, NODE_C)= +ic;
+  cy(NODE_C, NODE_E)= -ic;
+  cy(NODE_E, NODE_B)= -ib;
+  cy(NODE_E, NODE_C)= -ic;
+  cy(NODE_E, NODE_E)= +ic + ib;
   return cy;
 }
 

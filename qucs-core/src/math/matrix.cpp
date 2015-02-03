@@ -232,18 +232,9 @@ matrix operator / (matrix a, nr_double_t d) {
     \todo a and b are const
 */
 matrix operator * (matrix a, matrix b) {
-  assert (a.cols () == b.rows ());
-
-  int r, c, i, n = a.cols ();
-  nr_complex_t z;
-  matrix res (a.rows (), b.cols ());
-  for (r = 0; r < a.rows (); r++) {
-    for (c = 0; c < b.cols (); c++) {
-      for (i = 0, z = 0; i < n; i++) z += a.get (r, i) * b.get (i, c);
-      res.set (r, c, z);
-    }
-  }
-  return res;
+  Eigen::Matrix<nr_complex_t,Eigen::Dynamic,Eigen::Dynamic> tmp = Eigen::Matrix<nr_complex_t,Eigen::Dynamic,Eigen::Dynamic>::Zero(a.rows(),b.cols());
+  tmp = a.m*b.m;
+  return tmp;
 }
 
 /*!\brief Complex scalar addition.
@@ -256,7 +247,7 @@ matrix operator + (matrix a, nr_complex_t z) {
   matrix res (a.rows (), a.cols ());
   for (int r = 0; r < a.rows (); r++)
     for (int c = 0; c < a.cols (); c++)
-      res.set (r, c, a.get (r, c) + z);
+      res(r, c)=a(r, c) + z;
   return res;
 }
 
@@ -281,7 +272,7 @@ matrix operator + (matrix a, nr_double_t d) {
   matrix res (a.rows (), a.cols ());
   for (int r = 0; r < a.rows (); r++)
     for (int c = 0; c < a.cols (); c++)
-      res.set (r, c, a.get (r, c) + d);
+      res(r,c) = a(r,c) + d;
   return res;
 }
 
@@ -383,7 +374,7 @@ matrix abs (matrix a) {
   matrix res (a.rows (), a.cols ());
   for (int r = 0; r < a.rows (); r++)
     for (int c = 0; c < a.cols (); c++)
-      res.set (r, c, abs (a.get (r, c)));
+      res(r,c) = abs(a(r,c));
   return res;
 }
 
@@ -394,7 +385,7 @@ matrix dB (matrix a) {
   matrix res (a.rows (), a.cols ());
   for (int r = 0; r < a.rows (); r++)
     for (int c = 0; c < a.cols (); c++)
-      res.set (r, c, dB (a.get (r, c)));
+      res(r, c) = dB (a(r, c));
   return res;
 }
 
@@ -407,7 +398,7 @@ matrix arg (matrix a) {
   matrix res (a.rows (), a.cols ());
   for (int r = 0; r < a.rows (); r++)
     for (int c = 0; c < a.cols (); c++)
-      res.set (r, c, arg (a.get (r, c)));
+      res(r, c) = arg (a(r, c));
   return res;
 }
 
@@ -420,7 +411,7 @@ matrix real (matrix a) {
   matrix res (a.rows (), a.cols ());
   for (int r = 0; r < a.rows (); r++)
     for (int c = 0; c < a.cols (); c++)
-      res.set (r, c, real (a.get (r, c)));
+      res(r, c) = real (a(r, c));
   return res;
 }
 
@@ -433,7 +424,7 @@ matrix imag (matrix a) {
   matrix res (a.rows (), a.cols ());
   for (int r = 0; r < a.rows (); r++)
     for (int c = 0; c < a.cols (); c++)
-      res.set (r, c, imag (a.get (r, c)));
+      res(r, c) =  imag (a(r, c));
   return res;
 }
 
@@ -455,7 +446,8 @@ matrix eye (int rs, int cs) {
   matrix res (rs, cs);
   for (int r = 0; r < res.rows (); r++)
     for (int c = 0; c < res.cols (); c++)
-      if (r == c) res.set (r, c, 1);
+      if (r == c)
+	res(r, c)= 1;
   return res;
 }
 
@@ -512,7 +504,7 @@ nr_complex_t cofactor (matrix a, int u, int v) {
     if (ra == u) ra++;
     for (ca = c = 0; c < res.cols (); c++, ca++) {
       if (ca == v) ca++;
-      res.set (r, c, a.get (ra, ca));
+      res(r, c)= a(ra, ca);
     }
   }
   nr_complex_t z = detLaplace (res);
@@ -595,7 +587,7 @@ nr_complex_t detGauss (matrix a) {
     for (r = i + 1; r < n; r++) {
       f = b.get (r, i) / b.get (i, i);
       for (c = i + 1; c < n; c++) {
-	b.set (r, c, b.get (r, c) - f * b.get (i, c));
+	b(r, c)= b(r, c) - f * b(i, c);
       }
     }
   }
@@ -633,7 +625,7 @@ matrix inverseLaplace (matrix a) {
   assert (abs (d) != 0); // singular matrix
   for (int r = 0; r < a.rows (); r++)
     for (int c = 0; c < a.cols (); c++)
-      res.set (r, c, cofactor (a, c, r) / d);
+      res(r, c)= cofactor (a, c, r) / d;
   return res;
 }
 
@@ -1036,13 +1028,13 @@ matrix stoa (matrix s, nr_complex_t z1, nr_complex_t z2) {
 
   assert (s.rows () >= 2 && s.cols () >= 2);
 
-  a.set (0, 0, (conj (z1) + z1 * s (0, 0) -
-		conj (z1) * s (1, 1) - z1 * d) / n);
-  a.set (0, 1, (conj (z1) * conj (z2) + z1 * conj (z2) * s (0, 0) +
-		conj (z1) * z2 * s (1, 1) + z1 * z2 * d) / n);
-  a.set (1, 0, (1.0 - s (0, 0) - s (1, 1) + d) / n);
-  a.set (1, 1, (conj (z2) - conj (z2) * s (0, 0) +
-		z2 * s (1, 1) - z2 * d) / n);
+  a(0, 0)= (conj (z1) + z1 * s (0, 0) -
+		conj (z1) * s (1, 1) - z1 * d) / n;
+  a(0, 1) = (conj (z1) * conj (z2) + z1 * conj (z2) * s (0, 0) +
+		conj (z1) * z2 * s (1, 1) + z1 * z2 * d) / n;
+  a(1, 0) = (1.0 - s (0, 0) - s (1, 1) + d) / n;
+  a(1, 1) =  (conj (z2) - conj (z2) * s (0, 0) +
+		z2 * s (1, 1) - z2 * d) / n;
   return a;
 }
 
@@ -1078,13 +1070,13 @@ matrix atos (matrix a, nr_complex_t z1, nr_complex_t z2) {
 
   assert (a.rows () >= 2 && a.cols () >= 2);
 
-  s.set (0, 0, (a (0, 0) * z2 + a (0, 1)
-                - a (1, 0) * conj (z1) * z2 - a (1, 1) * conj (z1)) / n);
-  s.set (0, 1, (a (0, 0) * a (1, 1) -
-		a (0, 1) * a (1, 0)) * d / n);
-  s.set (1, 0, d / n);
-  s.set (1, 1, (a (1, 1) * z1 - a (0, 0) * conj (z2) +
-		a (0, 1) - a (1, 0) * z1 * conj (z2)) / n);
+  s(0, 0)=  (a (0, 0) * z2 + a (0, 1)
+                - a (1, 0) * conj (z1) * z2 - a (1, 1) * conj (z1)) / n;
+  s(0, 1) = (a (0, 0) * a (1, 1) -
+		a (0, 1) * a (1, 0)) * d / n;
+  s(1, 0) = d / n;
+  s(1, 1) = (a (1, 1) * z1 - a (0, 0) * conj (z2) +
+		a (0, 1) - a (1, 0) * z1 * conj (z2)) / n;
   return s;
 }
 
@@ -1124,10 +1116,10 @@ matrix stoh (matrix s, nr_complex_t z1, nr_complex_t z2) {
 
   assert (s.rows () >= 2 && s.cols () >= 2);
 
-  h.set (0, 0, ((1.0 + s (0, 0)) * (1.0 + s (1, 1)) - n) * z1 / d);
-  h.set (0, 1, +2.0 * s (0, 1) / d);
-  h.set (1, 0, -2.0 * s (1, 0) / d);
-  h.set (1, 1, ((1.0 - s (0, 0)) * (1.0 - s (1, 1)) - n) / z2 / d);
+  h(0, 0) = ((1.0 + s (0, 0)) * (1.0 + s (1, 1)) - n) * z1 / d;
+  h(0, 1) = +2.0 * s (0, 1) / d;
+  h(1, 0) = -2.0 * s (1, 0) / d;
+  h(1, 1) = ((1.0 - s (0, 0)) * (1.0 - s (1, 1)) - n) / z2 / d;
   return h;
 }
 
@@ -1162,10 +1154,10 @@ matrix htos (matrix h, nr_complex_t z1, nr_complex_t z2) {
 
   assert (h.rows () >= 2 && h.cols () >= 2);
 
-  s.set (0, 0, ((h (0, 0) / z1 - 1.0) * (1.0 + z2 * h (1, 1)) - n) / d);
-  s.set (0, 1, +2.0 * h (0, 1) / d);
-  s.set (1, 0, -2.0 * h (1, 0) / d);
-  s.set (1, 1, ((1.0 + h (0, 0) / z1) * (1.0 - z2 * h (1, 1)) + n) / d);
+  s(0, 0) = ((h (0, 0) / z1 - 1.0) * (1.0 + z2 * h (1, 1)) - n) / d;
+  s(0, 1) = +2.0 * h (0, 1) / d;
+  s(1, 0) = -2.0 * h (1, 0) / d;
+  s(1, 1) = ((1.0 + h (0, 0) / z1) * (1.0 - z2 * h (1, 1)) + n) / d;
   return s;
 }
 
@@ -1186,10 +1178,10 @@ matrix stog (matrix s, nr_complex_t z1, nr_complex_t z2) {
 
   assert (s.rows () >= 2 && s.cols () >= 2);
 
-  g.set (0, 0, ((1.0 - s (0, 0)) * (1.0 - s (1, 1)) - n) / z1 / d);
-  g.set (0, 1, -2.0 * s (0, 1) / d);
-  g.set (1, 0, +2.0 * s (1, 0) / d);
-  g.set (1, 1, ((1.0 + s (0, 0)) * (1.0 + s (1, 1)) - n) * z2 / d);
+  g(0, 0) = ((1.0 - s (0, 0)) * (1.0 - s (1, 1)) - n) / z1 / d;
+  g(0, 1) = -2.0 * s (0, 1) / d;
+  g(1, 0) = +2.0 * s (1, 0) / d;
+  g(1, 1)= ((1.0 + s (0, 0)) * (1.0 + s (1, 1)) - n) * z2 / d;
   return g;
 }
 
@@ -1210,10 +1202,10 @@ matrix gtos (matrix g, nr_complex_t z1, nr_complex_t z2) {
 
   assert (g.rows () >= 2 && g.cols () >= 2);
 
-  s.set (0, 0, ((1.0 - g (0, 0) * z1) * (1.0 + g (1, 1) / z2) + n) / d);
-  s.set (0, 1, -2.0 * g (0, 1) / d);
-  s.set (1, 0, +2.0 * g (1, 0) / d);
-  s.set (1, 1, ((g (0, 0) * z1 + 1.0) * (g (1, 1) / z2 - 1.0) - n) / d);
+  s(0, 0)= ((1.0 - g (0, 0) * z1) * (1.0 + g (1, 1) / z2) + n) / d;
+  s(0, 1)= -2.0 * g (0, 1) / d;
+  s(1, 0)= +2.0 * g (1, 0) / d;
+  s(1, 1)= ((g (0, 0) * z1 + 1.0) * (g (1, 1) / z2 - 1.0) - n) / d;
   return s;
 }
 
@@ -1458,31 +1450,31 @@ matrix twoport (matrix m, char in, char out) {
       break;
     case 'Z': // Y to Z
       d = m (0, 0) * m (1, 1) - m (0, 1) * m (1, 0);
-      res.set (0, 0, m (1, 1) / d);
-      res.set (0, 1, -m (0, 1) / d);
-      res.set (1, 0, -m (1, 0) / d);
-      res.set (1, 1, m (0, 0) / d);
+      res(0, 0)= m (1, 1) / d;
+      res(0, 1)= -m (0, 1) / d;
+      res(1, 0)= -m (1, 0) / d;
+      res(1, 1)= m (0, 0) / d;
       break;
     case 'H': // Y to H
       d = m (0, 0);
-      res.set (0, 0, 1.0 / d);
-      res.set (0, 1, -m (0, 1) / d);
-      res.set (1, 0, m (1, 0) / d);
-      res.set (1, 1, m (1, 1) - m (0, 1) * m (1, 0) / d);
+      res(0, 0) = 1.0 / d;
+      res(0, 1)= -m (0, 1) / d;
+      res(1, 0)= m (1, 0) / d;
+      res(1, 1)= m (1, 1) - m (0, 1) * m (1, 0) / d;
       break;
     case 'G': // Y to G
       d = m (1, 1);
-      res.set (0, 0, m (0, 0) - m (0, 1) * m (1, 0) / d);
-      res.set (0, 1, m (0, 1) / d);
-      res.set (1, 0, -m (1, 0) / d);
-      res.set (1, 1, 1.0 / d);
+      res(0, 0)= m (0, 0) - m (0, 1) * m (1, 0) / d;
+      res(0, 1)= m (0, 1) / d;
+      res(1, 0)= -m (1, 0) / d;
+      res(1, 1)= 1.0 / d;
       break;
     case 'A': // Y to A
       d = m (1, 0);
-      res.set (0, 0, -m (1, 1) / d);
-      res.set (0, 1, -1.0 / d);
-      res.set (1, 0, m (0, 1) - m (1, 1) * m (0, 0) / d);
-      res.set (1, 1, -m (0, 0) / d);
+      res(0, 0)= -m (1, 1) / d;
+      res(0, 1)= -1.0 / d;
+      res(1, 0)= m (0, 1) - m (1, 1) * m (0, 0) / d;
+      res(1, 1)= -m (0, 0) / d;
       break;
     case 'S': // Y to S
       res = ytos (m);
@@ -1493,34 +1485,34 @@ matrix twoport (matrix m, char in, char out) {
     switch (out) {
     case 'Y': // Z to Y
       d = m (0, 0) * m (1, 1) - m (0, 1) * m (1, 0);
-      res.set (0, 0, m (1, 1) / d);
-      res.set (0, 1, -m (0, 1) / d);
-      res.set (1, 0, -m (1, 0) / d);
-      res.set (1, 1, m (0, 0) / d);
+      res(0, 0)= m (1, 1) / d;
+      res(0, 1)= -m (0, 1) / d;
+      res(1, 0)= -m (1, 0) / d;
+      res(1, 1)= m (0, 0) / d;
       break;
     case 'Z': // Z to Z
       res = m;
       break;
     case 'H': // Z to H
       d = m (1, 1);
-      res.set (0, 0, m (0, 0) - m (0, 1) * m (1, 0) / d);
-      res.set (0, 1, m (0, 1) / d);
-      res.set (1, 0, -m (1, 0) / d);
-      res.set (1, 1, 1.0 / d);
+      res(0, 0)= m (0, 0) - m (0, 1) * m (1, 0) / d;
+      res(0, 1)= m (0, 1) / d;
+      res(1, 0)= -m (1, 0) / d;
+      res(1, 1)= 1.0 / d;
       break;
     case 'G': // Z to G
       d = m (0, 0);
-      res.set (0, 0, 1.0 / d);
-      res.set (0, 1, -m (0, 1) / d);
-      res.set (1, 0, m (1, 0) / d);
-      res.set (1, 1, m (1, 1) - m (0, 1) * m (1, 0) / d);
+      res(0, 0)= 1.0 / d;
+      res(0, 1)= -m (0, 1) / d;
+      res(1, 0)= m (1, 0) / d;
+      res(1, 1)= m (1, 1) - m (0, 1) * m (1, 0) / d;
       break;
     case 'A': // Z to A
       d = m (1, 0);
-      res.set (0, 0, m (0, 0) / d);
-      res.set (0, 1, m (0, 0) * m (1, 1) / d - m (0, 1));
-      res.set (1, 0, 1.0 / d);
-      res.set (1, 1, m (1, 1) / d);
+      res(0, 0)= m (0, 0) / d;
+      res(0, 1)= m (0, 0) * m (1, 1) / d - m (0, 1);
+      res(1, 0)= 1.0 / d;
+      res(1, 1)= m (1, 1) / d;
       break;
     case 'S': // Z to S
       res = ztos (m);
@@ -1531,34 +1523,34 @@ matrix twoport (matrix m, char in, char out) {
     switch (out) {
     case 'Y': // H to Y
       d = m (0, 0);
-      res.set (0, 0, 1.0 / d);
-      res.set (0, 1, -m (0, 1) / d);
-      res.set (1, 0, m (1, 0) / d);
-      res.set (1, 1, m (1, 1) - m (0, 1) * m.get(2, 1) / d);
+      res(0, 0)=1.0 / d;
+      res(0, 1)=-m (0, 1) / d;
+      res(1, 0)= m (1, 0) / d;
+      res(1, 1)= m (1, 1) - m (0, 1) * m.get(2, 1) / d;
       break;
     case 'Z': // H to Z
       d = m (1, 1);
-      res.set (0, 0, m (0, 0) - m (0, 1) * m (1, 0) / d);
-      res.set (0, 1, m (0, 1) / d);
-      res.set (1, 0, -m (1, 0) / d);
-      res.set (1, 1, 1.0 / d);
+      res(0, 0)= m (0, 0) - m (0, 1) * m (1, 0) / d;
+      res(0, 1)= m (0, 1) / d;
+      res(1, 0)= -m (1, 0) / d;
+      res(1, 1)= 1.0 / d;
       break;
     case 'H': // H to H
       res = m;
       break;
     case 'G': // H to G
       d = m (0, 0) * m (1, 1) - m (0, 1) * m (1, 0);
-      res.set (0, 0, m (1, 1) / d);
-      res.set (0, 1, -m (0, 1) / d);
-      res.set (1, 0, -m (1, 0) / d);
-      res.set (1, 1, m (0, 0) / d);
+      res(0, 0)= m (1, 1) / d;
+      res(0, 1)= -m (0, 1) / d;
+      res(1, 0)= -m (1, 0) / d;
+      res(1, 1)= m (0, 0) / d;
       break;
     case 'A': // H to A
       d = m (1, 0);
-      res.set (0, 0, m (0, 1) - m (0, 0) * m (1, 1) / d);
-      res.set (0, 1, -m (0, 0) / d);
-      res.set (1, 0, -m (1, 1) / d);
-      res.set (1, 1, -1.0 / d);
+      res(0, 0)= m (0, 1) - m (0, 0) * m (1, 1) / d;
+      res(0, 1)= -m (0, 0) / d;
+      res(1, 0)= -m (1, 1) / d;
+      res(1, 1)= -1.0 / d;
       break;
     case 'S': // H to S
       res = htos (m);
@@ -1569,34 +1561,34 @@ matrix twoport (matrix m, char in, char out) {
     switch (out) {
     case 'Y': // G to Y
       d = m (1, 1);
-      res.set (0, 0, m (0, 0) - m (0, 1) * m (1, 0) / d);
-      res.set (0, 1, m (0, 1) / d);
-      res.set (1, 0, -m (1, 0) / d);
-      res.set (1, 1, 1.0 / d);
+      res(0, 0)= m (0, 0) - m (0, 1) * m (1, 0) / d;
+      res(0, 1)= m (0, 1) / d;
+      res(1, 0)= -m (1, 0) / d;
+      res(1, 1)= 1.0 / d;
       break;
     case 'Z': // G to Z
       d = m (0, 0);
-      res.set (0, 0, 1.0 / d);
-      res.set (0, 1, -m (0, 1) / d);
-      res.set (1, 0, m (1, 0) / d);
-      res.set (1, 1, m (1, 1) - m (0, 1) * m (1, 0) / d);
+      res(0, 0)= 1.0 / d;
+      res(0, 1)= -m (0, 1) / d;
+      res(1, 0)= m (1, 0) / d;
+      res(1, 1)= m (1, 1) - m (0, 1) * m (1, 0) / d;
       break;
     case 'H': // G to H
       d = m (0, 0) * m (1, 1) - m (0, 1) * m (1, 0);
-      res.set (0, 0, m (1, 1) / d);
-      res.set (0, 1, -m (0, 1) / d);
-      res.set (1, 0, -m (1, 0) / d);
-      res.set (1, 1, m (0, 0) / d);
+      res(0, 0)= m (1, 1) / d;
+      res(0, 1)= -m (0, 1) / d;
+      res(1, 0)= -m (1, 0) / d;
+      res(1, 1)= m (0, 0) / d;
       break;
     case 'G': // G to G
       res = m;
       break;
     case 'A': // G to A
       d = m (1, 0);
-      res.set (0, 0, 1.0 / d);
-      res.set (0, 1, m (1, 1) / d);
-      res.set (1, 0, m (0, 0) / d);
-      res.set (1, 1, m (0, 0) * m (1, 1) / d - m (0, 1));
+      res(0, 0)= 1.0 / d;
+      res(0, 1)= m (1, 1) / d;
+      res(1, 0)= m (0, 0) / d;
+      res(1, 1)= m (0, 0) * m (1, 1) / d - m (0, 1);
       break;
     case 'S': // G to S
       res = gtos (m);
@@ -1607,31 +1599,31 @@ matrix twoport (matrix m, char in, char out) {
     switch (out) {
     case 'Y': // A to Y
       d = m (0, 1);
-      res.set (0, 0, m (1, 1) / d);
-      res.set (0, 1, m (1, 0) - m (0, 0) * m (1, 1) / d);
-      res.set (1, 0, -1.0 / d);
-      res.set (1, 1, m (0, 0) / d);
+      res(0, 0)= m (1, 1) / d;
+      res(0, 1)= m (1, 0) - m (0, 0) * m (1, 1) / d;
+      res(1, 0)=-1.0 / d;
+      res(1, 1)= m (0, 0) / d;
       break;
     case 'Z': // A to Z
       d = m (1, 0);
-      res.set (0, 0, m (0, 0) / d);
-      res.set (0, 1, m (0, 0) * m (1, 1) / d - m (0, 1));
-      res.set (1, 0, 1.0 / d);
-      res.set (1, 1, m (1, 1) / d);
+      res(0, 0)= m (0, 0) / d;
+      res(0, 1)= m (0, 0) * m (1, 1) / d - m (0, 1);
+      res(1, 0)= 1.0 / d;
+      res(1, 1)= m (1, 1) / d;
       break;
     case 'H': // A to H
       d = m (1, 1);
-      res.set (0, 0, m (0, 1) / d);
-      res.set (0, 1, m (0, 0) - m (0, 1) * m (1, 0) / d);
-      res.set (1, 0, -1.0 / d);
-      res.set (1, 1, m (1, 0) / d);
+      res(0, 0)= m (0, 1) / d;
+      res(0, 1)= m (0, 0) - m (0, 1) * m (1, 0) / d;
+      res(1, 0)= -1.0 / d;
+      res(1, 1)= m (1, 0) / d;
       break;
     case 'G': // A to G
       d = m (0, 0);
-      res.set (0, 0, m (1, 0) / d);
-      res.set (0, 1, m (1, 0) * m (0, 1) / d - m (1, 1));
-      res.set (1, 0, 1.0 / d);
-      res.set (1, 1, m (0, 1) / d);
+      res(0, 0)=m (1, 0) / d;
+      res(0, 1)=m (1, 0) * m (0, 1) / d - m (1, 1);
+      res(1, 0)=1.0 / d;
+      res(1, 1)=m(0, 1) / d;
       break;
     case 'A': // A to A
       res = m;
@@ -1648,10 +1640,10 @@ matrix twoport (matrix m, char in, char out) {
       break;
     case 'T': // S to T
       d = m (1, 0);
-      res.set (0, 0, m (0, 1) - m (0, 0) * m (1, 1) / d);
-      res.set (0, 1, m (0, 0) / d);
-      res.set (1, 0, -m (1, 1) / d);
-      res.set (0, 1, 1.0 / d);
+      res(0, 0)= m (0, 1) - m (0, 0) * m (1, 1) / d;
+      res(0, 1)= m (0, 0) / d;
+      res(1, 0)= -m (1, 1) / d;
+      res(0, 1)= 1.0 / d;
       break;
     case 'A': // S to A
       res = stoa (m);
@@ -1674,10 +1666,10 @@ matrix twoport (matrix m, char in, char out) {
     switch (out) {
     case 'S': // T to S
       d = m (1, 1);
-      res.set (0, 0, m (0, 1) / d);
-      res.set (0, 1, m (0, 0) - m (0, 1) * m (1, 0) / d);
-      res.set (1, 0, 1.0 / d);
-      res.set (0, 1, -m (1, 0) / d);
+      res(0, 0)= m (0, 1) / d;
+      res(0, 1)= m (0, 0) - m (0, 1) * m (1, 0) / d;
+      res(1, 0)= 1.0 / d;
+      res(0, 1)= -m (1, 0) / d;
       break;
     case 'T': // T to T
       res = m;
@@ -1726,7 +1718,7 @@ matrix rad2deg (matrix a) {
   matrix res (a.rows (), a.cols ());
   for (int r = 0; r < a.rows (); r++)
     for (int c = 0; c < a.cols (); c++)
-      res.set (r, c, rad2deg (a.get (r, c)));
+      res(r, c)=rad2deg (a(r, c));
   return res;
 }
 
@@ -1734,7 +1726,7 @@ matrix deg2rad (matrix a) {
   matrix res (a.rows (), a.cols ());
   for (int r = 0; r < a.rows (); r++)
     for (int c = 0; c < a.cols (); c++)
-      res.set (r, c, deg2rad (a.get (r, c)));
+      res(r, c)= deg2rad (a(r, c));
   return res;
 }
 

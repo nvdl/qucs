@@ -147,13 +147,13 @@ matrix diac::calcMatrixY (nr_double_t frequency) {
   nr_double_t Ci = getOperatingPoint ("Ci");
   nr_complex_t yd = nr_complex_t (gd, Ci * 2.0 * pi * frequency);
   matrix y (3);
-  y.set (NODE_A2, NODE_A2, +yd);
-  y.set (NODE_IN, NODE_IN, +yd +gi);
-  y.set (NODE_A2, NODE_IN, -yd);
-  y.set (NODE_IN, NODE_A2, -yd);
-  y.set (NODE_A1, NODE_A1, +gi);
-  y.set (NODE_A1, NODE_IN, -gi);
-  y.set (NODE_IN, NODE_A1, -gi);
+  y(NODE_A2, NODE_A2)= +yd;
+  y(NODE_IN, NODE_IN)= +yd +gi;
+  y(NODE_A2, NODE_IN)= -yd;
+  y(NODE_IN, NODE_A2)= -yd;
+  y(NODE_A1, NODE_A1)= +gi;
+  y(NODE_A1, NODE_IN)= -gi;
+  y(NODE_IN, NODE_A1)= -gi;
   return y;
 }
 

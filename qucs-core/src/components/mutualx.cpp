@@ -53,10 +53,10 @@ matrix mutualx::calcMatrixY (nr_double_t frequency) {
 
   for (r = 0; r < inductors; r++) {
     for (c = 0; c < inductors; c++) {
-      y.set (2 * r + 0, 2 * c + 0, +ty (r, c));
-      y.set (2 * r + 1, 2 * c + 1, +ty (r, c));
-      y.set (2 * r + 0, 2 * c + 1, -ty (r, c));
-      y.set (2 * r + 1, 2 * c + 0, -ty (r, c));
+      y(2 * r + 0, 2 * c + 0)= +ty (r, c);
+      y(2 * r + 1, 2 * c + 1)= +ty (r, c);
+      y(2 * r + 0, 2 * c + 1)= -ty (r, c);
+      y(2 * r + 1, 2 * c + 0)= -ty (r, c);
     }
   }
   return y;
@@ -76,7 +76,7 @@ matrix mutualx::calcMatrixZ (nr_double_t frequency) {
       nr_double_t l1 = real (L->get (r));
       nr_double_t l2 = real (L->get (c));
       nr_double_t k = real (C->get (state)) * std::sqrt (l1 * l2);
-      z.set (r, c, nr_complex_t (0.0, k * o));
+      z(r, c)= nr_complex_t (0.0, k * o);
     }
   }
   return z;

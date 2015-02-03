@@ -332,7 +332,7 @@ static void touchstone_normalize_sp (void) {
     // save entries in a temporary matrix
     for (i = 0; i < ports; i++) {
       for (j = 0; j < ports; j++) {
-	s.set (i, j, v->get (n));
+	s(i, j)= v->get(n);
 	v = (qucs::vector *) v->getNext ();
       }
     }
