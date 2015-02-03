@@ -96,18 +96,23 @@ matrix deg2rad     (matrix);
 */
 class matrix
 {
+ private:
+  Eigen::Matrix<nr_complex_t, Eigen::Dynamic, Eigen::Dynamic> m;
  public:
-  matrix ();
-  matrix (int);
-  matrix (int, int);
-  matrix (const matrix &);
-  const matrix& operator = (const matrix &);
-  ~matrix ();
-  nr_complex_t get (int, int);
-  void set (int, int, nr_complex_t);
-  int getCols (void) { return cols; }
-  int getRows (void) { return rows; }
-  nr_complex_t * getData (void) { return data; }
+  matrix () = default;
+  matrix (int n) : m(Eigen::Matrix<nr_complex_t,Eigen::Dynamic,Eigen::Dynamic>::Zero(n,n)) {};
+  matrix (int r, int c) : m(Eigen::Matrix<nr_complex_t,Eigen::Dynamic,Eigen::Dynamic>::Zero(r,c)) {} ;
+  matrix (const matrix &)= default;
+  matrix (const Eigen::Matrix<nr_complex_t,Eigen::Dynamic,Eigen::Dynamic> &n):
+    m(n) {};
+  matrix (Eigen::Matrix<nr_complex_t,Eigen::Dynamic,Eigen::Dynamic> &&n):
+    m(std::move(n)) {};
+  ~matrix () = default;
+  nr_complex_t get (int r, int c) const { return (*this)(r,c); }
+  void set (int r, int c, const nr_complex_t v) { (*this)(r,c) = v; }
+  int getCols (void) { return m.cols(); }
+  int getRows (void) { return m.rows(); }
+  nr_complex_t * getData (void) { return m.data(); }
   void print (void);
   void exchangeRows (int, int);
   void exchangeCols (int, int);
@@ -199,7 +204,7 @@ class matrix
       \todo: Why not r and c not const
       \todo: Create a debug version checking out of bound (using directly assert)
   */
-  nr_complex_t  operator () (int r, int c) const { return data[r * cols + c]; }
+  nr_complex_t  operator () (int r, int c) const { return m(r,c); }
   /*! \brief Write access operator
       \param[in] r: row number (from 0 like usually in C)
       \param[in] c: column number (from 0 like usually in C)
@@ -208,16 +213,8 @@ class matrix
       \todo: Why r and c not const
       \todo: Create a debug version checking out of bound (using directly assert)
   */
-  nr_complex_t& operator () (int r, int c) { return data[r * cols + c]; }
+  nr_complex_t& operator () (int r, int c) { return m(r,c); }
 
- private:
-  /*! Number of colunms */
-  int cols;
-  /*! Number of rows */
-  int rows;
-  /*! Matrix data */
-  nr_complex_t * data;
-  Eigen::Matrix<nr_complex_t, Eigen::Dynamic, Eigen::Dynamic> m;
 };
 
 } // namespace qucs

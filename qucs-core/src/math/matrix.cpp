@@ -97,120 +97,12 @@
 
 namespace qucs {
 
-/*!\brief Create an empty matrix
-
-   Constructor creates an unnamed instance of the matrix class.
-*/
-matrix::matrix () {
-  rows = 0;
-  cols = 0;
-  data = NULL;
-}
-
-/*!\brief Creates a square matrix
-
-    Constructor creates an unnamed instance of the matrix class with a
-    certain number of rows and columns.  Particularly creates a square matrix.
-    \param[in] s number of rows or colums of square matrix
-    \todo Why not s const?
-*/
-matrix::matrix (int s)  {
-  rows = cols = s;
-  data = (s > 0) ? new nr_complex_t[s * s] : NULL;
-}
-
-/* \brief Creates a matrix
-
-   Constructor creates an unnamed instance of the matrix class with a
-   certain number of rows and columns.
-   \param[in] r number of rows
-   \param[in] c number of column
-   \todo Why not r and c constant
-   \todo Assert r >= 0 and c >= 0
-*/
-matrix::matrix (int r, int c)  {
-  rows = r;
-  cols = c;
-  data = (r > 0 && c > 0) ? new nr_complex_t[r * c] : NULL;
-}
-
-/* \brief copy constructor
-
-   The copy constructor creates a new instance based on the given
-   matrix object.
-   \todo Add assert tests
-*/
-matrix::matrix (const matrix & m) {
-  rows = m.rows;
-  cols = m.cols;
-  data = NULL;
-
-  // copy matrix elements
-  if (rows > 0 && cols > 0) {
-    data = new nr_complex_t[rows * cols];
-    memcpy (data, m.data, sizeof (nr_complex_t) * rows * cols);
-  }
-}
-
-/*!\brief Assignment operator
-
-  The assignment copy constructor creates a new instance based on the
-  given matrix object.
-
-  \param[in] m object to copy
-  \return assigned object
-  \note m = m is safe
-*/
-const matrix& matrix::operator=(const matrix & m) {
-  if (&m != this) {
-    rows = m.rows;
-    cols = m.cols;
-    if (data) {
-      delete[] data;
-      data = NULL;
-    }
-    if (rows > 0 && cols > 0) {
-      data = new nr_complex_t[rows * cols];
-      memcpy (data, m.data, sizeof (nr_complex_t) * rows * cols);
-    }
-  }
-  return *this;
-}
-
-/*!\bried Destructor
-
-   Destructor deletes a matrix object.
-*/
-matrix::~matrix () {
-  if (data) delete[] data;
-}
-
-/*!\brief  Returns the matrix element at the given row and column.
-   \param[in] r row number
-   \param[in] c column number
-   \todo Why not inline and synonymous of ()
-   \todo c and r const
-*/
-nr_complex_t matrix::get (int r, int c) {
-  return data[r * cols + c];
-}
-
-/*!\brief Sets the matrix element at the given row and column.
-   \param[in] r row number
-   \param[in] c column number
-   \param[in] z complex number to assign
-   \todo Why not inline and synonymous of ()
-   \todo r c and z const
-*/
-void matrix::set (int r, int c, nr_complex_t z) {
-  data[r * cols + c] = z;
-}
 
 #ifdef DEBUG
 /*!\brief Debug function: Prints the matrix object */
 void matrix::print (void) {
-  for (int r = 0; r < rows; r++) {
-    for (int c = 0; c < cols; c++) {
+  for (int r = 0; r < this->m.rows(); r++) {
+    for (int c = 0; c < this->m.cols(); c++) {
       fprintf (stderr, "%+.2e,%+.2e ", (double) real (get (r, c)),
       	       (double) imag (get (r, c)));
     }
@@ -241,12 +133,9 @@ matrix operator + (matrix a, matrix b) {
    \todo a is const
 */
 matrix matrix::operator += (matrix a) {
-  assert (a.getRows () == rows && a.getCols () == cols);
+  assert (a.getRows () == a.m.rows() && a.getCols () == a.m.cols());
 
-  int r, c, i;
-  for (i = 0, r = 0; r < a.getRows (); r++)
-    for (c = 0; c < a.getCols (); c++, i++)
-      data[i] += a.get (r, c);
+  this->m += a.m;
   return *this;
 }
 
@@ -268,12 +157,8 @@ matrix operator - (matrix a, matrix b) {
 
 /*!\brief Unary minus. */
 matrix matrix::operator - () {
-  matrix res (getRows (), getCols ());
-  int r, c, i;
-  for (i = 0, r = 0; r < getRows (); r++)
-    for (c = 0; c < getCols (); c++, i++)
-      res.set (r, c, -data[i]);
-  return res;
+  decltype(this->m) tmp = -this->m;
+  return tmp;
 }
 
 /*!\brief Intrinsic matrix subtraction.
@@ -281,11 +166,7 @@ matrix matrix::operator - () {
    \note assert same size
 */
 matrix matrix::operator -= (matrix a) {
-  assert (a.getRows () == rows && a.getCols () == cols);
-  int r, c, i;
-  for (i = 0, r = 0; r < a.getRows (); r++)
-    for (c = 0; c < a.getCols (); c++, i++)
-      data[i] -= a.get (r, c);
+  this->m -= a.m;
   return *this;
 }
 
@@ -296,11 +177,7 @@ matrix matrix::operator -= (matrix a) {
    \todo Why not a and z const
 */
 matrix operator * (matrix a, nr_complex_t z) {
-  matrix res (a.getRows (), a.getCols ());
-  for (int r = 0; r < a.getRows (); r++)
-    for (int c = 0; c < a.getCols (); c++)
-      res.set (r, c, a.get (r, c) * z);
-  return res;
+  return a*z;
 }
 
 /*!\brief Matrix scaling complex version (different order)
@@ -1541,14 +1418,16 @@ matrix cytocz (matrix cy, matrix z) {
   \todo r1 and r2 const
 */
 void matrix::exchangeRows (int r1, int r2) {
+  auto cols = this->m.cols();
+  auto rows = this->m.rows();
   nr_complex_t * s = new nr_complex_t[cols];
   int len = sizeof (nr_complex_t) * cols;
 
   assert (r1 >= 0 && r2 >= 0 && r1 < rows && r2 < rows);
 
-  memcpy (s, &data[r1 * cols], len);
-  memcpy (&data[r1 * cols], &data[r2 * cols], len);
-  memcpy (&data[r2 * cols], s, len);
+  memcpy (s, &(m.data())[r1 * cols], len);
+  memcpy (&(m.data())[r1 * cols], &(m.data())[r2 * cols], len);
+  memcpy (&(m.data())[r2 * cols], s, len);
   delete[] s;
 }
 
@@ -1560,13 +1439,14 @@ void matrix::exchangeRows (int r1, int r2) {
 */
 void matrix::exchangeCols (int c1, int c2) {
   nr_complex_t s;
-
+  auto cols = this->m.cols();
+  auto rows = this->m.rows();
   assert (c1 >= 0 && c2 >= 0 && c1 < cols && c2 < cols);
 
   for (int r = 0; r < rows * cols; r += cols) {
-    s = data[r + c1];
-    data[r + c1] = data[r + c2];
-    data[r + c2] = s;
+    s = (this->m.data())[r + c1];
+    (this->m.data())[r + c1] = (this->m.data())[r + c2];
+    (this->m.data())[r + c2] = s;
   }
 }
 
