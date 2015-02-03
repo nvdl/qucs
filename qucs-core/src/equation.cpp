@@ -212,19 +212,19 @@ char * constant::toString (void)
     break;
     case TAG_MATRIX:
     {
-        int len = 3 + (m->getRows () - 1) * m->getCols () + (m->getCols () - 1);
+        int len = 3 + (m->rows () - 1) * m->cols () + (m->cols () - 1);
         txt = (char *) malloc (len);
         strcpy (txt, "[");
-        for (int r = 0; r < m->getRows (); r++)
+        for (int r = 0; r < m->rows (); r++)
         {
-            for (int c = 0; c < m->getCols (); c++)
+            for (int c = 0; c < m->cols (); c++)
             {
                 char * s = Cplx2String (m->get (r, c));
                 txt = (char *) realloc (txt, len += strlen (s));
                 strcat (txt, s);
-                if (c != m->getCols () - 1) strcat (txt, ",");
+                if (c != m->cols () - 1) strcat (txt, ",");
             }
-            if (r != m->getRows () - 1) strcat (txt, ";");
+            if (r != m->rows () - 1) strcat (txt, ";");
         }
         strcat (txt, "]");
     }
@@ -1195,9 +1195,9 @@ qucs::vector node::getResultVector (void)
         case TAG_MATRIX:
         {
             int ro, co, n = 0;
-            v = qucs::vector (c->m->getRows () * c->m->getCols ());
-            for (co = 0; co < c->m->getCols (); co++)
-                for (ro = 0; ro < c->m->getRows (); ro++)
+            v = qucs::vector (c->m->rows () * c->m->cols ());
+            for (co = 0; co < c->m->cols (); co++)
+                for (ro = 0; ro < c->m->rows (); ro++)
                     v (n++) = c->m->get (ro, co);
         }
         break;
@@ -2008,9 +2008,9 @@ qucs::vector * solver::dataVector (node * eqn)
     {
         // convert matrix to a list of vectors
         matrix * m = eqn->getResult()->m;
-        for (int r = 0; r < m->getRows (); r++)
+        for (int r = 0; r < m->rows (); r++)
         {
-            for (int c = 0; c < m->getCols (); c++)
+            for (int c = 0; c < m->cols (); c++)
             {
                 qucs::vector * t = new qucs::vector ();
                 t->setName (matvec::createMatrixString (A(eqn)->result, r, c));

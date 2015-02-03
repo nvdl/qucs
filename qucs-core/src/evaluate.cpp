@@ -743,9 +743,9 @@ constant * evaluate::times_m_m (constant * args) {
   _ARM0 (m1);
   _ARM1 (m2);
   _DEFM ();
-  if (m1->getCols () != m2->getRows ()) {
+  if (m1->cols () != m2->rows ()) {
     THROW_MATH_EXCEPTION ("nonconformant arguments in matrix multiplication");
-    res->m = new matrix (m1->getRows (), m2->getCols ());
+    res->m = new matrix (m1->rows (), m2->cols ());
   } else {
     res->m = new matrix (*m1 * *m2);
   }
@@ -825,9 +825,9 @@ constant * evaluate::times_mv_m (constant * args) {
   _ARMV0 (v1);
   _ARM1 (m2);
   _DEFMV ();
-  if (v1->getCols () != m2->getRows ()) {
+  if (v1->getCols () != m2->rows ()) {
     THROW_MATH_EXCEPTION ("nonconformant arguments in matrix multiplication");
-    res->mv = new matvec (v1->getSize (), v1->getRows (), m2->getCols ());
+    res->mv = new matvec (v1->getSize (), v1->getRows (), m2->cols ());
   } else {
     res->mv = new matvec (*v1 * *m2);
   }
@@ -838,9 +838,9 @@ constant * evaluate::times_m_mv (constant * args) {
   _ARM0 (m1);
   _ARMV1 (v2);
   _DEFMV ();
-  if (m1->getCols () != v2->getRows ()) {
+  if (m1->cols () != v2->getRows ()) {
     THROW_MATH_EXCEPTION ("nonconformant arguments in matrix multiplication");
-    res->mv = new matvec (v2->getSize (), m1->getRows (), v2->getCols ());
+    res->mv = new matvec (v2->getSize (), m1->rows (), v2->getCols ());
   } else {
     res->mv = new matvec (*m1 * *v2);
   }
@@ -2215,10 +2215,10 @@ constant * evaluate::index_m_2 (constant * args) {
   _ARI1 (r);
   _ARI2 (c);
   _DEFC ();
-  if (r < 1 || r > m->getRows () || c < 1 || c > m->getCols ()) {
+  if (r < 1 || r > m->rows () || c < 1 || c > m->cols ()) {
     char txt[256];
     sprintf (txt, "matrix indices [%d,%d] out of bounds [1-%d,1-%d]",
-	     r, c, m->getRows (), m->getCols ());
+	     r, c, m->rows (), m->cols ());
     THROW_MATH_EXCEPTION (txt);
     res->c = new nr_complex_t ();
   } else {
@@ -2415,9 +2415,9 @@ constant * evaluate::ztoy_mv (constant * args) {
 
 // These are stos() helpers.
 #define _CHKM(m) /* check square matrix */              \
-  if (m->getCols () != m->getRows ()) {                 \
+  if (m->cols () != m->rows ()) {                 \
     THROW_MATH_EXCEPTION ("stos: not a square matrix"); \
-    res->m = new matrix (m->getRows (), m->getCols ()); \
+    res->m = new matrix (m->rows (), m->cols ()); \
     return res; }
 #define _CHKMV(mv) /* check square matrix vector */                        \
   if (mv->getCols () != mv->getRows ()) {                                  \
@@ -2427,7 +2427,7 @@ constant * evaluate::ztoy_mv (constant * args) {
 #define _CHKMA(m,cond) \
   if (!(cond)) {                                            \
     THROW_MATH_EXCEPTION ("stos: nonconformant arguments"); \
-    res->m = new matrix (m->getRows (), m->getCols ());     \
+    res->m = new matrix (m->rows (), m->cols ());     \
     return res; }
 #define _CHKMVA(mv,cond) \
   if (!(cond)) {                                                           \
@@ -2480,43 +2480,43 @@ constant * evaluate::stos_m_c_c (constant * args) {
 // Function -- MATRIX stos (MATRIX, VECTOR)
 constant * evaluate::stos_m_v (constant * args) {
   _ARM0 (m); _ARV1 (zref); _DEFM ();
-  _CHKM (m); _CHKMA (m, m->getRows () == zref->getSize ());
+  _CHKM (m); _CHKMA (m, m->rows () == zref->getSize ());
   _RETM (stos (*m, *zref));
 }
 
 // Function -- MATRIX stos (MATRIX, VECTOR, DOUBLE)
 constant * evaluate::stos_m_v_d (constant * args) {
   _ARM0 (m); _ARV1 (zref); _ARD2 (z0); _DEFM ();
-  _CHKM (m); _CHKMA (m, m->getRows () == zref->getSize ());
+  _CHKM (m); _CHKMA (m, m->rows () == zref->getSize ());
   _RETM (stos (*m, *zref, nr_complex_t (z0, 0)));
 }
 
 // Function -- MATRIX stos (MATRIX, VECTOR, COMPLEX)
 constant * evaluate::stos_m_v_c (constant * args) {
   _ARM0 (m); _ARV1 (zref); _ARC2 (z0); _DEFM ();
-  _CHKM (m); _CHKMA (m, m->getRows () == zref->getSize ());
+  _CHKM (m); _CHKMA (m, m->rows () == zref->getSize ());
   _RETM (stos (*m, *zref, *z0));
 }
 
 // Function -- MATRIX stos (MATRIX, DOUBLE, VECTOR)
 constant * evaluate::stos_m_d_v (constant * args) {
   _ARM0 (m); _ARD1 (zref); _ARV2 (z0); _DEFM ();
-  _CHKM (m); _CHKMA (m, m->getRows () == z0->getSize ());
+  _CHKM (m); _CHKMA (m, m->rows () == z0->getSize ());
   _RETM (stos (*m, nr_complex_t (zref, 0), *z0));
 }
 
 // Function -- MATRIX stos (MATRIX, COMPLEX, VECTOR)
 constant * evaluate::stos_m_c_v (constant * args) {
   _ARM0 (m); _ARC1 (zref); _ARV2 (z0); _DEFM ();
-  _CHKM (m); _CHKMA (m, m->getRows () == z0->getSize ());
+  _CHKM (m); _CHKMA (m, m->rows () == z0->getSize ());
   _RETM (stos (*m, *zref, *z0));
 }
 
 // Function -- MATRIX stos (MATRIX, VECTOR, VECTOR)
 constant * evaluate::stos_m_v_v (constant * args) {
   _ARM0 (m); _ARV1 (zref); _ARV2 (z0); _DEFM ();
-  _CHKM (m); _CHKMA (m, m->getRows () == z0->getSize () &&
-		     m->getRows () == zref->getSize ());
+  _CHKM (m); _CHKMA (m, m->rows () == z0->getSize () &&
+		     m->rows () == zref->getSize ());
   _RETM (stos (*m, *zref, *z0));
 }
 
@@ -2610,7 +2610,7 @@ constant * evaluate::twoport_m (constant * args) {
   char f = CHR (_ARES(1));
   char t = CHR (_ARES(2));
   _DEFM ();
-  if (m->getRows () < 2 || m->getCols () < 2) {
+  if (m->rows () < 2 || m->cols () < 2) {
     THROW_MATH_EXCEPTION ("invalid matrix dimensions for twoport "
 			  "transformation");
     _RETM (*m);

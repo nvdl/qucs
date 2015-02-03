@@ -642,8 +642,8 @@ void circuit::setInternalNode (int node, const std::string &suffix) {
 /* This function copies the matrix elements inside the given matrix to
    the internal S-parameter matrix of the circuit. */
 void circuit::setMatrixS (matrix s) {
-  int r = s.getRows ();
-  int c = s.getCols ();
+  int r = s.rows ();
+  int c = s.cols ();
   // copy matrix elements
   if (r > 0 && c > 0 && r * c == size * size) {
     memcpy (MatrixS, s.getData (), sizeof (nr_complex_t) * r * c);
@@ -663,8 +663,8 @@ matrix circuit::getMatrixS (void) {
 /* This function copies the matrix elements inside the given matrix to
    the internal noise correlation matrix of the circuit. */
 void circuit::setMatrixN (matrix n) {
-  int r = n.getRows ();
-  int c = n.getCols ();
+  int r = n.rows ();
+  int c = n.cols ();
   // copy matrix elements
   if (r > 0 && c > 0 && r * c == size * size) {
     memcpy (MatrixN, n.getData (), sizeof (nr_complex_t) * r * c);
@@ -684,8 +684,8 @@ matrix circuit::getMatrixN (void) {
 /* This function copies the matrix elements inside the given matrix to
    the internal G-MNA matrix of the circuit. */
 void circuit::setMatrixY (matrix y) {
-  int r = y.getRows ();
-  int c = y.getCols ();
+  int r = y.rows ();
+  int c = y.cols ();
   // copy matrix elements
   if (r > 0 && c > 0 && r * c == size * size) {
     memcpy (MatrixY, y.getData (), sizeof (nr_complex_t) * r * c);

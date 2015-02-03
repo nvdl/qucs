@@ -162,8 +162,8 @@ matrix spfile::calcMatrixCs (nr_double_t frequency) {
    within the touchstone file to have an additional reference one-port
    whose S-parameter is -1 (i.e. ground). */
 matrix spfile::expandSParaMatrix (matrix s) {
-  assert (s.getCols () == s.getRows ());
-  int r, c, ports = s.getCols () + 1;
+  assert (s.cols () == s.rows ());
+  int r, c, ports = s.cols () + 1;
   nr_double_t g = -1;
   nr_complex_t fr, ss, sr, sc, sa;
   matrix res (ports);
@@ -202,8 +202,8 @@ matrix spfile::expandSParaMatrix (matrix s) {
    function.  It shrinks the S-parameter matrix by removing the
    reference port. */
 matrix spfile::shrinkSParaMatrix (matrix s) {
-  assert (s.getCols () == s.getRows () && s.getCols () > 0);
-  int r, c, ports = s.getCols ();
+  assert (s.cols () == s.rows () && s.cols () > 0);
+  int r, c, ports = s.cols ();
   nr_double_t g = -1;
   matrix res (ports - 1);
 
@@ -223,10 +223,11 @@ matrix spfile::shrinkSParaMatrix (matrix s) {
    this transformation and is obtained using the expandSParaMatrix()
    function. */
 matrix spfile::expandNoiseMatrix (matrix n, matrix s) {
-  assert (s.getCols () == s.getRows () && n.getCols () == n.getRows () &&
-	  n.getCols () == s.getCols () - 1);
+  assert (s.
+	  cols () == s.rows () && n.cols () == n.rows () &&
+	  n.cols () == s.cols () - 1);
   nr_double_t T = getPropertyDouble ("Temp");
-  int r, c, ports = n.getCols () + 1;
+  int r, c, ports = n.cols () + 1;
   nr_double_t g = -1;
 
   // create K matrix
@@ -260,9 +261,9 @@ matrix spfile::expandNoiseMatrix (matrix n, matrix s) {
    this transformation and is obtained using the expandSParaMatrix()
    function. */
 matrix spfile::shrinkNoiseMatrix (matrix n, matrix s) {
-  assert (s.getCols () == s.getRows () && n.getCols () == n.getRows () &&
-	  n.getCols () == s.getCols () && n.getCols () > 0);
-  int r, ports = n.getCols ();
+  assert (s.cols () == s.rows () && n.cols () == n.rows () &&
+	  n.cols () == s.cols () && n.cols () > 0);
+  int r, ports = n.cols ();
   nr_double_t g = -1;
   nr_double_t T = getPropertyDouble ("Temp");
 
@@ -406,7 +407,7 @@ void spfile::createIndex (void) {
    matrix. */
 matrix spfile::correlationMatrix (nr_double_t Fmin, nr_complex_t Sopt,
 				  nr_double_t Rn, matrix s) {
-  assert (s.getCols () == s.getRows () && s.getCols () == 2);
+  assert (s.cols () == s.rows () && s.cols () == 2);
   matrix c (2);
   nr_complex_t Kx = 4 * Rn / z0 / norm (1.0 + Sopt);
   c.set (0, 0, (Fmin - 1) * (norm (s.get (0, 0)) - 1) +
@@ -422,8 +423,8 @@ matrix spfile::correlationMatrix (nr_double_t Fmin, nr_complex_t Sopt,
    given S-parameter and noise correlation matrices of a twoport. */
 nr_double_t spfile::noiseFigure (matrix s, matrix c, nr_double_t& Fmin,
 				 nr_complex_t& Sopt, nr_double_t& Rn) {
-  assert (s.getCols () == s.getRows () && c.getCols () == c.getRows () &&
-	  s.getCols () == 2 && c.getCols () == 2);
+  assert (s.cols () == s.rows () && c.cols () == c.rows () &&
+	  s.cols () == 2 && c.cols () == 2);
   nr_complex_t n1, n2;
   n1 = c.get (0, 0) * norm (s.get (1, 0)) -
     2 * real (c.get (0, 1) * s.get (1, 0) * conj (s.get (0, 0))) +

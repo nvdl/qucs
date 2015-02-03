@@ -232,7 +232,7 @@ matvec * matvec::getMatrixVector (qucs::vector * data, char * name) {
 /* This function saves the given matrix in the matrix vector at the
    specified position. */
 void matvec::set (matrix m, int idx) {
-  assert (m.getRows () == rows && m.getCols () == cols &&
+  assert (m.rows () == rows && m.cols () == cols &&
 	  idx >= 0 && idx < size);
   data[idx] = m;
 }
@@ -256,7 +256,7 @@ matvec operator + (matvec a, matvec b) {
 
 // Matrix vector addition with single matrix.
 matvec operator + (matvec a, matrix b) {
-  assert (a.getRows () == b.getRows () && a.getCols () == b.getCols ());
+  assert (a.getRows () == b.rows () && a.getCols () == b.cols ());
   matvec res (a.getSize (), a.getRows (), a.getCols ());
   for (int i = 0; i < a.getSize (); i++) res.set (a.get (i) + b, i);
   return res;
@@ -355,7 +355,7 @@ matvec operator - (matvec a, matvec b) {
 
 // Matrix vector subtraction with single matrix.
 matvec operator - (matvec a, matrix b) {
-  assert (a.getRows () == b.getRows () && a.getCols () == b.getCols ());
+  assert (a.getRows () == b.rows () && a.getCols () == b.cols ());
   matvec res (a.getSize (), a.getRows (), a.getCols ());
   for (int i = 0; i < a.getSize (); i++) res.set (a.get (i) - b, i);
   return res;
@@ -460,8 +460,8 @@ matvec operator * (matvec a, matvec b) {
 
 // Matrix vector multiplication with a single matrix.
 matvec operator * (matvec a, matrix b) {
-  assert (a.getCols () == b.getRows ());
-  matvec res (a.getSize (), a.getRows (), b.getCols ());
+  assert (a.getCols () == b.rows ());
+  matvec res (a.getSize (), a.getRows (), b.cols ());
   for (int i = 0; i < a.getSize (); i++) res.set (a.get (i) * b, i);
   return res;
 }

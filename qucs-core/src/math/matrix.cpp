@@ -118,13 +118,8 @@ void matrix::print (void) {
    \todo a and b are const
 */
 matrix operator + (matrix a, matrix b) {
-  assert (a.getRows () == b.getRows () && a.getCols () == b.getCols ());
-
-  matrix res (a.getRows (), a.getCols ());
-  for (int r = 0; r < a.getRows (); r++)
-    for (int c = 0; c < a.getCols (); c++)
-      res.set (r, c, a.get (r, c) + b.get (r, c));
-  return res;
+  decltype(a.m) tmp=a.m+b.m;
+  return tmp;
 }
 
 /*!\brief Intrinsic matrix addition.
@@ -133,8 +128,6 @@ matrix operator + (matrix a, matrix b) {
    \todo a is const
 */
 matrix matrix::operator += (matrix a) {
-  assert (a.getRows () == a.m.rows() && a.getCols () == a.m.cols());
-
   this->m += a.m;
   return *this;
 }
@@ -146,13 +139,8 @@ matrix matrix::operator += (matrix a) {
    \todo a and b are const
 */
 matrix operator - (matrix a, matrix b) {
-  assert (a.getRows () == b.getRows () && a.getCols () == b.getCols ());
-
-  matrix res (a.getRows (), a.getCols ());
-  for (int r = 0; r < a.getRows (); r++)
-    for (int c = 0; c < a.getCols (); c++)
-      res.set (r, c, a.get (r, c) - b.get (r, c));
-  return res;
+  decltype(a.m) tmp = a.m - b.m;
+  return tmp;
 }
 
 /*!\brief Unary minus. */
@@ -198,11 +186,8 @@ matrix operator * (nr_complex_t z, matrix a) {
    \todo Why not d and a const
 */
 matrix operator * (matrix a, nr_double_t d) {
-  matrix res (a.getRows (), a.getCols ());
-  for (int r = 0; r < a.getRows (); r++)
-    for (int c = 0; c < a.getCols (); c++)
-      res.set (r, c, a.get (r, c) * d);
-  return res;
+  decltype(a.m) tmp = d*a.m;
+  return tmp;
 }
 
 /*!\brief Matrix scaling real version (different order)
@@ -223,11 +208,8 @@ matrix operator * (nr_double_t d, matrix a) {
    \todo Why not a and z const
 */
 matrix operator / (matrix a, nr_complex_t z) {
-  matrix res (a.getRows (), a.getCols ());
-  for (int r = 0; r < a.getRows (); r++)
-    for (int c = 0; c < a.getCols (); c++)
-      res.set (r, c, a.get (r, c) / z);
-  return res;
+  decltype(a.m) tmp = a.m/z;
+  return tmp;
 }
 
 /*!\brief Matrix scaling division by real version
@@ -237,11 +219,8 @@ matrix operator / (matrix a, nr_complex_t z) {
    \todo Why not a and d const
 */
 matrix operator / (matrix a, nr_double_t d) {
-  matrix res (a.getRows (), a.getCols ());
-  for (int r = 0; r < a.getRows (); r++)
-    for (int c = 0; c < a.getCols (); c++)
-      res.set (r, c, a.get (r, c) / d);
-  return res;
+  decltype(a.m) tmp = a.m/std::complex<nr_double_t>(d);
+  return tmp;
 }
 
 /*! Matrix multiplication.
@@ -253,13 +232,13 @@ matrix operator / (matrix a, nr_double_t d) {
     \todo a and b are const
 */
 matrix operator * (matrix a, matrix b) {
-  assert (a.getCols () == b.getRows ());
+  assert (a.cols () == b.rows ());
 
-  int r, c, i, n = a.getCols ();
+  int r, c, i, n = a.cols ();
   nr_complex_t z;
-  matrix res (a.getRows (), b.getCols ());
-  for (r = 0; r < a.getRows (); r++) {
-    for (c = 0; c < b.getCols (); c++) {
+  matrix res (a.rows (), b.cols ());
+  for (r = 0; r < a.rows (); r++) {
+    for (c = 0; c < b.cols (); c++) {
       for (i = 0, z = 0; i < n; i++) z += a.get (r, i) * b.get (i, c);
       res.set (r, c, z);
     }
@@ -274,9 +253,9 @@ matrix operator * (matrix a, matrix b) {
    \todo a and z are const
 */
 matrix operator + (matrix a, nr_complex_t z) {
-  matrix res (a.getRows (), a.getCols ());
-  for (int r = 0; r < a.getRows (); r++)
-    for (int c = 0; c < a.getCols (); c++)
+  matrix res (a.rows (), a.cols ());
+  for (int r = 0; r < a.rows (); r++)
+    for (int c = 0; c < a.cols (); c++)
       res.set (r, c, a.get (r, c) + z);
   return res;
 }
@@ -299,9 +278,9 @@ matrix operator + (nr_complex_t z, matrix a) {
    \todo a and d are const
 */
 matrix operator + (matrix a, nr_double_t d) {
-  matrix res (a.getRows (), a.getCols ());
-  for (int r = 0; r < a.getRows (); r++)
-    for (int c = 0; c < a.getCols (); c++)
+  matrix res (a.rows (), a.cols ());
+  for (int r = 0; r < a.rows (); r++)
+    for (int c = 0; c < a.cols (); c++)
       res.set (r, c, a.get (r, c) + d);
   return res;
 }
@@ -367,11 +346,8 @@ matrix operator - (nr_double_t d, matrix a) {
    \todo a is const
 */
 matrix transpose (matrix a) {
-  matrix res (a.getCols (), a.getRows ());
-  for (int r = 0; r < a.getRows (); r++)
-    for (int c = 0; c < a.getCols (); c++)
-      res.set (c, r, a.get (r, c));
-  return res;
+  decltype(a.m) tmp = a.m.transpose();
+  return tmp;
 }
 
 /*!\brief Conjugate complex matrix.
@@ -380,11 +356,8 @@ matrix transpose (matrix a) {
   \todo a is const
 */
 matrix conj (matrix a) {
-  matrix res (a.getRows (), a.getCols ());
-  for (int r = 0; r < a.getRows (); r++)
-    for (int c = 0; c < a.getCols (); c++)
-      res.set (r, c, conj (a.get (r, c)));
-  return res;
+  decltype(a.m) tmp = a.m.conjugate();
+  return tmp;
 }
 
 /*!\brief adjoint matrix
@@ -397,7 +370,8 @@ matrix conj (matrix a) {
    \todo a is const
 */
 matrix adjoint (matrix a) {
-  return transpose (conj (a));
+  decltype(a.m) tmp = a.m.adjoint();
+  return tmp;
 }
 
 /*!\brief Computes magnitude of each matrix element.
@@ -406,9 +380,9 @@ matrix adjoint (matrix a) {
    \todo a is const
 */
 matrix abs (matrix a) {
-  matrix res (a.getRows (), a.getCols ());
-  for (int r = 0; r < a.getRows (); r++)
-    for (int c = 0; c < a.getCols (); c++)
+  matrix res (a.rows (), a.cols ());
+  for (int r = 0; r < a.rows (); r++)
+    for (int c = 0; c < a.cols (); c++)
       res.set (r, c, abs (a.get (r, c)));
   return res;
 }
@@ -417,9 +391,9 @@ matrix abs (matrix a) {
    \param[in] a matrix
 */
 matrix dB (matrix a) {
-  matrix res (a.getRows (), a.getCols ());
-  for (int r = 0; r < a.getRows (); r++)
-    for (int c = 0; c < a.getCols (); c++)
+  matrix res (a.rows (), a.cols ());
+  for (int r = 0; r < a.rows (); r++)
+    for (int c = 0; c < a.cols (); c++)
       res.set (r, c, dB (a.get (r, c)));
   return res;
 }
@@ -430,9 +404,9 @@ matrix dB (matrix a) {
    \todo a is const
 */
 matrix arg (matrix a) {
-  matrix res (a.getRows (), a.getCols ());
-  for (int r = 0; r < a.getRows (); r++)
-    for (int c = 0; c < a.getCols (); c++)
+  matrix res (a.rows (), a.cols ());
+  for (int r = 0; r < a.rows (); r++)
+    for (int c = 0; c < a.cols (); c++)
       res.set (r, c, arg (a.get (r, c)));
   return res;
 }
@@ -443,9 +417,9 @@ matrix arg (matrix a) {
    \todo a is const
 */
 matrix real (matrix a) {
-  matrix res (a.getRows (), a.getCols ());
-  for (int r = 0; r < a.getRows (); r++)
-    for (int c = 0; c < a.getCols (); c++)
+  matrix res (a.rows (), a.cols ());
+  for (int r = 0; r < a.rows (); r++)
+    for (int c = 0; c < a.cols (); c++)
       res.set (r, c, real (a.get (r, c)));
   return res;
 }
@@ -456,9 +430,9 @@ matrix real (matrix a) {
    \todo a is const
 */
 matrix imag (matrix a) {
-  matrix res (a.getRows (), a.getCols ());
-  for (int r = 0; r < a.getRows (); r++)
-    for (int c = 0; c < a.getCols (); c++)
+  matrix res (a.rows (), a.cols ());
+  for (int r = 0; r < a.rows (); r++)
+    for (int c = 0; c < a.cols (); c++)
       res.set (r, c, imag (a.get (r, c)));
   return res;
 }
@@ -479,8 +453,8 @@ matrix sqr (matrix a) {
 */
 matrix eye (int rs, int cs) {
   matrix res (rs, cs);
-  for (int r = 0; r < res.getRows (); r++)
-    for (int c = 0; c < res.getCols (); c++)
+  for (int r = 0; r < res.rows (); r++)
+    for (int c = 0; c < res.cols (); c++)
       if (r == c) res.set (r, c, 1);
   return res;
 }
@@ -509,7 +483,7 @@ matrix diagonal (qucs::vector diag) {
 matrix pow (matrix a, int n) {
   matrix res;
   if (n == 0) {
-    res = eye (a.getRows (), a.getCols ());
+    res = eye (a.rows (), a.cols ());
   }
   else {
     res = a = n < 0 ? inverse (a) : a;
@@ -532,11 +506,11 @@ matrix pow (matrix a, int n) {
    \todo static?
 */
 nr_complex_t cofactor (matrix a, int u, int v) {
-  matrix res (a.getRows () - 1, a.getCols () - 1);
+  matrix res (a.rows () - 1, a.cols () - 1);
   int r, c, ra, ca;
-  for (ra = r = 0; r < res.getRows (); r++, ra++) {
+  for (ra = r = 0; r < res.rows (); r++, ra++) {
     if (ra == u) ra++;
-    for (ca = c = 0; c < res.getCols (); c++, ca++) {
+    for (ca = c = 0; c < res.cols (); c++, ca++) {
       if (ca == v) ca++;
       res.set (r, c, a.get (ra, ca));
     }
@@ -561,8 +535,8 @@ nr_complex_t cofactor (matrix a, int u, int v) {
    \todo static ?
 */
 nr_complex_t detLaplace (matrix a) {
-  assert (a.getRows () == a.getCols ());
-  int s = a.getRows ();
+  assert (a.rows () == a.cols ());
+  int s = a.rows ();
   nr_complex_t res = 0;
   if (s > 1) {
     /* always use the first row for sub-determinant, but you should
@@ -592,11 +566,11 @@ nr_complex_t detLaplace (matrix a) {
    \todo a const?
    */
 nr_complex_t detGauss (matrix a) {
-  assert (a.getRows () == a.getCols ());
+  assert (a.rows () == a.cols ());
   nr_double_t MaxPivot;
   nr_complex_t f, res;
   matrix b;
-  int i, c, r, pivot, n = a.getCols ();
+  int i, c, r, pivot, n = a.cols ();
 
   // return special matrix cases
   if (n == 0) return 1;
@@ -654,11 +628,11 @@ nr_complex_t det (matrix a) {
   \todo #ifdef 0
 */
 matrix inverseLaplace (matrix a) {
-  matrix res (a.getRows (), a.getCols ());
+  matrix res (a.rows (), a.cols ());
   nr_complex_t d = detLaplace (a);
   assert (abs (d) != 0); // singular matrix
-  for (int r = 0; r < a.getRows (); r++)
-    for (int c = 0; c < a.getCols (); c++)
+  for (int r = 0; r < a.rows (); r++)
+    for (int c = 0; c < a.cols (); c++)
       res.set (r, c, cofactor (a, c, r) / d);
   return res;
 }
@@ -676,7 +650,7 @@ matrix inverseGaussJordan (matrix a) {
   nr_double_t MaxPivot;
   nr_complex_t f;
   matrix b, e;
-  int i, c, r, pivot, n = a.getCols ();
+  int i, c, r, pivot, n = a.cols ();
 
   // create temporary matrix and the result matrix
   b = matrix (a);
@@ -765,10 +739,10 @@ matrix inverse (matrix a) {
   \todo s, zref and z0 const
 */
 matrix stos (matrix s, qucs::vector zref, qucs::vector z0) {
-  int d = s.getRows ();
+  int d = s.rows ();
   matrix e, r, a;
 
-  assert (d == s.getCols () && d == z0.getSize () && d == zref.getSize ());
+  assert (d == s.cols () && d == z0.getSize () && d == zref.getSize ());
 
   e = eye (d);
   r = diagonal ((z0 - zref) / (z0 + zref));
@@ -785,7 +759,7 @@ matrix stos (matrix s, qucs::vector zref, qucs::vector z0) {
    \todo s, zref and z0 const
 */
 matrix stos (matrix s, nr_complex_t zref, nr_complex_t z0) {
-  int d = s.getRows ();
+  int d = s.rows ();
   return stos (s, qucs::vector (d, zref), qucs::vector (d, z0));
 }
 
@@ -848,10 +822,10 @@ matrix stos (matrix s, nr_complex_t zref, qucs::vector z0) {
   \return Impedance matrix
 */
 matrix stoz (matrix s, qucs::vector z0) {
-  int d = s.getRows ();
+  int d = s.rows ();
   matrix e, zref, gref;
 
-  assert (d == s.getCols () && d == z0.getSize ());
+  assert (d == s.cols () && d == z0.getSize ());
 
   e = eye (d);
   zref = diagonal (z0);
@@ -867,7 +841,7 @@ matrix stoz (matrix s, qucs::vector z0) {
    \todo s and z0 const?
 */
 matrix stoz (matrix s, nr_complex_t z0) {
-  return stoz (s, qucs::vector (s.getRows (), z0));
+  return stoz (s, qucs::vector (s.rows (), z0));
 }
 
 /*!\brief Convert impedance matrix scattering parameters.
@@ -893,10 +867,10 @@ matrix stoz (matrix s, nr_complex_t z0) {
   \todo z and z0 const?
 */
 matrix ztos (matrix z, qucs::vector z0) {
-  int d = z.getRows ();
+  int d = z.rows ();
   matrix e, zref, gref;
 
-  assert (d == z.getCols () && d == z0.getSize ());
+  assert (d == z.cols () && d == z0.getSize ());
 
   e = eye (d);
   zref = diagonal (z0);
@@ -912,7 +886,7 @@ matrix ztos (matrix z, qucs::vector z0) {
    \todo z and z0 const
  */
 matrix ztos (matrix z, nr_complex_t z0) {
-  return ztos (z, qucs::vector (z.getRows (), z0));
+  return ztos (z, qucs::vector (z.rows (), z0));
 }
 
 /*!\brief impedance matrix to admittance matrix.
@@ -925,7 +899,7 @@ matrix ztos (matrix z, nr_complex_t z0) {
    \todo z const
 */
 matrix ztoy (matrix z) {
-  assert (z.getRows () == z.getCols ());
+  assert (z.rows () == z.cols ());
   return inverse (z);
 }
 
@@ -957,10 +931,10 @@ matrix ztoy (matrix z) {
   \return Admittance matrix
 */
 matrix stoy (matrix s, qucs::vector z0) {
-  int d = s.getRows ();
+  int d = s.rows ();
   matrix e, zref, gref;
 
-  assert (d == s.getCols () && d == z0.getSize ());
+  assert (d == s.cols () && d == z0.getSize ());
 
   e = eye (d);
   zref = diagonal (z0);
@@ -976,7 +950,7 @@ matrix stoy (matrix s, qucs::vector z0) {
    \todo s and z0 const
  */
 matrix stoy (matrix s, nr_complex_t z0) {
-  return stoy (s, qucs::vector (s.getRows (), z0));
+  return stoy (s, qucs::vector (s.rows (), z0));
 }
 
 /*!\brief Admittance matrix to scattering parameters
@@ -1008,10 +982,10 @@ matrix stoy (matrix s, nr_complex_t z0) {
    \return Scattering matrix
 */
 matrix ytos (matrix y, qucs::vector z0) {
-  int d = y.getRows ();
+  int d = y.rows ();
   matrix e, zref, gref;
 
-  assert (d == y.getCols () && d == z0.getSize ());
+  assert (d == y.cols () && d == z0.getSize ());
 
   e = eye (d);
   zref = diagonal (z0);
@@ -1026,7 +1000,7 @@ matrix ytos (matrix y, qucs::vector z0) {
    \todo y and z0 const
  */
 matrix ytos (matrix y, nr_complex_t z0) {
-  return ytos (y, qucs::vector (y.getRows (), z0));
+  return ytos (y, qucs::vector (y.rows (), z0));
 }
 /*!\brief Converts chain matrix to scattering parameters.
 
@@ -1060,7 +1034,7 @@ matrix stoa (matrix s, nr_complex_t z1, nr_complex_t z2) {
   nr_complex_t n = 2.0 * s (1, 0) * sqrt (fabs (real (z1) * real (z2)));
   matrix a (2);
 
-  assert (s.getRows () >= 2 && s.getCols () >= 2);
+  assert (s.rows () >= 2 && s.cols () >= 2);
 
   a.set (0, 0, (conj (z1) + z1 * s (0, 0) -
 		conj (z1) * s (1, 1) - z1 * d) / n);
@@ -1102,7 +1076,7 @@ matrix atos (matrix a, nr_complex_t z1, nr_complex_t z2) {
     a (1, 0) * z1 * z2 + a (1, 1) * z1;
   matrix s (2);
 
-  assert (a.getRows () >= 2 && a.getCols () >= 2);
+  assert (a.rows () >= 2 && a.cols () >= 2);
 
   s.set (0, 0, (a (0, 0) * z2 + a (0, 1)
                 - a (1, 0) * conj (z1) * z2 - a (1, 1) * conj (z1)) / n);
@@ -1148,7 +1122,7 @@ matrix stoh (matrix s, nr_complex_t z1, nr_complex_t z2) {
   nr_complex_t d = (1.0 - s (0, 0)) * (1.0 + s (1, 1)) + n;
   matrix h (2);
 
-  assert (s.getRows () >= 2 && s.getCols () >= 2);
+  assert (s.rows () >= 2 && s.cols () >= 2);
 
   h.set (0, 0, ((1.0 + s (0, 0)) * (1.0 + s (1, 1)) - n) * z1 / d);
   h.set (0, 1, +2.0 * s (0, 1) / d);
@@ -1186,7 +1160,7 @@ matrix htos (matrix h, nr_complex_t z1, nr_complex_t z2) {
   nr_complex_t d = (1.0 + h (0, 0) / z1) * (1.0 + z2 * h (1, 1)) - n;
   matrix s (2);
 
-  assert (h.getRows () >= 2 && h.getCols () >= 2);
+  assert (h.rows () >= 2 && h.cols () >= 2);
 
   s.set (0, 0, ((h (0, 0) / z1 - 1.0) * (1.0 + z2 * h (1, 1)) - n) / d);
   s.set (0, 1, +2.0 * h (0, 1) / d);
@@ -1210,7 +1184,7 @@ matrix stog (matrix s, nr_complex_t z1, nr_complex_t z2) {
   nr_complex_t d = (1.0 + s (0, 0)) * (1.0 - s (1, 1)) + n;
   matrix g (2);
 
-  assert (s.getRows () >= 2 && s.getCols () >= 2);
+  assert (s.rows () >= 2 && s.cols () >= 2);
 
   g.set (0, 0, ((1.0 - s (0, 0)) * (1.0 - s (1, 1)) - n) / z1 / d);
   g.set (0, 1, -2.0 * s (0, 1) / d);
@@ -1234,7 +1208,7 @@ matrix gtos (matrix g, nr_complex_t z1, nr_complex_t z2) {
   nr_complex_t d = (1.0 + g (0, 0) * z1) * (1.0 + g (1, 1) / z2) - n;
   matrix s (2);
 
-  assert (g.getRows () >= 2 && g.getCols () >= 2);
+  assert (g.rows () >= 2 && g.cols () >= 2);
 
   s.set (0, 0, ((1.0 - g (0, 0) * z1) * (1.0 + g (1, 1) / z2) + n) / d);
   s.set (0, 1, -2.0 * g (0, 1) / d);
@@ -1255,7 +1229,7 @@ matrix gtos (matrix g, nr_complex_t z1, nr_complex_t z2) {
   \todo move near ztoy()
 */
 matrix ytoz (matrix y) {
-  assert (y.getRows () == y.getCols ());
+  assert (y.rows () == y.cols ());
   return inverse (y);
 }
 
@@ -1279,10 +1253,10 @@ matrix ytoz (matrix y) {
    \todo cy s const
 */
 matrix cytocs (matrix cy, matrix s) {
-  matrix e = eye (s.getRows ());
+  matrix e = eye (s.rows ());
 
-  assert (cy.getRows () == cy.getCols () && s.getRows () == s.getCols () &&
-	  cy.getRows () == s.getRows ());
+  assert (cy.rows () == cy.cols () && s.rows () == s.cols () &&
+	  cy.rows () == s.rows ());
 
   return (e + s) * cy * adjoint (e + s) / 4;
 }
@@ -1305,10 +1279,10 @@ matrix cytocs (matrix cy, matrix s) {
     \todo cs, y const
 */
 matrix cstocy (matrix cs, matrix y) {
-  matrix e = eye (y.getRows ());
+  matrix e = eye (y.rows ());
 
-  assert (cs.getRows () == cs.getCols () && y.getRows () == y.getCols () &&
-	  cs.getRows () == y.getRows ());
+  assert (cs.rows () == cs.cols () && y.rows () == y.cols () &&
+	  cs.rows () == y.rows ());
 
   return (e + y) * cs * adjoint (e + y);
 }
@@ -1332,10 +1306,10 @@ matrix cstocy (matrix cs, matrix y) {
    \todo cz, s const
 */
 matrix cztocs (matrix cz, matrix s) {
-  matrix e = eye (s.getRows ());
+  matrix e = eye (s.rows ());
 
-  assert (cz.getRows () == cz.getCols () && s.getRows () == s.getCols () &&
-	  cz.getRows () == s.getRows ());
+  assert (cz.rows () == cz.cols () && s.rows () == s.cols () &&
+	  cz.rows () == s.rows ());
 
   return (e - s) * cz * adjoint (e - s) / 4;
 }
@@ -1358,9 +1332,9 @@ matrix cztocs (matrix cz, matrix s) {
     \todo cs, z const
 */
 matrix cstocz (matrix cs, matrix z) {
-  assert (cs.getRows () == cs.getCols () && z.getRows () == z.getCols () &&
-	  cs.getRows () == z.getRows ());
-  matrix e = eye (z.getRows ());
+  assert (cs.rows () == cs.cols () && z.rows () == z.cols () &&
+	  cs.rows () == z.rows ());
+  matrix e = eye (z.rows ());
   return (e + z) * cs * adjoint (e + z);
 }
 
@@ -1382,8 +1356,8 @@ matrix cstocz (matrix cs, matrix z) {
     \todo cs, y const
 */
 matrix cztocy (matrix cz, matrix y) {
-  assert (cz.getRows () == cz.getCols () && y.getRows () == y.getCols () &&
-	  cz.getRows () == y.getRows ());
+  assert (cz.rows () == cz.cols () && y.rows () == y.cols () &&
+	  cz.rows () == y.rows ());
 
   return y * cz * adjoint (y);
 }
@@ -1406,8 +1380,8 @@ matrix cztocy (matrix cz, matrix y) {
     \todo cs, z const
 */
 matrix cytocz (matrix cy, matrix z) {
-  assert (cy.getRows () == cy.getCols () && z.getRows () == z.getCols () &&
-	  cy.getRows () == z.getRows ());
+  assert (cy.rows () == cy.cols () && z.rows () == z.cols () &&
+	  cy.rows () == z.rows ());
   return z * cy * adjoint (z);
 }
 
@@ -1472,7 +1446,7 @@ void matrix::exchangeCols (int c1, int c2) {
   \todo m, in, out const
 */
 matrix twoport (matrix m, char in, char out) {
-  assert (m.getRows () >= 2 && m.getCols () >= 2);
+  assert (m.rows () >= 2 && m.cols () >= 2);
   nr_complex_t d;
   matrix res (2);
 
@@ -1732,7 +1706,7 @@ matrix twoport (matrix m, char in, char out) {
    \todo Rewrite with abs and expand det. It is cleaner.
 */
 nr_double_t rollet (matrix m) {
-  assert (m.getRows () >= 2 && m.getCols () >= 2);
+  assert (m.rows () >= 2 && m.cols () >= 2);
   nr_double_t res;
   res = (1 - norm (m (0, 0)) - norm (m (1, 1)) + norm (det (m))) /
     2 / abs (m (0, 1) * m (1, 0));
@@ -1741,7 +1715,7 @@ nr_double_t rollet (matrix m) {
 
 /* Computes stability measure B1 of the given S-parameter matrix. */
 nr_double_t b1 (matrix m) {
-  assert (m.getRows () >= 2 && m.getCols () >= 2);
+  assert (m.rows () >= 2 && m.cols () >= 2);
   nr_double_t res;
   res = 1 + norm (m (0, 0)) - norm (m (1, 1)) - norm (det (m));
   return res;
@@ -1749,17 +1723,17 @@ nr_double_t b1 (matrix m) {
 
 
 matrix rad2deg (matrix a) {
-  matrix res (a.getRows (), a.getCols ());
-  for (int r = 0; r < a.getRows (); r++)
-    for (int c = 0; c < a.getCols (); c++)
+  matrix res (a.rows (), a.cols ());
+  for (int r = 0; r < a.rows (); r++)
+    for (int c = 0; c < a.cols (); c++)
       res.set (r, c, rad2deg (a.get (r, c)));
   return res;
 }
 
 matrix deg2rad (matrix a) {
-  matrix res (a.getRows (), a.getCols ());
-  for (int r = 0; r < a.getRows (); r++)
-    for (int c = 0; c < a.getCols (); c++)
+  matrix res (a.rows (), a.cols ());
+  for (int r = 0; r < a.rows (); r++)
+    for (int c = 0; c < a.cols (); c++)
       res.set (r, c, deg2rad (a.get (r, c)));
   return res;
 }

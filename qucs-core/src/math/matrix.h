@@ -110,8 +110,8 @@ class matrix
   ~matrix () = default;
   nr_complex_t get (int r, int c) const { return (*this)(r,c); }
   void set (int r, int c, const nr_complex_t v) { (*this)(r,c) = v; }
-  int getCols (void) { return m.cols(); }
-  int getRows (void) { return m.rows(); }
+  int cols (void) const { return m.cols(); }
+  int rows (void) const { return m.rows(); }
   nr_complex_t * getData (void) { return m.data(); }
   void print (void);
   void exchangeRows (int, int);

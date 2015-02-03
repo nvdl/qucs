@@ -155,8 +155,8 @@ void touchstone_print (void) {
     for (int i = 0; i < touchstone_data.vd->getSize (); i++) {
       matrix S = touchstone_data.mv->get (i);
       nr_double_t f = real (touchstone_data.vd->get (i));
-      int cs = S.getCols ();
-      int rs = S.getRows ();
+      int cs = S.cols ();
+      int rs = S.rows ();
       fprintf (touchstone_out, "%." "20" "e", f);
       for (int r = 0; r < rs; r++) {
 	if (r >= 1)
