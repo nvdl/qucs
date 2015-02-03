@@ -116,14 +116,14 @@ static void matlab_matrix (matrix * m) {
   // real part
   for (c = 0; c < m->cols (); c++) {
     for (r = 0; r < m->rows (); r++) {
-      nr_double_t re = real (m->get (r, c));
+      nr_double_t re = real ((*m)(r, c));
       fwrite (&re, sizeof (nr_double_t), 1, matlab_out);
     }
   }
   // imaginary part
   for (c = 0; c < m->cols (); c++) {
     for (r = 0; r < m->rows (); r++) {
-      nr_double_t im = imag (m->get (r, c));
+      nr_double_t im = imag ((*m)(r, c));
       fwrite (&im, sizeof (nr_double_t), 1, matlab_out);
     }
   }

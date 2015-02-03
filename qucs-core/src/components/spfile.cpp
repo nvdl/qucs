@@ -170,20 +170,20 @@ matrix spfile::expandSParaMatrix (matrix s) {
 
   // compute S'mm
   for (sa = 0, r = 0; r < ports - 1; r++)
-    for (c = 0; c < ports - 1; c++) sa += s.get (r, c);
+    for (c = 0; c < ports - 1; c++) sa += s(r, c);
   ss = (2 - g - ports + sa) / (1 - ports * g - sa);
   res(ports - 1,ports - 1)= ss;
   fr = (1.0 - g * ss) / (1.0 - g);
 
   // compute S'im
   for (r = 0; r < ports - 1; r++) {
-    for (sc = 0, c = 0; c < ports - 1; c++) sc += s.get (r, c);
+    for (sc = 0, c = 0; c < ports - 1; c++) sc += s(r, c);
     res(r, ports - 1)= fr * (1.0 - sc);
   }
 
   // compute S'mj
   for (c = 0; c < ports - 1; c++) {
-    for (sr = 0, r = 0; r < ports - 1; r++) sr += s.get (r, c);
+    for (sr = 0, r = 0; r < ports - 1; r++) sr += s(r, c);
     res(ports - 1, c)= fr * (1.0 - sr);
   }
 
@@ -191,7 +191,7 @@ matrix spfile::expandSParaMatrix (matrix s) {
   for (r = 0; r < ports - 1; r++) {
     for (c = 0; c < ports - 1; c++) {
       fr = g * res (r, ports - 1) * res (ports - 1, c) / (1.0 - g * ss);
-      res(r, c)= s.get (r, c) - fr;
+      res(r, c)= s(r, c) - fr;
     }
   }
 
@@ -235,7 +235,7 @@ matrix spfile::expandNoiseMatrix (matrix n, matrix s) {
   for (r = 0; r < ports - 1; r++) {
     for (c = 0; c < ports - 1; c++) {
       if (r == c)
-	k(r, c)= 1.0 + g * (s.get (r, ports - 1) - 1.0);
+	k(r, c)= 1.0 + g * (s(r, ports - 1) - 1.0);
       else
 	k(r, c)= g * s(r, ports - 1);
     }
@@ -281,7 +281,7 @@ matrix spfile::shrinkNoiseMatrix (matrix n, matrix s) {
   // shrink noise correlation matrix
   matrix res (ports - 1);
   res = k * n * adjoint (k) + celsius2kelvin (T) / T0 * fabs (1.0 - norm (g)) /
-    norm (1.0 - g * s.get (ports - 1, ports - 1)) * d * adjoint (d);
+    norm (1.0 - g * s(ports - 1, ports - 1)) * d * adjoint (d);
   return res;
 }
 
@@ -426,11 +426,11 @@ nr_double_t spfile::noiseFigure (matrix s, matrix c, nr_double_t& Fmin,
   assert (s.cols () == s.rows () && c.cols () == c.rows () &&
 	  s.cols () == 2 && c.cols () == 2);
   nr_complex_t n1, n2;
-  n1 = c.get (0, 0) * norm (s.get (1, 0)) -
-    2 * real (c.get (0, 1) * s.get (1, 0) * conj (s.get (0, 0))) +
-    c.get (1, 1) * norm (s.get (0, 0));
-  n2 = 2.0 * (c.get (1, 1) * s.get (0, 0) -
-	      c.get (0, 1) * s.get (1, 0)) / (c.get (1, 1) + n1);
+  n1 = c(0, 0) * norm (s(1, 0)) -
+    2 * real (c(0, 1) * s(1, 0) * conj (s(0, 0))) +
+    c(1, 1) * norm (s(0, 0));
+  n2 = 2.0 * (c(1, 1) * s(0, 0) -
+	      c(0, 1) * s(1, 0)) / (c(1, 1) + n1);
 
   // optimal source reflection coefficient
   Sopt = 1 - norm (n2);
@@ -440,8 +440,8 @@ nr_double_t spfile::noiseFigure (matrix s, matrix c, nr_double_t& Fmin,
     Sopt = (1.0 - std::sqrt (Sopt)) / n2;
 
   // minimum noise figure
-  Fmin = real (1.0 + (c.get (1, 1) - n1 * norm (Sopt)) /
-	       norm (s.get (1, 0)) / (1.0 + norm (Sopt)));
+  Fmin = real (1.0 + (c(1, 1) - n1 * norm (Sopt)) /
+	       norm (s(1, 0)) / (1.0 + norm (Sopt)));
 
   // equivalent noise resistance
   Rn = real ((c (0, 0) - 2.0 *
@@ -450,7 +450,7 @@ nr_double_t spfile::noiseFigure (matrix s, matrix c, nr_double_t& Fmin,
   Rn = Rn * z0;
 
   // noise figure itself
-  return real (1.0 + c.get (1, 1) / norm (s.get (1, 0)));
+  return real (1.0 + c(1, 1) / norm (s(1, 0)));
 }
 
 void spfile::initDC (void) {

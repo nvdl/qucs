@@ -103,8 +103,8 @@ namespace qucs {
 void matrix::print (void) {
   for (int r = 0; r < this->m.rows(); r++) {
     for (int c = 0; c < this->m.cols(); c++) {
-      fprintf (stderr, "%+.2e,%+.2e ", (double) real (get (r, c)),
-      	       (double) imag (get (r, c)));
+      fprintf (stderr, "%+.2e,%+.2e ", (double) real ((*this)(r, c)),
+      	       (double) imag ((*this) (r, c)));
     }
     fprintf (stderr, "\n");
   }
@@ -535,7 +535,7 @@ nr_complex_t detLaplace (matrix a) {
        use the row or column with most zeros in it */
     int r = 0;
     for (int i = 0; i < s; i++) {
-      res += a.get (r, i) * cofactor (a, r, i);
+      res += a(r, i) * cofactor (a, r, i);
     }
     return res;
   }
@@ -575,8 +575,8 @@ nr_complex_t detGauss (matrix a) {
   for (res = 1, i = 0; i < n; i++) {
     // find maximum column value for pivoting
     for (MaxPivot = 0, pivot = r = i; r < n; r++) {
-      if (abs (b.get (r, i)) > MaxPivot) {
-	MaxPivot = abs (b.get (r, i));
+      if (abs (b(r, i)) > MaxPivot) {
+	MaxPivot = abs (b(r, i));
 	pivot = r;
       }
     }
@@ -585,7 +585,7 @@ nr_complex_t detGauss (matrix a) {
     if (i != pivot) { b.exchangeRows (i, pivot); res = -res; }
     // compute new rows and columns
     for (r = i + 1; r < n; r++) {
-      f = b.get (r, i) / b.get (i, i);
+      f = b(r, i) / b(i, i);
       for (c = i + 1; c < n; c++) {
 	b(r, c)= b(r, c) - f * b(i, c);
       }
@@ -593,7 +593,7 @@ nr_complex_t detGauss (matrix a) {
   }
 
   // now compute determinant by multiplying diagonal
-  for (i = 0; i < n; i++) res *= b.get (i, i);
+  for (i = 0; i < n; i++) res *= b(i, i);
   return res;
 }
 
@@ -1526,7 +1526,7 @@ matrix twoport (matrix m, char in, char out) {
       res(0, 0)=1.0 / d;
       res(0, 1)=-m (0, 1) / d;
       res(1, 0)= m (1, 0) / d;
-      res(1, 1)= m (1, 1) - m (0, 1) * m.get(2, 1) / d;
+      res(1, 1)= m (1, 1) - m (0, 1) * m(2, 1) / d;
       break;
     case 'Z': // H to Z
       d = m (1, 1);

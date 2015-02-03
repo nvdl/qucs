@@ -108,7 +108,7 @@ class matrix
   matrix (Eigen::Matrix<nr_complex_t,Eigen::Dynamic,Eigen::Dynamic> &&n):
     m(std::move(n)) {};
   ~matrix () = default;
-  nr_complex_t get (int r, int c) const { return (*this)(r,c); }
+  nr_complex_t get (int r, int c) const = delete;
   void set(int r, int c, const nr_complex_t v) = delete;
   int cols (void) const { return m.cols(); }
   int rows (void) const { return m.rows(); }

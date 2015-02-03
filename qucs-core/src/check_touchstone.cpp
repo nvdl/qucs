@@ -342,7 +342,7 @@ static void touchstone_normalize_sp (void) {
     // restore the results in the entries
     for (i = 0; i < ports; i++) {
       for (j = 0; j < ports; j++) {
-	v->set (s.get (i, j), n);
+	v->set (s(i, j), n);
 	v = (qucs::vector *) v->getNext ();
       }
     }

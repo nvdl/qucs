@@ -219,7 +219,7 @@ char * constant::toString (void)
         {
             for (int c = 0; c < m->cols (); c++)
             {
-                char * s = Cplx2String (m->get (r, c));
+	        char * s = Cplx2String ((*m)(r, c));
                 txt = (char *) realloc (txt, len += strlen (s));
                 strcat (txt, s);
                 if (c != m->cols () - 1) strcat (txt, ",");
@@ -1198,7 +1198,7 @@ qucs::vector node::getResultVector (void)
             v = qucs::vector (c->m->rows () * c->m->cols ());
             for (co = 0; co < c->m->cols (); co++)
                 for (ro = 0; ro < c->m->rows (); ro++)
-                    v (n++) = c->m->get (ro, co);
+		  v (n++) = (*(c->m))(ro, co);
         }
         break;
         case TAG_VECTOR:
@@ -2014,7 +2014,7 @@ qucs::vector * solver::dataVector (node * eqn)
             {
                 qucs::vector * t = new qucs::vector ();
                 t->setName (matvec::createMatrixString (A(eqn)->result, r, c));
-                t->add (m->get (r, c));
+                t->add ((*m)(r, c));
                 // chain the vectors appropriately
                 t->setNext (v);
                 v = t;

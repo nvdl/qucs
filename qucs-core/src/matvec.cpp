@@ -117,7 +117,7 @@ void matvec::set (qucs::vector v, int r, int c) {
 qucs::vector matvec::get (int r, int c) {
   assert (r >= 0 && r < rows && c >= 0 && c < cols);
   qucs::vector res;
-  for (int i = 0; i < size; i++) res.add (data[i].get (r, c));
+  for (int i = 0; i < size; i++) res.add ((data[i])(r, c));
   if (name != NULL) {
     res.setName (createMatrixString (name, r, c));
   }

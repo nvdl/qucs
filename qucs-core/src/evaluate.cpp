@@ -2222,7 +2222,7 @@ constant * evaluate::index_m_2 (constant * args) {
     THROW_MATH_EXCEPTION (txt);
     res->c = new nr_complex_t ();
   } else {
-    res->c = new nr_complex_t (m->get (r - 1, c - 1));
+    res->c = new nr_complex_t ((*m)(r - 1, c - 1));
   }
   return res;
 }
@@ -2702,9 +2702,9 @@ constant * evaluate::mu1_m (constant * args) {
   _ARM0 (m);
   _DEFD ();
   nr_double_t k;
-  k = (1 - norm (m->get (0, 0))) /
-    (abs (m->get (1, 1) - conj (m->get (0, 0)) * det (*m)) +
-     abs (m->get (0, 1) * m->get (1, 0)));
+  k = (1 - norm ((*m)(0, 0))) /
+    (abs ((*m)(1, 1) - conj ((*m)(0, 0)) * det (*m)) +
+     abs ((*m)(0, 1) * ((*m)(1, 0))));
   _RETD (k);
 }
 
@@ -2722,9 +2722,9 @@ constant * evaluate::mu2_m (constant * args) {
   _ARM0 (m);
   _DEFD ();
   nr_double_t k;
-  k = (1 - norm (m->get (1, 1))) /
-    (abs (m->get (0, 0) - conj (m->get (1, 1)) * det (*m)) +
-     abs (m->get (0, 1) * m->get (1, 0)));
+  k = (1 - norm ((*m)(1, 1))) /
+    (abs ((*m)(0, 0) - conj ((*m)(1, 1)) * det (*m)) +
+     abs ((*m)(0, 1) * (*m)(1, 0)));
   _RETD (k);
 }
 
