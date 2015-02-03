@@ -380,7 +380,7 @@ void cpwline::calcNoiseSP (nr_double_t) {
   nr_double_t T = getPropertyDouble ("Temp");
   matrix s = getMatrixS ();
   matrix e = eye (getSize ());
-  setMatrixN (celsius2kelvin (T) / T0 * (e - s * transpose (conj (s))));
+  setMatrixN (celsius2kelvin (T) / T0 * (e - s * s.adjoint()));
 }
 
 void cpwline::initDC (void) {

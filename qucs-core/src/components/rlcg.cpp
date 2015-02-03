@@ -69,7 +69,7 @@ void rlcg::calcNoiseSP (nr_double_t) {
   nr_double_t T = getPropertyDouble ("Temp");
   matrix s = getMatrixS ();
   matrix e = eye (getSize ());
-  setMatrixN (celsius2kelvin (T) / T0 * (e - s * transpose (conj (s))));
+  setMatrixN (celsius2kelvin (T) / T0 * (e - s * s.adjoint()));
 }
 
 void rlcg::calcNoiseAC (nr_double_t) {

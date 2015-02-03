@@ -1215,13 +1215,13 @@ constant * evaluate::conj_v (constant * args) {
 constant * evaluate::conj_m (constant * args) {
   _ARM0 (m);
   _DEFM ();
-  _RETM (conj (*m));
+  _RETM ((*m).conjugate());
 }
 
 constant * evaluate::conj_mv (constant * args) {
   _ARMV0 (mv);
   _DEFMV ();
-  _RETMV (conj (*mv));
+  _RETMV (conj(*mv));
 }
 
 // ********** square of absolute value *****************
@@ -2646,7 +2646,7 @@ constant * evaluate::inverse_mv (constant * args) {
 constant * evaluate::transpose_m (constant * args) {
   _ARM0 (m);
   _DEFM ();
-  _RETM (transpose (*m));
+  _RETM ((*m).transpose());
 }
 
 constant * evaluate::transpose_mv (constant * args) {
@@ -2676,7 +2676,7 @@ constant * evaluate::eye_m (constant * args) {
 constant * evaluate::adjoint_m (constant * args) {
   _ARM0 (m);
   _DEFM ();
-  _RETM (adjoint (*m));
+  _RETM ((*m).adjoint());
 }
 
 constant * evaluate::adjoint_mv (constant * args) {

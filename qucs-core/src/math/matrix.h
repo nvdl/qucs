@@ -37,12 +37,9 @@ class vector;
 class matrix;
 
 matrix eye (int);
-matrix transpose (matrix);
-matrix conj (matrix);
 matrix abs (matrix);
 matrix dB (matrix);
 matrix arg (matrix);
-matrix adjoint (matrix);
 matrix real (matrix);
 matrix imag (matrix);
 matrix sqr (matrix);
@@ -117,7 +114,19 @@ class matrix
   void print (void);
   void exchangeRows (int, int);
   void exchangeCols (int, int);
-
+  matrix transpose() {
+    decltype(this->m) temp=m.transpose();
+    return temp;
+  }
+  matrix adjoint() {
+    decltype(this->m) temp=m.adjoint();
+    return temp;
+  }
+   matrix conjugate() {
+    decltype(this->m) temp=m.conjugate();
+    return temp;
+  }
+  
   // operator functions
   friend matrix operator + (matrix, matrix);
   friend matrix operator + (nr_complex_t, matrix);
@@ -143,12 +152,9 @@ class matrix
   matrix operator -= (matrix);
 
   // other operations
-  friend matrix transpose (matrix);
-  friend matrix conj (matrix);
   friend matrix abs (matrix);
   friend matrix dB (matrix);
   friend matrix arg (matrix);
-  friend matrix adjoint (matrix);
   friend matrix real (matrix);
   friend matrix imag (matrix);
   friend matrix sqr (matrix);

@@ -331,39 +331,7 @@ matrix operator - (nr_double_t d, matrix a) {
   return -a + d;
 }
 
-/*!\brief Matrix transposition
-   \param[in] a Matrix to transpose
-   \todo add transpose in place
-   \todo a is const
-*/
-matrix transpose (matrix a) {
-  decltype(a.m) tmp = a.m.transpose();
-  return tmp;
-}
 
-/*!\brief Conjugate complex matrix.
-  \param[in] a Matrix to conjugate
-  \todo add conj in place
-  \todo a is const
-*/
-matrix conj (matrix a) {
-  decltype(a.m) tmp = a.m.conjugate();
-  return tmp;
-}
-
-/*!\brief adjoint matrix
-
-   The function returns the adjoint complex matrix.  This is also
-   called the adjugate or transpose conjugate.
-   \param[in] a Matrix to transpose
-   \todo add adjoint in place
-   \todo Do not lazy and avoid conj and transpose copy
-   \todo a is const
-*/
-matrix adjoint (matrix a) {
-  decltype(a.m) tmp = a.m.adjoint();
-  return tmp;
-}
 
 /*!\brief Computes magnitude of each matrix element.
    \param[in] a matrix
@@ -1250,7 +1218,7 @@ matrix cytocs (matrix cy, matrix s) {
   assert (cy.rows () == cy.cols () && s.rows () == s.cols () &&
 	  cy.rows () == s.rows ());
 
-  return (e + s) * cy * adjoint (e + s) / 4;
+  return 0.25 * (e + s) * cy * (e + s).adjoint();
 }
 
 /*!\brief Converts S-parameter noise correlation matrix to admittance noise
@@ -1276,7 +1244,7 @@ matrix cstocy (matrix cs, matrix y) {
   assert (cs.rows () == cs.cols () && y.rows () == y.cols () &&
 	  cs.rows () == y.rows ());
 
-  return (e + y) * cs * adjoint (e + y);
+  return (e + y) * cs * (e + y).adjoint();
 }
 
 /*!\brief Converts impedance noise correlation matrix to S-parameter noise
@@ -1303,7 +1271,7 @@ matrix cztocs (matrix cz, matrix s) {
   assert (cz.rows () == cz.cols () && s.rows () == s.cols () &&
 	  cz.rows () == s.rows ());
 
-  return (e - s) * cz * adjoint (e - s) / 4;
+  return 0.25 * (e - s) * cz * (e - s).adjoint();
 }
 
 /*!\brief Converts S-parameter noise correlation matrix to impedance noise
@@ -1327,7 +1295,7 @@ matrix cstocz (matrix cs, matrix z) {
   assert (cs.rows () == cs.cols () && z.rows () == z.cols () &&
 	  cs.rows () == z.rows ());
   matrix e = eye (z.rows ());
-  return (e + z) * cs * adjoint (e + z);
+  return (e + z) * cs * (e + z).adjoint();
 }
 
 /*!\brief Converts impedance noise correlation matrix to admittance noise
@@ -1351,7 +1319,7 @@ matrix cztocy (matrix cz, matrix y) {
   assert (cz.rows () == cz.cols () && y.rows () == y.cols () &&
 	  cz.rows () == y.rows ());
 
-  return y * cz * adjoint (y);
+  return y * cz * y.adjoint();
 }
 
 /*!\brief Converts admittance noise correlation matrix to impedance noise
@@ -1374,7 +1342,7 @@ matrix cztocy (matrix cz, matrix y) {
 matrix cytocz (matrix cy, matrix z) {
   assert (cy.rows () == cy.cols () && z.rows () == z.cols () &&
 	  cy.rows () == z.rows ());
-  return z * cy * adjoint (z);
+  return z * cy * z.adjoint();
 }
 
 /*!\brief The function swaps the given rows with each other.

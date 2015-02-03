@@ -510,7 +510,7 @@ matvec pow (matvec a, qucs::vector v) {
 // Conjugate complex matrix vector.
 matvec conj (matvec a) {
   matvec res (a.getSize (), a.getRows (), a.getCols ());
-  for (int i = 0; i < a.getSize (); i++) res.set (conj (a.get (i)), i);
+  for (int i = 0; i < a.getSize (); i++) res.set ((a.get (i)).conjugate(), i);
   return res;
 }
 
@@ -553,14 +553,15 @@ matvec imag (matvec a) {
    also called the adjugate or transpose conjugate. */
 matvec adjoint (matvec a) {
   matvec res (a.getSize (), a.getRows (), a.getCols ());
-  for (int i = 0; i < a.getSize (); i++) res.set (adjoint (a.get (i)), i);
+  for (int i = 0; i < a.getSize (); i++) res.set ((a.get (i)).adjoint(), i);
   return res;
 }
 
 // Transpose the matrix vector.
 matvec transpose (matvec a) {
   matvec res (a.getSize (), a.getCols (), a.getRows ());
-  for (int i = 0; i < a.getSize (); i++) res.set (transpose (a.get (i)), i);
+  for (int i = 0; i < a.getSize (); i++)
+    res.set (a.get (i).transpose(), i);
   return res;
 }
 
