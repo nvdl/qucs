@@ -333,7 +333,7 @@ matrix bondwire::calcMatrixY (const nr_double_t f) {
   /* build Y-parameter matrix */
   nr_complex_t yL = 1.0 / nr_complex_t (R, Lw);
 
-  matrix Y (2);
+  matrix Y (2,2);
   Y(NODE_1, NODE_1)=+yL;
   Y(NODE_1, NODE_2)=-yL;
   Y(NODE_2, NODE_1)=-yL;

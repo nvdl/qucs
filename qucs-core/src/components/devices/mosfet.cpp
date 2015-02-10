@@ -71,7 +71,7 @@ matrix mosfet::calcMatrixY (nr_double_t frequency) {
   nr_complex_t Ygb = nr_complex_t (0.0, 2.0 * pi * frequency * Cgb);
 
   // build admittance matrix and convert it to S-parameter matrix
-  matrix y (4);
+  matrix y (4,4);
   y(NODE_G, NODE_G)= Ygd + Ygs + Ygb;
   y(NODE_G, NODE_D)= -Ygd;
   y(NODE_G, NODE_S)= -Ygs;
@@ -112,7 +112,7 @@ matrix mosfet::calcMatrixCy (nr_double_t frequency) {
 
   /* build noise current correlation matrix and convert it to
      noise-wave correlation matrix */
-  matrix cy = matrix (4);
+  matrix cy = matrix (4,4);
   cy(NODE_D, NODE_D)= +i;
   cy(NODE_S, NODE_S)= +i;
   cy(NODE_D, NODE_S)= -i;

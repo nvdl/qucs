@@ -33,6 +33,7 @@
 
 #include "characteristic.h"
 #include "operatingpoint.h"
+#include "matrix.h"
 
 #define NODE_1 0
 #define NODE_2 1
@@ -78,7 +79,6 @@ enum circuit_flag {
 class node;
 class property;
 class substrate;
-class matrix;
 class net;
 class environment;
 class history;

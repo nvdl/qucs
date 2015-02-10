@@ -146,7 +146,7 @@ matrix diac::calcMatrixY (nr_double_t frequency) {
   nr_double_t gi = getOperatingPoint ("gi");
   nr_double_t Ci = getOperatingPoint ("Ci");
   nr_complex_t yd = nr_complex_t (gd, Ci * 2.0 * pi * frequency);
-  matrix y (3);
+  matrix y (3,3);
   y(NODE_A2, NODE_A2)= +yd;
   y(NODE_IN, NODE_IN)= +yd +gi;
   y(NODE_A2, NODE_IN)= -yd;

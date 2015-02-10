@@ -25,9 +25,10 @@
 #ifndef __MATVEC_H__
 #define __MATVEC_H__
 
+#include "matrix.h"
+
 namespace qucs {
 
-class matrix;
 class matvec;
 
 // forward declarations

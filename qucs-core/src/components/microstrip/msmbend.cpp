@@ -77,7 +77,7 @@ matrix msmbend::calcMatrixZ (nr_double_t frequency) {
   // calculate Z-parameters
   z21 = nr_complex_t (0.0, -0.5e12 / (pi * frequency * C));
   z11 = nr_complex_t (0.0, 2e-9 * pi * frequency * L) + z21;
-  matrix z (2);
+  matrix z (2,2);
   z(0, 0)= z11;
   z(0, 1)= z21;
   z(1, 0)= z21;

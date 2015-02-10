@@ -113,9 +113,9 @@ void spfile::calcSP (nr_double_t frequency) {
    given frequency.  It uses interpolation for frequency points which
    are not part of the original touchstone file. */
 matrix spfile::getInterpolMatrixS (nr_double_t frequency) {
-
+  auto size = getSize () - 1;
   // first interpolate the matrix values
-  matrix s (getSize () - 1);
+  matrix s (size,size);
   for (int r = 0; r < getSize () - 1; r++) {
     for (int c = 0; c < getSize () - 1; c++) {
       int i = r * getSize () + c;
@@ -166,7 +166,7 @@ matrix spfile::expandSParaMatrix (matrix s) {
   int r, c, ports = s.cols () + 1;
   nr_double_t g = -1;
   nr_complex_t fr, ss, sr, sc, sa;
-  matrix res (ports);
+  matrix res (ports,ports);
 
   // compute S'mm
   for (sa = 0, r = 0; r < ports - 1; r++)
@@ -205,7 +205,7 @@ matrix spfile::shrinkSParaMatrix (matrix s) {
   assert (s.cols () == s.rows () && s.cols () > 0);
   int r, c, ports = s.cols ();
   nr_double_t g = -1;
-  matrix res (ports - 1);
+  matrix res (ports - 1,ports -1);
 
   // compute S'ij
   for (r = 0; r < ports - 1; r++) {
@@ -249,7 +249,7 @@ matrix spfile::expandNoiseMatrix (matrix n, matrix s) {
   d(ports - 1, 0)= s(ports - 1, ports - 1) - 1.0;
 
   // expand noise correlation matrix
-  matrix res (ports);
+  matrix res (ports,ports);
   res = (k * n * k.adjoint() - celsius2kelvin (T) / T0 * fabs (1 - norm (g)) *
 	 d * d.adjoint()) * norm (1 / (1 - g));
   return res;
@@ -279,7 +279,7 @@ matrix spfile::shrinkNoiseMatrix (matrix n, matrix s) {
   for (r = 0; r < ports - 1; r++) d(r, 0)= s(r, ports - 1);
 
   // shrink noise correlation matrix
-  matrix res (ports - 1);
+  matrix res (ports - 1,ports - 1);
   res = k * n * k.adjoint() + celsius2kelvin (T) / T0 * fabs (1.0 - norm (g)) /
     norm (1.0 - g * s(ports - 1, ports - 1)) * d *d.adjoint();
   return res;
@@ -408,7 +408,7 @@ void spfile::createIndex (void) {
 matrix spfile::correlationMatrix (nr_double_t Fmin, nr_complex_t Sopt,
 				  nr_double_t Rn, matrix s) {
   assert (s.cols () == s.rows () && s.cols () == 2);
-  matrix c (2);
+  matrix c (2,2);
   nr_complex_t Kx = 4 * Rn / z0 / norm (1.0 + Sopt);
   c(0, 0)= (Fmin - 1) * (norm (s(0, 0)) - 1.0) +
 	 Kx * norm (1.0 - s(0, 0) * Sopt);

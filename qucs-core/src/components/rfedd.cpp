@@ -317,7 +317,7 @@ void rfedd::calcAC (nr_double_t frequency) {
 // Computes parameter matrix.
 matrix rfedd::calcMatrix (nr_double_t frequency) {
   int i, j, k, ports = getSize ();
-  matrix p (ports);
+  matrix p (ports, ports);
 
   // update local equations
   updateLocals (frequency);

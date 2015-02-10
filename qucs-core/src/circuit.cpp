@@ -653,7 +653,7 @@ void circuit::setMatrixS (matrix s) {
 /* The function return a matrix containing the S-parameters of the
    circuit. */
 matrix circuit::getMatrixS (void) {
-  matrix res (size);
+  matrix res (size, size);
   for(unsigned int i=0; i < size; ++i)
     for(unsigned int j=0; j < size; ++j)
       res(i,j) = MatrixS[i*size + j];
@@ -674,7 +674,7 @@ void circuit::setMatrixN (matrix n) {
 /* The function return a matrix containing the noise correlation
    matrix of the circuit. */
 matrix circuit::getMatrixN (void) {
-  matrix res (size);
+  matrix res (size, size);
   for(unsigned int i=0; i < size; ++i)
     for(unsigned int j=0; j < size; ++j)
       res(i,j) = MatrixN[i*size + j];
@@ -695,7 +695,7 @@ void circuit::setMatrixY (matrix y) {
 /* The function return a matrix containing the G-MNA matrix of the
    circuit. */
 matrix circuit::getMatrixY (void) {
-  matrix res (size);
+  matrix res (size, size);
   for(unsigned int i=0; i < size; ++i)
     for(unsigned int j=0; j < size; ++j)
       res(i,j) = MatrixY[i*size + j];

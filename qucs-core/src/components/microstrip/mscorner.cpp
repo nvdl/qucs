@@ -81,7 +81,7 @@ matrix mscorner::calcMatrixZ (nr_double_t frequency) {
   }
 
   // create Z-parameter matrix
-  matrix z (2);
+  matrix z (2,2);
   nr_complex_t z21 = nr_complex_t (0.0, -0.5e12 / (pi * frequency * C));
   nr_complex_t z11 = nr_complex_t (0.0, 2e-9 * pi * frequency * L) + z21;
   z(0, 0)= z11;

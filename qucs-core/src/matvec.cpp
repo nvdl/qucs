@@ -267,7 +267,9 @@ matvec operator + (matvec a, matrix b) {
 matvec operator + (matvec a, qucs::vector b) {
   assert (a.getSize () == b.getSize ());
   matvec res (a.getSize (), a.getRows (), a.getCols ());
-  for (int i = 0; i < a.getSize (); i++) res.set (a.get (i) + b.get (i), i);
+  for (int i = 0; i < a.getSize (); i++) {
+    res.set (a.get(i) + b.get (i), i);
+  }
   return res;
 }
 

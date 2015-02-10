@@ -62,7 +62,7 @@ matrix jfet::calcMatrixY (nr_double_t frequency) {
   nr_complex_t Yds = gds;
 
   // build admittance matrix and convert it to S-parameter matrix
-  matrix y (3);
+  matrix y (3,3);
   y(NODE_G, NODE_G)= Ygd + Ygs;
   y(NODE_G, NODE_D)= -Ygd;
   y(NODE_G, NODE_S)= -Ygs;
@@ -95,7 +95,7 @@ matrix jfet::calcMatrixCy (nr_double_t frequency) {
 
   /* build noise current correlation matrix and convert it to
      noise-wave correlation matrix */
-  matrix cy = matrix (3);
+  matrix cy = matrix (3,3);
   cy(NODE_D, NODE_D)= +i;
   cy(NODE_S, NODE_S)= +i;
   cy(NODE_D, NODE_S)= -i;

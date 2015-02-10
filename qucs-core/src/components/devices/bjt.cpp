@@ -85,7 +85,7 @@ matrix bjt::calcMatrixY (nr_double_t frequency) {
 #endif
 
   // build admittance matrix
-  matrix y (4);
+  matrix y (4,4);
 #if NEWSGP
   // for some reason this small signal equivalent can't be used
   y(NODE_B, NODE_B)= +Ybc + Ybe + Ybebc;
@@ -151,7 +151,7 @@ matrix bjt::calcMatrixCy (nr_double_t frequency) {
 
   /* build noise current correlation matrix and convert it to
      noise-wave correlation matrix */
-  matrix cy = matrix (4);
+  matrix cy = matrix (4,4);
   cy(NODE_B, NODE_B)= +ib;
   cy(NODE_B, NODE_E)= -ib;
   cy(NODE_C, NODE_C)= +ic;

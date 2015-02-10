@@ -34,8 +34,184 @@
 namespace qucs {
 
 class vector;
-class matrix;
+#if USE_EIGEN
+typedef Eigen::Matrix<nr_complex_t,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> matrix;
+#endif
+ 
+#ifndef USE_EIGEN
+/*!\class matrix
+ * \brief Dense complex matrix class
+ * This class defines a matrix object with its methods, operators and operations.
+*/
+class matrix
+{
+ private:
+  Eigen::Matrix<nr_complex_t, Eigen::Dynamic, Eigen::Dynamic> m;
+ public:
+  matrix () = default;
+  matrix (int r, int c) : m(Eigen::Matrix<nr_complex_t,Eigen::Dynamic,Eigen::Dynamic>::Zero(r,c)) {} ;
+  matrix (const matrix &)= default;
+  matrix (const Eigen::Matrix<nr_complex_t,Eigen::Dynamic,Eigen::Dynamic> &n):
+    m(n) {};
+  matrix (Eigen::Matrix<nr_complex_t,Eigen::Dynamic,Eigen::Dynamic> &&n):
+    m(std::move(n)) {};
+  ~matrix () = default;
+  auto row(int i) -> decltype(m.row(i)) { return m.row(i); }
+  nr_complex_t get (int r, int c) const = delete;
+  void set(int r, int c, const nr_complex_t v) = delete;
+  int cols (void) const { return m.cols(); }
+  int rows (void) const { return m.rows(); }
+  nr_complex_t * getData (void) = delete;
+  auto data(void) -> decltype(m.data()) { return m.data(); }
+  void print (void);
+  void exchangeRows (int, int);
+  void exchangeCols (int, int);
+  matrix transpose() {
+    decltype(this->m) temp=m.transpose();
+    return temp;
+  }
+  matrix adjoint() {
+    decltype(this->m) temp=m.adjoint();
+    return temp;
+  }
+   matrix conjugate() {
+    decltype(this->m) temp=m.conjugate();
+    return temp;
+  }
+  
+  // operator functions
+  friend matrix operator + (const matrix&, const matrix&);
+  friend matrix operator + (const nr_complex_t, const matrix&);
+  friend matrix operator + (const matrix &, const nr_complex_t);
+  friend matrix operator + (const nr_double_t, const matrix&);
+  friend matrix operator + (const matrix &, const nr_double_t);
+  friend matrix operator - (const matrix&, const matrix&);
+  friend matrix operator - (const nr_complex_t, const matrix&);
+  friend matrix operator - (const matrix&, const nr_complex_t);
+  friend matrix operator - (const nr_double_t, const matrix&);
+  friend matrix operator - (const matrix&, const nr_double_t);
+  friend matrix operator / (const matrix&, const nr_complex_t);
+  friend matrix operator / (const matrix&, const nr_double_t);
+  friend matrix operator * (const nr_complex_t, const matrix&);
+  friend matrix operator * (const matrix&, const nr_complex_t);
+  friend matrix operator * (const nr_double_t, const matrix&);
+  friend matrix operator * (const matrix&, const nr_double_t);
+  friend matrix operator * (const matrix&, const matrix&);
 
+  // intrinsic operator functions
+  matrix operator  - () { decltype(this->m) res = -this->m; return res;};
+
+  // other operations
+ 
+  /*! \brief Read access operator
+      \param[in] r: row number (from 0 like usually in C)
+      \param[in] c: column number (from 0 like usually in C)
+      \return Cell in the row r and column c
+      \todo: Why not inline
+      \todo: Why not r and c not const
+      \todo: Create a debug version checking out of bound (using directly assert)
+  */
+  nr_complex_t  operator () (int r, int c) const { return m(r,c); }
+  /*! \brief Write access operator
+      \param[in] r: row number (from 0 like usually in C)
+      \param[in] c: column number (from 0 like usually in C)
+      \return Reference to cell in the row r and column c
+      \todo: Why not inline
+      \todo: Why r and c not const
+      \todo: Create a debug version checking out of bound (using directly assert)
+  */
+  nr_complex_t& operator () (int r, int c) { return m(r,c); }
+
+};
+#endif
+inline matrix operator + (const matrix &a, const matrix &b) {
+  decltype(a.m) res = a.m;
+  res += b.m;
+  return res;
+}
+
+inline matrix operator + (const nr_double_t a, const matrix &b) {
+  decltype(b.m) res = (a + b.m.array()).matrix();
+  return res;
+}
+
+inline matrix operator + (const matrix &b, const nr_double_t a) {
+  return b+a;
+}
+
+inline matrix operator + (const nr_complex_t a, const matrix &b) {
+  decltype(b.m) res = (a + b.m.array()).matrix();
+  return res;
+}
+
+inline matrix operator + (const matrix &b, const nr_complex_t a) {
+  return b+a;
+}
+
+
+inline matrix operator - (const matrix &a, const matrix &b) {
+  decltype(a.m) res = a.m;
+  res -= b.m;
+  return res;
+}
+
+inline matrix operator - (const nr_double_t a, const matrix &b) {
+  decltype(b.m) res = (a - b.m.array()).matrix();
+  return res;
+}
+
+inline matrix operator - (const matrix &b, const nr_double_t a) {
+  decltype(b.m) res = (b.m.array() - a).matrix();
+  return res;
+}
+
+inline matrix operator - (const nr_complex_t a, const matrix &b) {
+  decltype(b.m) res = (a - b.m.array()).matrix();
+  return res;
+}
+
+inline matrix operator - (const matrix &b, const nr_complex_t a) {
+  decltype(b.m) res = (b.m.array() - a).matrix();
+  return res;
+}
+
+inline matrix operator / (const matrix&a, const nr_complex_t b) {
+  decltype(a.m) res = (1.0/b)*a.m;
+  return res;
+}
+
+inline matrix operator / (const matrix&a, const nr_double_t b) {
+  decltype(a.m) res = (1.0/b)*a.m;
+  return res;
+}
+
+inline matrix operator * (const matrix&a, const nr_complex_t b) {
+  decltype(a.m) res = b*a.m;
+  return res;
+}
+
+inline matrix operator * (const matrix&a, const nr_double_t b) {
+  decltype(a.m) res = b*a.m;
+  return res;
+}
+
+inline matrix operator * (const nr_complex_t b, const matrix&a) {
+  decltype(a.m) res = b*a.m;
+  return res;
+}
+
+inline matrix operator * (const nr_double_t b,const matrix&a) {
+  decltype(a.m) res = b*a.m;
+  return res;
+}
+ 
+ 
+inline matrix operator * (const matrix&a, const matrix&b) {
+  decltype(a.m) res = a.m;
+  res *= b.m;
+  return res;
+}
+ 
 matrix eye (int);
 matrix abs (matrix);
 matrix dB (matrix);
@@ -85,145 +261,6 @@ nr_double_t rollet (matrix);
 nr_double_t b1 (matrix);
 matrix rad2deg     (matrix);
 matrix deg2rad     (matrix);
-
-
-/*!\class matrix
- * \brief Dense complex matrix class
- * This class defines a matrix object with its methods, operators and operations.
-*/
-class matrix
-{
- private:
-  Eigen::Matrix<nr_complex_t, Eigen::Dynamic, Eigen::Dynamic> m;
- public:
-  matrix () = default;
-  matrix (int n) : m(Eigen::Matrix<nr_complex_t,Eigen::Dynamic,Eigen::Dynamic>::Zero(n,n)) {};
-  matrix (int r, int c) : m(Eigen::Matrix<nr_complex_t,Eigen::Dynamic,Eigen::Dynamic>::Zero(r,c)) {} ;
-  matrix (const matrix &)= default;
-  matrix (const Eigen::Matrix<nr_complex_t,Eigen::Dynamic,Eigen::Dynamic> &n):
-    m(n) {};
-  matrix (Eigen::Matrix<nr_complex_t,Eigen::Dynamic,Eigen::Dynamic> &&n):
-    m(std::move(n)) {};
-  ~matrix () = default;
-  nr_complex_t get (int r, int c) const = delete;
-  void set(int r, int c, const nr_complex_t v) = delete;
-  int cols (void) const { return m.cols(); }
-  int rows (void) const { return m.rows(); }
-  nr_complex_t * getData (void) = delete;
-  auto data(void) -> decltype(m.data()) { return m.data(); }
-  void print (void);
-  void exchangeRows (int, int);
-  void exchangeCols (int, int);
-  matrix transpose() {
-    decltype(this->m) temp=m.transpose();
-    return temp;
-  }
-  matrix adjoint() {
-    decltype(this->m) temp=m.adjoint();
-    return temp;
-  }
-   matrix conjugate() {
-    decltype(this->m) temp=m.conjugate();
-    return temp;
-  }
-  
-  // operator functions
-  friend matrix operator + (matrix, matrix);
-  friend matrix operator + (nr_complex_t, matrix);
-  friend matrix operator + (matrix, nr_complex_t);
-  friend matrix operator + (nr_double_t, matrix);
-  friend matrix operator + (matrix, nr_double_t);
-  friend matrix operator - (matrix, matrix);
-  friend matrix operator - (nr_complex_t, matrix);
-  friend matrix operator - (matrix, nr_complex_t);
-  friend matrix operator - (nr_double_t, matrix);
-  friend matrix operator - (matrix, nr_double_t);
-  friend matrix operator / (matrix, nr_complex_t);
-  friend matrix operator / (matrix, nr_double_t);
-  friend matrix operator * (nr_complex_t, matrix);
-  friend matrix operator * (matrix, nr_complex_t);
-  friend matrix operator * (nr_double_t, matrix);
-  friend matrix operator * (matrix, nr_double_t);
-  friend matrix operator * (matrix, matrix);
-
-  // intrinsic operator functions
-  matrix operator  - ();
-  matrix operator += (matrix);
-  matrix operator -= (matrix);
-
-  // other operations
-  friend matrix abs (matrix);
-  friend matrix dB (matrix);
-  friend matrix arg (matrix);
-  friend matrix real (matrix);
-  friend matrix imag (matrix);
-  friend matrix sqr (matrix);
-  friend matrix eye (int, int);
-  friend matrix diagonal (qucs::vector);
-  friend matrix pow (matrix, int);
-  friend nr_complex_t cofactor (matrix, int, int);
-  friend nr_complex_t detLaplace (matrix);
-  friend nr_complex_t detGauss (matrix);
-  friend nr_complex_t det (matrix);
-  friend matrix inverseLaplace (matrix);
-  friend matrix inverseGaussJordan (matrix);
-  friend matrix inverse (matrix);
-  friend matrix stos (matrix, nr_complex_t, nr_complex_t);
-  friend matrix stos (matrix, nr_double_t, nr_double_t);
-  friend matrix stos (matrix, qucs::vector, nr_complex_t);
-  friend matrix stos (matrix, nr_complex_t, qucs::vector);
-  friend matrix stos (matrix, qucs::vector, qucs::vector);
-  friend matrix stoz (matrix, nr_complex_t);
-  friend matrix stoz (matrix, qucs::vector);
-  friend matrix ztos (matrix, nr_complex_t);
-  friend matrix ztos (matrix, qucs::vector);
-  friend matrix ztoy (matrix);
-  friend matrix stoy (matrix, nr_complex_t);
-  friend matrix stoy (matrix, qucs::vector);
-  friend matrix ytos (matrix, nr_complex_t);
-  friend matrix ytos (matrix, qucs::vector);
-  friend matrix ytoz (matrix);
-  friend matrix stoa (matrix, nr_complex_t, nr_complex_t);
-  friend matrix atos (matrix, nr_complex_t, nr_complex_t);
-  friend matrix stoh (matrix, nr_complex_t, nr_complex_t);
-  friend matrix htos (matrix, nr_complex_t, nr_complex_t);
-  friend matrix stog (matrix, nr_complex_t, nr_complex_t);
-  friend matrix gtos (matrix, nr_complex_t, nr_complex_t);
-  friend matrix cytocs (matrix, matrix);
-  friend matrix cztocs (matrix, matrix);
-  friend matrix cztocy (matrix, matrix);
-  friend matrix cstocy (matrix, matrix);
-  friend matrix cytocz (matrix, matrix);
-  friend matrix cstocz (matrix, matrix);
-
-  friend matrix twoport (matrix, char, char);
-  friend nr_double_t rollet (matrix);
-  friend nr_double_t b1 (matrix);
-
-  friend matrix rad2deg    (matrix);
-  friend matrix deg2rad    (matrix);
-
-  /*! \brief Read access operator
-      \param[in] r: row number (from 0 like usually in C)
-      \param[in] c: column number (from 0 like usually in C)
-      \return Cell in the row r and column c
-      \todo: Why not inline
-      \todo: Why not r and c not const
-      \todo: Create a debug version checking out of bound (using directly assert)
-  */
-  nr_complex_t  operator () (int r, int c) const { return m(r,c); }
-  /*! \brief Write access operator
-      \param[in] r: row number (from 0 like usually in C)
-      \param[in] c: column number (from 0 like usually in C)
-      \return Reference to cell in the row r and column c
-      \todo: Why not inline
-      \todo: Why r and c not const
-      \todo: Create a debug version checking out of bound (using directly assert)
-  */
-  nr_complex_t& operator () (int r, int c) { return m(r,c); }
-
-};
-
 } // namespace qucs
 
 #endif /* __MATRIX_H__ */

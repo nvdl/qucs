@@ -324,7 +324,7 @@ static void touchstone_normalize_sp (void) {
   int ports = touchstone_options.ports;
   qucs::vector * v = touchstone_result->getVariables ();
   int i, j, n, len = v->getSize ();
-  matrix s = matrix (ports);
+  matrix s = matrix (ports,ports);
 
   // go through each matrix entry
   for (n = 0; n < len; n++) {

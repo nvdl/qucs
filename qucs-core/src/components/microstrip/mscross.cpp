@@ -151,7 +151,7 @@ matrix mscross::calcMatrixY (nr_double_t f) {
   nr_complex_t yl3 = 1.0 / nr_complex_t (0, o * L3);
   nr_complex_t yl4 = 1.0 / nr_complex_t (0, o * L4);
   nr_complex_t yl5 = 1.0 / nr_complex_t (0, o * L5);
-  matrix Y (6);
+  matrix Y (6,6);
   Y(NODE_1, NODE_1)= yl1 + yc1;
   Y(NODE_2, NODE_2)= yl2 + yc2;
   Y(NODE_3, NODE_3)= yl3 + yc3;

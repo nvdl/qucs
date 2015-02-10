@@ -168,7 +168,7 @@ matrix thyristor::calcMatrixY (nr_double_t frequency) {
   nr_double_t gg = 1.0 / getPropertyDouble ("Rg");
   nr_double_t Ci = getOperatingPoint ("Ci");
   nr_complex_t yi = nr_complex_t (gi, Ci * 2.0 * pi * frequency);
-  matrix y (4);
+  matrix y (4,4);
   y(NODE_A2, NODE_A2)= +gd;
   y(NODE_IN, NODE_IN)= +gd +yi +gg;
   y(NODE_A2, NODE_IN)= -gd;

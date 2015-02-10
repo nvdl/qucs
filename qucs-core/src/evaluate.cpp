@@ -3899,21 +3899,21 @@ constant * evaluate::ifthenelse_m_m (constant * args) {
   matrix m1, m2;
   switch (t1) {
   case TAG_DOUBLE:
-    m1 = matrix (1); m1 (1,1) = D(_ARES(1)); break;
+    m1 = matrix (1,1); m1 (1,1) = D(_ARES(1)); break;
   case TAG_COMPLEX:
-    m1 = matrix (1); m1 (1,1) = *C(_ARES(1)); break;
+    m1 = matrix (1,1); m1 (1,1) = *C(_ARES(1)); break;
   case TAG_BOOLEAN:
-    m1 = matrix (1); m1 (1,1) = B(_ARES(1)) ? 1.0 : 0.0; break;
+    m1 = matrix (1,1); m1 (1,1) = B(_ARES(1)) ? 1.0 : 0.0; break;
   case TAG_MATRIX:
     m1 = *M(_ARES(1)); break;
   }
   switch (t2) {
   case TAG_DOUBLE:
-    m2 = matrix (1); m2 (0,0) = D(_ARES(2)); break;
+    m2 = matrix (1,1); m2 (0,0) = D(_ARES(2)); break;
   case TAG_COMPLEX:
-    m2 = matrix (1); m2 (0,0) = *C(_ARES(2)); break;
+    m2 = matrix (1,1); m2 (0,0) = *C(_ARES(2)); break;
   case TAG_BOOLEAN:
-    m2 = matrix (1); m2 (0,0) = B(_ARES(2)) ? 1.0 : 0.0; break;
+    m2 = matrix (1,1); m2 (0,0) = B(_ARES(2)) ? 1.0 : 0.0; break;
   case TAG_MATRIX:
     m2 = *M(_ARES(2)); break;
   }

@@ -533,7 +533,7 @@ using qucs::matrix;
 <admst:text format="matrix $module::calcMatrixY (nr_double_t frequency)\n{"/>
   _freq = frequency;
   saveOperatingPoints ();
-  matrix y ($nbr_nodes);
+  matrix y ($nbr_nodes,$nbr_nodes);
 
 <admst:text format="\n"/>
 <admst:text format="  for (int i1 = 0; i1 < $nbr_nodes; i1++) {\n"/>
@@ -554,7 +554,7 @@ using qucs::matrix;
 
 <admst:text format="/* Perform S-parameter calculations. */\n"/>
 <admst:text format="void $module::calcSP (nr_double_t frequency)\n{"/>
-  setMatrixS (ytos (calcMatrixY (frequency)));
+  setMatrixS (qucs::ytos (calcMatrixY (frequency)));
 <admst:text format="\n}\n\n"/>
 
 <!-- ---------------------------------------------------------------------- -->
@@ -636,7 +636,7 @@ using qucs::matrix;
 <admst:text format="/* Compute Cy-matrix for AC noise analysis. */\n"/>
 <admst:text format="matrix $module::calcMatrixCy (nr_double_t frequency) \n{"/>
   _freq = frequency;
-  matrix cy ($nbr_nodes);
+  matrix cy ($nbr_nodes,$nbr_nodes);
 
 <admst:text format="\n"/>
 <admst:for-each select="source[flickernoise='yes']">
@@ -685,7 +685,7 @@ using qucs::matrix;
 
 <admst:text format="/* Perform S-parameter noise computations. */\n"/>
 <admst:text format="void $module::calcNoiseSP (nr_double_t frequency) \n{"/>
-  setMatrixN (cytocs (calcMatrixCy (frequency) * z0, getMatrixS ()));
+  setMatrixN (qucs::cytocs (calcMatrixCy (frequency) * z0, getMatrixS ()));
 <admst:text format="\n}\n\n"/>
 
 <!-- ---------------------------------------------------------------------- -->

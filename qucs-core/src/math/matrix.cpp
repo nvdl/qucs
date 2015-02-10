@@ -98,241 +98,6 @@
 namespace qucs {
 
 
-#ifdef DEBUG
-/*!\brief Debug function: Prints the matrix object */
-void matrix::print (void) {
-  for (int r = 0; r < this->m.rows(); r++) {
-    for (int c = 0; c < this->m.cols(); c++) {
-      fprintf (stderr, "%+.2e,%+.2e ", (double) real ((*this)(r, c)),
-      	       (double) imag ((*this) (r, c)));
-    }
-    fprintf (stderr, "\n");
-  }
-}
-#endif /* DEBUG */
-
-/*!\brief Matrix addition.
-   \param[a] first matrix
-   \param[b] second matrix
-   \note assert same size
-   \todo a and b are const
-*/
-matrix operator + (matrix a, matrix b) {
-  decltype(a.m) tmp=a.m+b.m;
-  return tmp;
-}
-
-/*!\brief Intrinsic matrix addition.
-   \param[in] a matrix to add
-   \note assert same size
-   \todo a is const
-*/
-matrix matrix::operator += (matrix a) {
-  this->m += a.m;
-  return *this;
-}
-
-/*!\brief Matrix subtraction.
-   \param[a] first matrix
-   \param[b] second matrix
-   \note assert same size
-   \todo a and b are const
-*/
-matrix operator - (matrix a, matrix b) {
-  decltype(a.m) tmp = a.m - b.m;
-  return tmp;
-}
-
-/*!\brief Unary minus. */
-matrix matrix::operator - () {
-  decltype(this->m) tmp = -this->m;
-  return tmp;
-}
-
-/*!\brief Intrinsic matrix subtraction.
-   \param[in] a matrix to substract
-   \note assert same size
-*/
-matrix matrix::operator -= (matrix a) {
-  this->m -= a.m;
-  return *this;
-}
-
-/*!\brief Matrix scaling complex version
-   \param[in] a matrix to scale
-   \param[in] z scaling complex
-   \return Scaled matrix
-   \todo Why not a and z const
-*/
-matrix operator * (matrix a, nr_complex_t z) {
-  return a*z;
-}
-
-/*!\brief Matrix scaling complex version (different order)
-   \param[in] a matrix to scale
-   \param[in] z scaling complex
-   \return Scaled matrix
-   \todo Why not a and z const
-   \todo Why not inline
-*/
-matrix operator * (nr_complex_t z, matrix a) {
-  return a * z;
-}
-
-/*!\brief Matrix scaling complex version
-   \param[in] a matrix to scale
-   \param[in] d scaling real
-   \return Scaled matrix
-   \todo Why not d and a const
-*/
-matrix operator * (matrix a, nr_double_t d) {
-  decltype(a.m) tmp = d*a.m;
-  return tmp;
-}
-
-/*!\brief Matrix scaling real version (different order)
-   \param[in] a matrix to scale
-   \param[in] d scaling real
-   \return Scaled matrix
-   \todo Why not inline?
-   \todo Why not d and a const
-*/
-matrix operator * (nr_double_t d, matrix a) {
-  return a * d;
-}
-
-/*!\brief Matrix scaling division by complex version
-   \param[in] a matrix to scale
-   \param[in] z scaling complex
-   \return Scaled matrix
-   \todo Why not a and z const
-*/
-matrix operator / (matrix a, nr_complex_t z) {
-  decltype(a.m) tmp = a.m/z;
-  return tmp;
-}
-
-/*!\brief Matrix scaling division by real version
-   \param[in] a matrix to scale
-   \param[in] d scaling real
-   \return Scaled matrix
-   \todo Why not a and d const
-*/
-matrix operator / (matrix a, nr_double_t d) {
-  decltype(a.m) tmp = a.m/std::complex<nr_double_t>(d);
-  return tmp;
-}
-
-/*! Matrix multiplication.
-
-    Dumb and not optimized matrix multiplication
-    \param[a] first matrix
-    \param[b] second matrix
-    \note assert compatibility
-    \todo a and b are const
-*/
-matrix operator * (matrix a, matrix b) {
-  Eigen::Matrix<nr_complex_t,Eigen::Dynamic,Eigen::Dynamic> tmp = Eigen::Matrix<nr_complex_t,Eigen::Dynamic,Eigen::Dynamic>::Zero(a.rows(),b.cols());
-  tmp = a.m*b.m;
-  return tmp;
-}
-
-/*!\brief Complex scalar addition.
-   \param[in] a matrix
-   \param[in] z complex to add
-   \todo Move near other +
-   \todo a and z are const
-*/
-matrix operator + (matrix a, nr_complex_t z) {
-  matrix res (a.rows (), a.cols ());
-  for (int r = 0; r < a.rows (); r++)
-    for (int c = 0; c < a.cols (); c++)
-      res(r, c)=a(r, c) + z;
-  return res;
-}
-
-/*!\brief Complex scalar addition different order.
-   \param[in] a matrix
-   \param[in] z complex to add
-   \todo Move near other +
-   \todo a and z are const
-   \todo Why not inline
-*/
-matrix operator + (nr_complex_t z, matrix a) {
-  return a + z;
-}
-
-/*!\brief Real scalar addition.
-   \param[in] a matrix
-   \param[in] d real to add
-   \todo Move near other +
-   \todo a and d are const
-*/
-matrix operator + (matrix a, nr_double_t d) {
-  matrix res (a.rows (), a.cols ());
-  for (int r = 0; r < a.rows (); r++)
-    for (int c = 0; c < a.cols (); c++)
-      res(r,c) = a(r,c) + d;
-  return res;
-}
-
-/*!\brief Real scalar addition different order.
-   \param[in] a matrix
-   \param[in] d real to add
-   \todo Move near other +
-   \todo a and d are const
-   \todo Why not inline
-*/
-matrix operator + (nr_double_t d, matrix a) {
-  return a + d;
-}
-
-/*!\brief Complex scalar substraction
-   \param[in] a matrix
-   \param[in] z complex to add
-   \todo Move near other +
-   \todo a and z are const
-   \todo Why not inline
-*/
-matrix operator - (matrix a, nr_complex_t z) {
-  return -z + a;
-}
-
-/*!\brief Complex scalar substraction different order
-   \param[in] a matrix
-   \param[in] z complex to add
-   \todo Move near other +
-   \todo a and z are const
-   \todo Why not inline
-*/
-matrix operator - (nr_complex_t z, matrix a) {
-  return -a + z;
-}
-
-/*!\brief Real scalar substraction
-   \param[in] a matrix
-   \param[in] z real to add
-   \todo Move near other +
-   \todo a and z are const
-   \todo Why not inline
-*/
-matrix operator - (matrix a, nr_double_t d) {
-  return -d + a;
-}
-
-/*!\brief Real scalar substraction different order
-   \param[in] a matrix
-   \param[in] z real to add
-   \todo Move near other +
-   \todo a and z are const
-   \todo Why not inline
-*/
-matrix operator - (nr_double_t d, matrix a) {
-  return -a + d;
-}
-
-
-
 /*!\brief Computes magnitude of each matrix element.
    \param[in] a matrix
    \todo add abs in place
@@ -434,7 +199,7 @@ matrix eye (int s) {
 */
 matrix diagonal (qucs::vector diag) {
   int size = diag.getSize ();
-  matrix res (size);
+  matrix res (size,size);
   for (int i = 0; i < size; i++) res (i, i) = diag (i);
   return res;
 }
@@ -550,7 +315,10 @@ nr_complex_t detGauss (matrix a) {
     }
     // exchange rows if necessary
     assert (MaxPivot != 0);
-    if (i != pivot) { b.exchangeRows (i, pivot); res = -res; }
+    if (i != pivot) {
+      b.row(i).swap(b.row(pivot));
+      res = -res;
+    }
     // compute new rows and columns
     for (r = i + 1; r < n; r++) {
       f = b(r, i) / b(i, i);
@@ -628,8 +396,8 @@ matrix inverseGaussJordan (matrix a) {
     // exchange rows if necessary
     assert (MaxPivot != 0); // singular matrix
     if (i != pivot) {
-      b.exchangeRows (i, pivot);
-      e.exchangeRows (i, pivot);
+      b.row(i).swap(b.row(pivot));
+      e.row(i).swap(e.row(pivot));
     }
 
     // compute current row
@@ -992,7 +760,7 @@ matrix ytos (matrix y, nr_complex_t z0) {
 matrix stoa (matrix s, nr_complex_t z1, nr_complex_t z2) {
   nr_complex_t d = s (0, 0) * s (1, 1) - s (0, 1) * s (1, 0);
   nr_complex_t n = 2.0 * s (1, 0) * sqrt (fabs (real (z1) * real (z2)));
-  matrix a (2);
+  matrix a (2,2);
 
   assert (s.rows () >= 2 && s.cols () >= 2);
 
@@ -1034,7 +802,7 @@ matrix atos (matrix a, nr_complex_t z1, nr_complex_t z2) {
   nr_complex_t d = 2.0 * sqrt (fabs (real (z1) * real (z2)));
   nr_complex_t n = a (0, 0) * z2 + a (0, 1) +
     a (1, 0) * z1 * z2 + a (1, 1) * z1;
-  matrix s (2);
+  matrix s (2,2);
 
   assert (a.rows () >= 2 && a.cols () >= 2);
 
@@ -1080,7 +848,7 @@ matrix atos (matrix a, nr_complex_t z1, nr_complex_t z2) {
 matrix stoh (matrix s, nr_complex_t z1, nr_complex_t z2) {
   nr_complex_t n = s (0, 1) * s (1, 0);
   nr_complex_t d = (1.0 - s (0, 0)) * (1.0 + s (1, 1)) + n;
-  matrix h (2);
+  matrix h (2,2);
 
   assert (s.rows () >= 2 && s.cols () >= 2);
 
@@ -1118,7 +886,7 @@ matrix stoh (matrix s, nr_complex_t z1, nr_complex_t z2) {
 matrix htos (matrix h, nr_complex_t z1, nr_complex_t z2) {
   nr_complex_t n = h (0, 1) * h (1, 0);
   nr_complex_t d = (1.0 + h (0, 0) / z1) * (1.0 + z2 * h (1, 1)) - n;
-  matrix s (2);
+  matrix s (2,2);
 
   assert (h.rows () >= 2 && h.cols () >= 2);
 
@@ -1142,7 +910,7 @@ matrix htos (matrix h, nr_complex_t z1, nr_complex_t z2) {
 matrix stog (matrix s, nr_complex_t z1, nr_complex_t z2) {
   nr_complex_t n = s (0, 1) * s (1, 0);
   nr_complex_t d = (1.0 + s (0, 0)) * (1.0 - s (1, 1)) + n;
-  matrix g (2);
+  matrix g (2,2);
 
   assert (s.rows () >= 2 && s.cols () >= 2);
 
@@ -1166,7 +934,7 @@ matrix stog (matrix s, nr_complex_t z1, nr_complex_t z2) {
 matrix gtos (matrix g, nr_complex_t z1, nr_complex_t z2) {
   nr_complex_t n = g (0, 1) * g (1, 0);
   nr_complex_t d = (1.0 + g (0, 0) * z1) * (1.0 + g (1, 1) / z2) - n;
-  matrix s (2);
+  matrix s (2,2);
 
   assert (g.rows () >= 2 && g.cols () >= 2);
 
@@ -1345,44 +1113,6 @@ matrix cytocz (matrix cy, matrix z) {
   return z * cy * z.adjoint();
 }
 
-/*!\brief The function swaps the given rows with each other.
-  \param[in] r1 source row
-  \param[in] r2 destination row
-  \note assert not out of bound r1 and r2
-  \todo r1 and r2 const
-*/
-void matrix::exchangeRows (int r1, int r2) {
-  auto cols = this->m.cols();
-  auto rows = this->m.rows();
-  nr_complex_t * s = new nr_complex_t[cols];
-  int len = sizeof (nr_complex_t) * cols;
-
-  assert (r1 >= 0 && r2 >= 0 && r1 < rows && r2 < rows);
-
-  memcpy (s, &(m.data())[r1 * cols], len);
-  memcpy (&(m.data())[r1 * cols], &(m.data())[r2 * cols], len);
-  memcpy (&(m.data())[r2 * cols], s, len);
-  delete[] s;
-}
-
-/*!\brief The function swaps the given column with each other.
-  \param[in] c1 source column
-  \param[in] c2 destination column
-  \note assert not out of bound r1 and r2
-  \todo c1 and c2 const
-*/
-void matrix::exchangeCols (int c1, int c2) {
-  nr_complex_t s;
-  auto cols = this->m.cols();
-  auto rows = this->m.rows();
-  assert (c1 >= 0 && c2 >= 0 && c1 < cols && c2 < cols);
-
-  for (int r = 0; r < rows * cols; r += cols) {
-    s = (this->m.data())[r + c1];
-    (this->m.data())[r + c1] = (this->m.data())[r + c2];
-    (this->m.data())[r + c2] = s;
-  }
-}
 
 /*!\brief Generic conversion matrix
 
@@ -1408,7 +1138,7 @@ void matrix::exchangeCols (int c1, int c2) {
 matrix twoport (matrix m, char in, char out) {
   assert (m.rows () >= 2 && m.cols () >= 2);
   nr_complex_t d;
-  matrix res (2);
+  matrix res (2,2);
 
   switch (in) {
   case 'Y':

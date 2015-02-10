@@ -358,7 +358,7 @@ void eqndefined::calcAC (nr_double_t frequency) {
 // Computes Y-matrix for AC analysis.
 matrix eqndefined::calcMatrixY (nr_double_t frequency) {
   int i, j, k, branches = getSize () / 2;
-  matrix y (2 * branches);
+  matrix y (2 * branches,2*branches);
   nr_double_t o = 2 * pi * frequency;
 
   // merge conductances and capacitances

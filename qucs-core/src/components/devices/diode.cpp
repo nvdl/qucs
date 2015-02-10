@@ -97,7 +97,7 @@ matrix diode::calcMatrixCy (nr_double_t frequency) {
   nr_double_t Ffe = getPropertyDouble ("Ffe");
 
   // build noise current correlation matrix
-  matrix cy (2);
+  matrix cy (2,2);
   nr_double_t i = 2 * (Id + 2 * Is) * QoverkB / T0 +    // shot noise
     Kf * qucs::pow (fabs (Id), Af) / qucs::pow (frequency, Ffe) / kB / T0; // flicker noise
   cy(NODE_C, NODE_C)= +i; cy(NODE_A, NODE_A)= +i;

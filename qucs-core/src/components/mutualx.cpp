@@ -49,7 +49,7 @@ matrix mutualx::calcMatrixY (nr_double_t frequency) {
 #endif
   int r, c;
   int inductors = getSize () / 2;
-  matrix y = matrix (inductors * 2);
+  matrix y = matrix (inductors * 2, inductors * 2);
 
   for (r = 0; r < inductors; r++) {
     for (c = 0; c < inductors; c++) {
@@ -68,7 +68,7 @@ matrix mutualx::calcMatrixZ (nr_double_t frequency) {
   qucs::vector * L = getPropertyVector ("L");
   qucs::vector * C = getPropertyVector ("k");
   nr_double_t o = 2 * pi * frequency;
-  matrix z = matrix (inductors);
+  matrix z = matrix (inductors, inductors);
 
   // fill Z-Matrix entries
   for (state = 0, r = 0; r < inductors; r++) {

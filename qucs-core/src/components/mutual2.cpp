@@ -55,7 +55,7 @@ matrix mutual2::calcMatrixY (nr_double_t frequency) {
   nr_complex_t y15 = nr_complex_t (0, (k12 - k13 * k23) / std::sqrt (l1 * l2) / a / o);
   nr_complex_t y25 = nr_complex_t (0, (k23 - k12 * k13) / std::sqrt (l2 * l3) / a / o);
 
-  matrix y = matrix (6);
+  matrix y = matrix (6,6);
   y(NODE_1, NODE_1)= +y11; y(NODE_6, NODE_6)= +y11;
   y(NODE_1, NODE_6)= -y11; y(NODE_6, NODE_1)= -y11;
   y(NODE_2, NODE_2)= +y22; y(NODE_3, NODE_3)= +y22;
