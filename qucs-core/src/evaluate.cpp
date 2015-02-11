@@ -395,28 +395,33 @@ constant * evaluate::plus_m_d (constant * args) {
   _ARM0 (m1);
   _ARD1 (d2);
   _DEFM ();
-  _RETM (*m1 + d2);
+  matrix tmp((m1->array()+d2).matrix());
+  *m1 = tmp;
+  _RETM (*m1);
 }
 
 constant * evaluate::plus_d_m (constant * args) {
   _ARD0 (d1);
   _ARM1 (m2);
   _DEFM ();
-  _RETM (d1 + *m2);
+  matrix temp((m2->array()+d1).matrix());
+  _RETM (temp);
 }
 
 constant * evaluate::plus_m_c (constant * args) {
   _ARM0 (m1);
   _ARC1 (c2);
   _DEFM ();
-  _RETM (*m1 + *c2);
+  matrix temp((m1->array()+*c2).matrix());
+  _RETM (temp);
 }
 
 constant * evaluate::plus_c_m (constant * args) {
   _ARC0 (c1);
   _ARM1 (m2);
   _DEFM ();
-  _RETM (*c1 + *m2);
+  matrix temp((m2->array()+*c1).matrix());
+  _RETM (temp);
 }
 
 constant * evaluate::plus_mv_d (constant * args) {
@@ -608,28 +613,32 @@ constant * evaluate::minus_m_d (constant * args) {
   _ARM0 (m1);
   _ARD1 (d2);
   _DEFM ();
-  _RETM (*m1 - d2);
+  matrix temp((m1->array()-d2).matrix());
+  _RETM (temp);
 }
 
 constant * evaluate::minus_d_m (constant * args) {
   _ARD0 (d1);
   _ARM1 (m2);
   _DEFM ();
-  _RETM (d1 - *m2);
+   matrix temp((d1-m2->array()).matrix());
+  _RETM (temp);
 }
 
 constant * evaluate::minus_m_c (constant * args) {
   _ARM0 (m1);
   _ARC1 (c2);
   _DEFM ();
-  _RETM (*m1 - *c2);
+  matrix temp((m1->array()-*c2).matrix());
+  _RETM (temp);
 }
 
 constant * evaluate::minus_c_m (constant * args) {
   _ARC0 (c1);
   _ARM1 (m2);
   _DEFM ();
-  _RETM (*c1 - *m2);
+  matrix temp((*c1-m2->array()).matrix());
+  _RETM (temp);
 }
 
 constant * evaluate::minus_mv_d (constant * args) {
@@ -935,14 +944,14 @@ constant * evaluate::over_m_c (constant * args) {
   _ARM0 (m1);
   _ARC1 (c2);
   _DEFM ();
-  _RETM (*m1 / *c2);
+  _RETM ((1.0/(*c2))*(*m1));
 }
 
 constant * evaluate::over_m_d (constant * args) {
   _ARM0 (m1);
   _ARD1 (d2);
   _DEFM ();
-  _RETM (*m1 / d2);
+  _RETM ((1.0/d2)*(*m1));
 }
 
 constant * evaluate::over_mv_c (constant * args) {

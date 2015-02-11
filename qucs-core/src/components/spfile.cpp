@@ -510,7 +510,7 @@ void spfile::calcAC (nr_double_t frequency) {
 void spfile::calcNoiseAC (nr_double_t frequency) {
   // nothing to do if the given file type had errors
   if (spara == NULL || nfreq == NULL) return;
-  setMatrixN (cstocy (calcMatrixCs (frequency), getMatrixY () * z0) / z0);
+  setMatrixN ((1/z0)*cstocy (calcMatrixCs (frequency), getMatrixY () * z0));
 }
 
 void spfile::initTR (void) {

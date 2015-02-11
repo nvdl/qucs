@@ -78,20 +78,15 @@ class matrix
     decltype(this->m) temp=m.conjugate();
     return temp;
   }
+
+  auto array() -> decltype(this->m.array()) {
+    return this->m.array();
+  }
   
   // operator functions
   friend matrix operator + (const matrix&, const matrix&);
-  friend matrix operator + (const nr_complex_t, const matrix&);
-  friend matrix operator + (const matrix &, const nr_complex_t);
-  friend matrix operator + (const nr_double_t, const matrix&);
-  friend matrix operator + (const matrix &, const nr_double_t);
   friend matrix operator - (const matrix&, const matrix&);
-  friend matrix operator - (const nr_complex_t, const matrix&);
-  friend matrix operator - (const matrix&, const nr_complex_t);
-  friend matrix operator - (const nr_double_t, const matrix&);
-  friend matrix operator - (const matrix&, const nr_double_t);
-  friend matrix operator / (const matrix&, const nr_complex_t);
-  friend matrix operator / (const matrix&, const nr_double_t);
+  
   friend matrix operator * (const nr_complex_t, const matrix&);
   friend matrix operator * (const matrix&, const nr_complex_t);
   friend matrix operator * (const nr_double_t, const matrix&);
@@ -130,58 +125,10 @@ inline matrix operator + (const matrix &a, const matrix &b) {
   return res;
 }
 
-inline matrix operator + (const nr_double_t a, const matrix &b) {
-  decltype(b.m) res = (a + b.m.array()).matrix();
-  return res;
-}
-
-inline matrix operator + (const matrix &b, const nr_double_t a) {
-  return b+a;
-}
-
-inline matrix operator + (const nr_complex_t a, const matrix &b) {
-  decltype(b.m) res = (a + b.m.array()).matrix();
-  return res;
-}
-
-inline matrix operator + (const matrix &b, const nr_complex_t a) {
-  return b+a;
-}
-
 
 inline matrix operator - (const matrix &a, const matrix &b) {
   decltype(a.m) res = a.m;
   res -= b.m;
-  return res;
-}
-
-inline matrix operator - (const nr_double_t a, const matrix &b) {
-  decltype(b.m) res = (a - b.m.array()).matrix();
-  return res;
-}
-
-inline matrix operator - (const matrix &b, const nr_double_t a) {
-  decltype(b.m) res = (b.m.array() - a).matrix();
-  return res;
-}
-
-inline matrix operator - (const nr_complex_t a, const matrix &b) {
-  decltype(b.m) res = (a - b.m.array()).matrix();
-  return res;
-}
-
-inline matrix operator - (const matrix &b, const nr_complex_t a) {
-  decltype(b.m) res = (b.m.array() - a).matrix();
-  return res;
-}
-
-inline matrix operator / (const matrix&a, const nr_complex_t b) {
-  decltype(a.m) res = (1.0/b)*a.m;
-  return res;
-}
-
-inline matrix operator / (const matrix&a, const nr_double_t b) {
-  decltype(a.m) res = (1.0/b)*a.m;
   return res;
 }
 
