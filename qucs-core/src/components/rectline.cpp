@@ -297,7 +297,8 @@ void rectline::calcNoiseAC (nr_double_t) {
   if (l < 0) return;
   // calculate noise using Bosma's theorem
   nr_double_t T = getPropertyDouble ("Temp");
-  setMatrixN (4.0 * celsius2kelvin (T) / T0 * real (getMatrixY ()));
+  setMatrixN (4 * celsius2kelvin (T) / T0 * getMatrixY ().real().cast<nr_complex_t>());
+ 
 }
 
 // properties

@@ -274,9 +274,91 @@ MAKE_FUNC_DEFINITION_0_QUCS (sign);   // sign function
 MAKE_FUNC_DEFINITION_0_QUCS (sinc);   // sin(x)/x aka sinc function
 MAKE_FUNC_DEFINITION_0 (sqr);    // square value
 
-MAKE_FUNC_DEFINITION_1 (real);   // real value
-MAKE_FUNC_DEFINITION_1 (imag);   // imaginary value
-MAKE_FUNC_DEFINITION_1 (abs);    // absolute value
+constant * evaluate::real_d (constant * args) {
+  _ARD0 (d);
+  _DEFD ();
+  _RETD (d);
+}
+constant * evaluate::real_c (constant * args) {
+  _ARC0 (c);
+  _DEFD ();
+  res->d = std::real(*c);
+  return res;
+}
+constant * evaluate::real_v (constant * args) {
+  _ARV0 (v);
+  _DEFV ();
+  _RETV (real(*v));
+}
+constant * evaluate::real_m (constant * args) {
+  _ARM0 (m);
+  _DEFM ();
+  matrix temp = m->real().cast<nr_complex_t>();
+  _RETM (temp);
+}
+constant * evaluate::real_mv (constant * args) {
+  _ARMV0 (mv);
+  _DEFMV ();
+  _RETMV (real(*mv));
+}
+
+constant * evaluate::imag_d (constant * args) {
+  _ARD0 (d);
+  (void) d;
+  _DEFD ();
+  _RETD (0.0);
+}
+constant * evaluate::imag_c (constant * args) {
+  _ARC0 (c);
+  _DEFD ();
+  res->d = std::imag(*c);
+  return res;
+}
+constant * evaluate::imag_v (constant * args) {
+  _ARV0 (v);
+  _DEFV ();
+  _RETV (imag(*v));
+}
+constant * evaluate::imag_m (constant * args) {
+  _ARM0 (m);
+  _DEFM ();
+  matrix temp = m->imag().cast<nr_complex_t>();
+  _RETM (temp);
+}
+constant * evaluate::imag_mv (constant * args) {
+  _ARMV0 (mv);
+  _DEFMV ();
+  _RETMV (imag(*mv));
+}
+
+
+constant * evaluate::abs_d (constant * args) {
+  _ARD0 (d);
+  _DEFD ();
+  _RETD (std::abs(d));
+}
+constant * evaluate::abs_c (constant * args) {
+  _ARC0 (c);
+  _DEFD ();
+  res->d = std::abs(*c);
+  return res;
+}
+constant * evaluate::abs_v (constant * args) {
+  _ARV0 (v);
+  _DEFV ();
+  _RETV (abs(*v));
+}
+constant * evaluate::abs_m (constant * args) {
+  _ARM0 (m);
+  _DEFM ();
+  matrix temp = m->cwiseAbs().cast<nr_complex_t>();
+  _RETM (temp);
+}
+constant * evaluate::abs_mv (constant * args) {
+  _ARMV0 (mv);
+  _DEFMV ();
+  _RETMV (abs(*mv));
+}
 
 // ******************** unary plus *************************
 constant * evaluate::plus_d (constant * args) {

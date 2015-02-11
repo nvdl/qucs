@@ -544,7 +544,10 @@ matvec conj (matvec a) {
 // Computes magnitude of each matrix vector element.
 matvec abs (matvec a) {
   matvec res (a.getSize (), a.getRows (), a.getCols ());
-  for (int i = 0; i < a.getSize (); i++) res.set (abs (a.get (i)), i);
+  for (int i = 0; i < a.getSize (); i++) {
+    matrix temp(a.get(i).cwiseAbs().cast<nr_complex_t>());
+    res.set (temp, i);
+  }
   return res;
 }
 
@@ -565,14 +568,22 @@ matvec arg (matvec a) {
 // Real part matrix vector.
 matvec real (matvec a) {
   matvec res (a.getSize (), a.getRows (), a.getCols ());
-  for (int i = 0; i < a.getSize (); i++) res.set (real (a.get (i)), i);
+  for (int i = 0; i < a.getSize (); i++)
+    {
+      matrix m = a.get(i).real().cast<nr_complex_t>();
+      res.set (m, i);
+    }
   return res;
 }
 
 // Real part matrix vector.
 matvec imag (matvec a) {
   matvec res (a.getSize (), a.getRows (), a.getCols ());
-  for (int i = 0; i < a.getSize (); i++) res.set (imag (a.get (i)), i);
+  for (int i = 0; i < a.getSize (); i++)
+     {
+       matrix m = a.get(i).imag().cast<nr_complex_t>();
+       res.set (m, i);
+    }
   return res;
 }
 

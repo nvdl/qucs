@@ -460,7 +460,7 @@ void mscoupled::calcAC (nr_double_t frequency) {
 void mscoupled::calcNoiseAC (nr_double_t) {
   // calculate noise using Bosma's theorem
   nr_double_t T = getPropertyDouble ("Temp");
-  setMatrixN (4 * celsius2kelvin (T) / T0 * real (getMatrixY ()));
+  setMatrixN (4 * celsius2kelvin (T) / T0 * getMatrixY ().real().cast<nr_complex_t>());
 }
 
 // properties

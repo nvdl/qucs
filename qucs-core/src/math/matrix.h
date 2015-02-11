@@ -37,11 +37,8 @@ class vector;
 typedef Eigen::Matrix<nr_complex_t,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> matrix;
  
 matrix eye (int);
-matrix abs (matrix);
 matrix dB (matrix);
 matrix arg (matrix);
-matrix real (matrix);
-matrix imag (matrix);
 matrix sqr (matrix);
 matrix eye (int, int);
 matrix diagonal (vector);

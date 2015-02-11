@@ -98,19 +98,6 @@
 namespace qucs {
 
 
-/*!\brief Computes magnitude of each matrix element.
-   \param[in] a matrix
-   \todo add abs in place
-   \todo a is const
-*/
-matrix abs (matrix a) {
-  matrix res (a.rows (), a.cols ());
-  for (int r = 0; r < a.rows (); r++)
-    for (int c = 0; c < a.cols (); c++)
-      res(r,c) = abs(a(r,c));
-  return res;
-}
-
 /*!\brief Computes magnitude in dB of each matrix element.
    \param[in] a matrix
 */
@@ -132,32 +119,6 @@ matrix arg (matrix a) {
   for (int r = 0; r < a.rows (); r++)
     for (int c = 0; c < a.cols (); c++)
       res(r, c) = arg (a(r, c));
-  return res;
-}
-
-/*!\brief Real part matrix.
-   \param[in] a matrix
-   \todo add real in place
-   \todo a is const
-*/
-matrix real (matrix a) {
-  matrix res (a.rows (), a.cols ());
-  for (int r = 0; r < a.rows (); r++)
-    for (int c = 0; c < a.cols (); c++)
-      res(r, c) = real (a(r, c));
-  return res;
-}
-
-/*!\brief Imaginary part matrix.
-   \param[in] a matrix
-   \todo add imag in place
-   \todo a is const
-*/
-matrix imag (matrix a) {
-  matrix res (a.rows (), a.cols ());
-  for (int r = 0; r < a.rows (); r++)
-    for (int c = 0; c < a.cols (); c++)
-      res(r, c) =  imag (a(r, c));
   return res;
 }
 
