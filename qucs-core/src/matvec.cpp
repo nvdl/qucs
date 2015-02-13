@@ -502,14 +502,16 @@ matvec operator * (matrix a, matvec b) {
 // Compute determinants of the given matrix vector.
 qucs::vector det (matvec a) {
   qucs::vector res (a.getSize ());
-  for (int i = 0; i < a.getSize (); i++) res.set (det (a.get (i)), i);
+  for (int i = 0; i < a.getSize (); i++) res.set (a.get(i).determinant(), i);
   return res;
 }
 
 // Compute inverse matrices of the given matrix vector.
 matvec inverse (matvec a) {
   matvec res (a.getSize (), a.getRows (), a.getCols ());
-  for (int i = 0; i < a.getSize (); i++) res.set (inverse (a.get (i)), i);
+  for (int i = 0; i < a.getSize (); i++) {
+    res.set (a.get(i).inverse(), i);
+  }
   return res;
 }
 

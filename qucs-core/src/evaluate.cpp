@@ -2725,7 +2725,7 @@ constant * evaluate::twoport_mv (constant * args) {
 constant * evaluate::inverse_m (constant * args) {
   _ARM0 (m);
   _DEFM ();
-  _RETM (inverse (*m));
+  _RETM ((*m).inverse());
 }
 
 constant * evaluate::inverse_mv (constant * args) {
@@ -2749,7 +2749,7 @@ constant * evaluate::transpose_mv (constant * args) {
 constant * evaluate::det_m (constant * args) {
   _ARM0 (m);
   _DEFC ();
-  _RETC (det (*m));
+  _RETC ((*m).determinant());
 }
 
 constant * evaluate::det_mv (constant * args) {
@@ -2794,7 +2794,7 @@ constant * evaluate::mu1_m (constant * args) {
   _DEFD ();
   nr_double_t k;
   k = (1 - norm ((*m)(0, 0))) /
-    (abs ((*m)(1, 1) - conj ((*m)(0, 0)) * det (*m)) +
+    (abs ((*m)(1, 1) - conj ((*m)(0, 0)) * (*m).determinant()) +
      abs ((*m)(0, 1) * ((*m)(1, 0))));
   _RETD (k);
 }
@@ -2814,7 +2814,7 @@ constant * evaluate::mu2_m (constant * args) {
   _DEFD ();
   nr_double_t k;
   k = (1 - norm ((*m)(1, 1))) /
-    (abs ((*m)(0, 0) - conj ((*m)(1, 1)) * det (*m)) +
+    (abs ((*m)(0, 0) - conj ((*m)(1, 1)) * (*m).determinant()) +
      abs ((*m)(0, 1) * (*m)(1, 0)));
   _RETD (k);
 }

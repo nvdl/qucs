@@ -172,224 +172,16 @@ matrix pow (matrix a, int n) {
     res = eye (a.rows (), a.cols ());
   }
   else {
-    res = a = n < 0 ? inverse (a) : a;
+    if(n <0) { 
+      res = a.inverse();
+      a = res;
+    }
+    else
+      res = a;
     for (int i = 1; i < std::abs (n); i++)
       res = res * a;
   }
   return res;
-}
-
-/*!\brief Computes the complex cofactor of the given determinant
-
-   The cofactor is the determinant obtained by deleting the row and column
-   of a given element of a matrix or determinant.
-   The cofactor is preceded by a + or - sign depending of the sign
-   of \f$(-1)^(u+v)\f$
-
-   \bug This algortihm is recursive! Stack overfull!
-   \todo ((u + v) & 1) is cryptic use (u + v)% 2
-   \todo #ifdef 0
-   \todo static?
-*/
-nr_complex_t cofactor (matrix a, int u, int v) {
-  matrix res (a.rows () - 1, a.cols () - 1);
-  int r, c, ra, ca;
-  for (ra = r = 0; r < res.rows (); r++, ra++) {
-    if (ra == u) ra++;
-    for (ca = c = 0; c < res.cols (); c++, ca++) {
-      if (ca == v) ca++;
-      res(r, c)= a(ra, ca);
-    }
-  }
-  nr_complex_t z = detLaplace (res);
-  return ((u + v) & 1) ? -z : z;
-}
-
-/*!\brief Compute determinant of the given matrix using Laplace expansion.
-
-   The Laplace expansion  of the determinant of
-   an n by n square matrix a expresses
-   the determinant of a as a sum of n determinants of (n-1) by  (n-1)
-   sub-matrices of a.  There are 2n such expressions, one for each row
-   and column of a.
-
-   See Wikipedia http://en.wikipedia.org/wiki/Laplace_expansion
-   \param[in] a matrix
-   \bug This algortihm is recursive! Stack overfull!
-   \note assert square matrix
-   \todo #ifdef 0
-   \todo static ?
-*/
-nr_complex_t detLaplace (matrix a) {
-  assert (a.rows () == a.cols ());
-  int s = a.rows ();
-  nr_complex_t res = 0;
-  if (s > 1) {
-    /* always use the first row for sub-determinant, but you should
-       use the row or column with most zeros in it */
-    int r = 0;
-    for (int i = 0; i < s; i++) {
-      res += a(r, i) * cofactor (a, r, i);
-    }
-    return res;
-  }
-  /* 1 by 1 matrix */
-  else if (s == 1) {
-    return a (0, 0);
-  }
-  /* 0 by 0 matrix */
-  return 1;
-}
-
-/*!\brief Compute determinant Gaussian algorithm
-
-   Compute determinant of the given matrix using the Gaussian
-   algorithm.  This means to triangulate the matrix and multiply all
-   the diagonal elements.
-   \param[in] a matrix
-   \note assert square matrix
-   \todo static ?
-   \todo a const?
-   */
-nr_complex_t detGauss (matrix a) {
-  assert (a.rows () == a.cols ());
-  nr_double_t MaxPivot;
-  nr_complex_t f, res;
-  matrix b;
-  int i, c, r, pivot, n = a.cols ();
-
-  // return special matrix cases
-  if (n == 0) return 1;
-  if (n == 1) return a (0, 0);
-
-  // make copy of original matrix
-  b = matrix (a);
-
-  // triangulate the matrix
-  for (res = 1, i = 0; i < n; i++) {
-    // find maximum column value for pivoting
-    for (MaxPivot = 0, pivot = r = i; r < n; r++) {
-      if (abs (b(r, i)) > MaxPivot) {
-	MaxPivot = abs (b(r, i));
-	pivot = r;
-      }
-    }
-    // exchange rows if necessary
-    assert (MaxPivot != 0);
-    if (i != pivot) {
-      b.row(i).swap(b.row(pivot));
-      res = -res;
-    }
-    // compute new rows and columns
-    for (r = i + 1; r < n; r++) {
-      f = b(r, i) / b(i, i);
-      for (c = i + 1; c < n; c++) {
-	b(r, c)= b(r, c) - f * b(i, c);
-      }
-    }
-  }
-
-  // now compute determinant by multiplying diagonal
-  for (i = 0; i < n; i++) res *= b(i, i);
-  return res;
-}
-
-/*!\brief Compute determinant of the given matrix.
-   \param[in] a matrix
-   \return Complex determinant
-   \todo a const?
-*/
-nr_complex_t det (matrix a) {
-#if 0
-  return detLaplace (a);
-#else
-  return detGauss (a);
-#endif
-}
-
-/*!\brief Compute inverse matrix using Laplace expansion
-
-  Compute inverse matrix of the given matrix using Laplace expansion.
-  \param[in] a matrix to invert
-  \todo Static?
-  \bug recursive! Stack overflow
-  \todo a const?
-  \todo #ifdef 0
-*/
-matrix inverseLaplace (matrix a) {
-  matrix res (a.rows (), a.cols ());
-  nr_complex_t d = detLaplace (a);
-  assert (abs (d) != 0); // singular matrix
-  for (int r = 0; r < a.rows (); r++)
-    for (int c = 0; c < a.cols (); c++)
-      res(r, c)= cofactor (a, c, r) / d;
-  return res;
-}
-
-/*!\brief Compute inverse matrix using Gauss-Jordan elimination
-
-   Compute inverse matrix of the given matrix by Gauss-Jordan
-   elimination.
-   \todo a const?
-   \todo static?
-   \note assert non singulat matix
-   \param[in] a matrix to invert
-*/
-matrix inverseGaussJordan (matrix a) {
-  nr_double_t MaxPivot;
-  nr_complex_t f;
-  matrix b, e;
-  int i, c, r, pivot, n = a.cols ();
-
-  // create temporary matrix and the result matrix
-  b = matrix (a);
-  e = eye (n);
-
-  // create the eye matrix in 'b' and the result in 'e'
-  for (i = 0; i < n; i++) {
-    // find maximum column value for pivoting
-    for (MaxPivot = 0, pivot = r = i; r < n; r++) {
-      if (abs (b (r, i)) > MaxPivot) {
-	MaxPivot = abs (b (r, i));
-	pivot = r;
-      }
-    }
-    // exchange rows if necessary
-    assert (MaxPivot != 0); // singular matrix
-    if (i != pivot) {
-      b.row(i).swap(b.row(pivot));
-      e.row(i).swap(e.row(pivot));
-    }
-
-    // compute current row
-    for (f = b (i, i), c = 0; c < n; c++) {
-      b (i, c) /= f;
-      e (i, c) /= f;
-    }
-
-    // compute new rows and columns
-    for (r = 0; r < n; r++) {
-      if (r != i) {
-	for (f = b (r, i), c = 0; c < n; c++) {
-	  b (r, c) -= f * b (i, c);
-	  e (r, c) -= f * e (i, c);
-	}
-      }
-    }
-  }
-  return e;
-}
-
-/*!\brief Compute inverse matrix
-   \param[in] a matrix to invert
-   \todo a is const
-*/
-matrix inverse (matrix a) {
-#if 0
-  return inverseLaplace (a);
-#else
-  return inverseGaussJordan (a);
-#endif
 }
 
 /*!\brief S params to S params
@@ -436,7 +228,7 @@ matrix stos (matrix s, qucs::vector zref, qucs::vector z0) {
   e = eye (d);
   r = diagonal ((z0 - zref) / (z0 + zref));
   a = diagonal (sqrt (z0 / zref) / (z0 + zref));
-  return inverse (a) * (s - r) * inverse (e - r * s) * a;
+  return a.inverse() * (s - r) * (e - r * s).inverse() * a;
 }
 
 /*!\brief S renormalization with all part identic
@@ -519,7 +311,7 @@ matrix stoz (matrix s, qucs::vector z0) {
   e = eye (d);
   zref = diagonal (z0);
   gref = diagonal (sqrt (real (1 / z0)));
-  return inverse (gref) * inverse (e - s) * (s * zref + zref) * gref;
+  return gref.inverse() * (e - s).inverse() * (s * zref + zref) * gref;
 }
 
 /*!\brief Scattering parameters to impedance matrix identic case
@@ -564,7 +356,7 @@ matrix ztos (matrix z, qucs::vector z0) {
   e = eye (d);
   zref = diagonal (z0);
   gref = diagonal (sqrt (real (1 / z0)));
-  return gref * (z - zref) * inverse (z + zref) * inverse (gref);
+  return gref * (z - zref) * (z + zref).inverse() * gref.inverse();
 }
 
 /*!\brief Convert impedance matrix to scattering parameters identic case
@@ -589,7 +381,7 @@ matrix ztos (matrix z, nr_complex_t z0) {
 */
 matrix ztoy (matrix z) {
   assert (z.rows () == z.cols ());
-  return inverse (z);
+  return z.inverse();
 }
 
 /*!\brief Scattering parameters to admittance matrix.
@@ -628,7 +420,7 @@ matrix stoy (matrix s, qucs::vector z0) {
   e = eye (d);
   zref = diagonal (z0);
   gref = diagonal (sqrt (real (1 / z0)));
-  return inverse (gref) * inverse (s * zref + zref) * (e - s) * gref;
+  return gref.inverse() * (s * zref + zref).inverse() * (e - s) * gref;
 }
 
 /*!\brief Convert scattering pto adminttance parameters identic case
@@ -679,7 +471,7 @@ matrix ytos (matrix y, qucs::vector z0) {
   e = eye (d);
   zref = diagonal (z0);
   gref = diagonal (sqrt (real (1 / z0)));
-  return gref * (e - zref * y) * inverse (e + zref * y) * inverse (gref);
+  return gref * (e - zref * y) * (e + zref * y).inverse() * gref.inverse();
 }
 /*!\brief Convert Admittance matrix to scattering parameters identic case
    \param[in] y Admittance matrix
@@ -919,7 +711,7 @@ matrix gtos (matrix g, nr_complex_t z1, nr_complex_t z2) {
 */
 matrix ytoz (matrix y) {
   assert (y.rows () == y.cols ());
-  return inverse (y);
+  return y.inverse();
 }
 
 /*!\brief Admittance noise correlation matrix to S-parameter noise
@@ -1359,7 +1151,7 @@ matrix twoport (matrix m, char in, char out) {
 nr_double_t rollet (matrix m) {
   assert (m.rows () >= 2 && m.cols () >= 2);
   nr_double_t res;
-  res = (1 - norm (m (0, 0)) - norm (m (1, 1)) + norm (det (m))) /
+  res = (1 - norm (m (0, 0)) - norm (m (1, 1)) + norm (m.determinant())) /
     2 / abs (m (0, 1) * m (1, 0));
   return res;
 }
@@ -1368,7 +1160,7 @@ nr_double_t rollet (matrix m) {
 nr_double_t b1 (matrix m) {
   assert (m.rows () >= 2 && m.cols () >= 2);
   nr_double_t res;
-  res = 1 + norm (m (0, 0)) - norm (m (1, 1)) - norm (det (m));
+  res = 1 + norm (m (0, 0)) - norm (m (1, 1)) - norm (m.determinant());
   return res;
 }
 
