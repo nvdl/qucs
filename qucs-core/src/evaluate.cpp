@@ -2761,7 +2761,7 @@ constant * evaluate::det_mv (constant * args) {
 constant * evaluate::eye_m (constant * args) {
   _ARI0 (i);
   _DEFM ();
-  _RETM (eye (i));
+  _RETM (matrix::Identity (i,i));
 }
 
 constant * evaluate::adjoint_m (constant * args) {

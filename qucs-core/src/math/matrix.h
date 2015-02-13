@@ -36,11 +36,9 @@ namespace qucs {
 class vector;
 typedef Eigen::Matrix<nr_complex_t,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> matrix;
  
-matrix eye (int);
 matrix dB (matrix);
 matrix arg (matrix);
 matrix sqr (matrix);
-matrix eye (int, int);
 matrix diagonal (vector);
 matrix pow (matrix, int);
 matrix stos (matrix, nr_complex_t, nr_complex_t z0 = 50.0);

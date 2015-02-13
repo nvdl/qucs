@@ -68,7 +68,7 @@ void coaxline::calcNoiseSP (nr_double_t) {
   // calculate noise using Bosma's theorem
   nr_double_t T = getPropertyDouble ("Temp");
   matrix s = getMatrixS ();
-  matrix e = eye (getSize ());
+  matrix e = e.Identity(getSize (),getSize());
   setMatrixN (celsius2kelvin (T) / T0 * (e - s * s.adjoint()));
 }
 

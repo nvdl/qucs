@@ -129,31 +129,6 @@ matrix sqr (matrix a) {
   return a * a;
 }
 
-/*!\brief Create identity matrix with specified number of rows and columns.
-   \param[in] rs row number
-   \param[in] cs column number
-   \todo Avoid res.get*
-   \todo Use memset
-   \todo rs, cs are const
-*/
-matrix eye (int rs, int cs) {
-  matrix res (rs, cs);
-  for (int r = 0; r < res.rows (); r++)
-    for (int c = 0; c < res.cols (); c++)
-      if (r == c)
-	res(r, c)= 1;
-  return res;
-}
-
-/*!\brief Create a square identity matrix
-   \param[in] s row or column number of square matrix
-   \todo Do not by lazy and implement it
-   \todo s is const
-*/
-matrix eye (int s) {
-  return eye (s, s);
-}
-
 /*!\brief Create a diagonal matrix from a vector
    \param[in] diag vector to write on the diagonal
    \todo diag is const
@@ -169,7 +144,7 @@ matrix diagonal (qucs::vector diag) {
 matrix pow (matrix a, int n) {
   matrix res;
   if (n == 0) {
-    res = eye (a.rows (), a.cols ());
+    res = res.Identity(a.rows(),a.cols());
   }
   else {
     if(n <0) { 
@@ -225,7 +200,7 @@ matrix stos (matrix s, qucs::vector zref, qucs::vector z0) {
 
   assert (d == s.cols () && d == z0.getSize () && d == zref.getSize ());
 
-  e = eye (d);
+  e = e.Identity(d,d);
   r = diagonal ((z0 - zref) / (z0 + zref));
   a = diagonal (sqrt (z0 / zref) / (z0 + zref));
   return a.inverse() * (s - r) * (e - r * s).inverse() * a;
@@ -308,7 +283,7 @@ matrix stoz (matrix s, qucs::vector z0) {
 
   assert (d == s.cols () && d == z0.getSize ());
 
-  e = eye (d);
+  e = e.Identity(d,d);
   zref = diagonal (z0);
   gref = diagonal (sqrt (real (1 / z0)));
   return gref.inverse() * (e - s).inverse() * (s * zref + zref) * gref;
@@ -353,7 +328,7 @@ matrix ztos (matrix z, qucs::vector z0) {
 
   assert (d == z.cols () && d == z0.getSize ());
 
-  e = eye (d);
+  e = e.Identity(d,d);
   zref = diagonal (z0);
   gref = diagonal (sqrt (real (1 / z0)));
   return gref * (z - zref) * (z + zref).inverse() * gref.inverse();
@@ -417,7 +392,7 @@ matrix stoy (matrix s, qucs::vector z0) {
 
   assert (d == s.cols () && d == z0.getSize ());
 
-  e = eye (d);
+  e = e.Identity(d,d);
   zref = diagonal (z0);
   gref = diagonal (sqrt (real (1 / z0)));
   return gref.inverse() * (s * zref + zref).inverse() * (e - s) * gref;
@@ -467,8 +442,8 @@ matrix ytos (matrix y, qucs::vector z0) {
   matrix e, zref, gref;
 
   assert (d == y.cols () && d == z0.getSize ());
-
-  e = eye (d);
+  
+  e = e.Identity(d,d);
   zref = diagonal (z0);
   gref = diagonal (sqrt (real (1 / z0)));
   return gref * (e - zref * y) * (e + zref * y).inverse() * gref.inverse();
@@ -734,7 +709,7 @@ matrix ytoz (matrix y) {
    \todo cy s const
 */
 matrix cytocs (matrix cy, matrix s) {
-  matrix e = eye (s.rows ());
+  matrix e = e.Identity(s.rows (),s.rows());
 
   assert (cy.rows () == cy.cols () && s.rows () == s.cols () &&
 	  cy.rows () == s.rows ());
@@ -760,7 +735,7 @@ matrix cytocs (matrix cy, matrix s) {
     \todo cs, y const
 */
 matrix cstocy (matrix cs, matrix y) {
-  matrix e = eye (y.rows ());
+  matrix e = e.Identity(y.rows (),y.rows());
 
   assert (cs.rows () == cs.cols () && y.rows () == y.cols () &&
 	  cs.rows () == y.rows ());
@@ -787,7 +762,7 @@ matrix cstocy (matrix cs, matrix y) {
    \todo cz, s const
 */
 matrix cztocs (matrix cz, matrix s) {
-  matrix e = eye (s.rows ());
+  matrix e = e.Identity (s.rows (),s.rows());
 
   assert (cz.rows () == cz.cols () && s.rows () == s.cols () &&
 	  cz.rows () == s.rows ());
@@ -815,7 +790,7 @@ matrix cztocs (matrix cz, matrix s) {
 matrix cstocz (matrix cs, matrix z) {
   assert (cs.rows () == cs.cols () && z.rows () == z.cols () &&
 	  cs.rows () == z.rows ());
-  matrix e = eye (z.rows ());
+  matrix e = e.Identity (z.rows (),z.rows());
   return (e + z) * cs * (e + z).adjoint();
 }
 
