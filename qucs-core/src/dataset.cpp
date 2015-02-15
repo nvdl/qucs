@@ -49,21 +49,25 @@
 namespace qucs {
 
 // Constructor creates an unnamed instance of the dataset class.
-dataset::dataset () : object () {
+dataset::dataset () :
+  object (),
+  file()
+{
   variables = dependencies = NULL;
-  file = NULL;
 }
 
 // Constructor creates an named instance of the dataset class.
-dataset::dataset (char * n) : object (n) {
+dataset::dataset (const std::string &n) :
+  object (n),
+  file()
+{
   variables = dependencies = NULL;
-  file = NULL;
 }
 
 /* The copy constructor creates a new instance based on the given
    dataset object. */
 dataset::dataset (const dataset & d) : object (d) {
-  file = d.file ? strdup (d.file) : NULL;
+  file = d.file;
   vector * v;
   // copy dependency vectors
   for (v = d.dependencies; v != NULL; v = (vector *) v->getNext ()) {
@@ -88,7 +92,6 @@ dataset::~dataset () {
     n = (vector *) v->getNext ();
     delete v;
   }
-  if (file) free (file);
 }
 
 // This function adds a dependency vector to the current dataset.
@@ -314,15 +317,14 @@ int dataset::countDependencies (void) {
 }
 
 // Returns the current output file name.
-char * dataset::getFile (void) {
+std::string dataset::getFile (void) const {
   return file;
 }
 
 /* Sets the current output file name.  The file name is used during
    the print functionality of the dataset class. */
-void dataset::setFile (const char * f) {
-  if (file) free (file);
-  file = f ? strdup (f) : NULL;
+void dataset::setFile (const std::string &f) {
+  file = f;
 }
 
 /* This function prints the current dataset representation either to
@@ -333,10 +335,10 @@ void dataset::print (void) {
   FILE * f = stdout;
 
   // open file for writing
-  if (file) {
-    if ((f = fopen (file, "w")) == NULL) {
+  if (!file.empty()) {
+    if ((f = fopen (file.c_str(), "w")) == NULL) {
       logprint (LOG_ERROR, "cannot create file `%s': %s\n",
-		file, strerror (errno));
+		file.c_str(), strerror (errno));
       return;
     }
   }
@@ -358,7 +360,7 @@ void dataset::print (void) {
   }
 
   // close file if necessary
-  if (file) fclose (f);
+  if (!file.empty()) fclose (f);
 }
 
 /* Prints the given vector as independent dataset vector into the

@@ -26,6 +26,8 @@
 # include <config.h>
 #endif
 
+#include <string>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -52,14 +54,16 @@
 #include <unistd.h>
 #endif
 
+
+
 using namespace qucs;
 
 /*! \todo replace environement name root by "/" in order to be filesystem compatible */
 int main (int argc, char ** argv) {
 
-  char * infile = NULL;
-  char * outfile = NULL;
-  char * projPath = NULL;
+  std::string infile;
+  std::string outfile;
+  std::string projPath;
   net * subnet;
   input * in;
   circuit * gnd;
@@ -158,7 +162,7 @@ int main (int argc, char ** argv) {
   // look for dynamic libs, load and register them
   // \todo, keep this way of loading or keep only annotated netlist?
   if (dynamicLoad) {
-    module::registerDynamicModules (projPath, vamodules);
+    module::registerDynamicModules (projPath.c_str(), vamodules);
   }
 
   else { //no argument, look into netlist
@@ -222,7 +226,7 @@ int main (int argc, char ** argv) {
 
   // create netlist object and input
   subnet = new net ("subnet");
-  in = infile ? new input (infile) : new input ();
+  in = (!infile.empty()) ? new input (infile.c_str()) : new input ();
 
   // pass root environment to netlist object and input
   subnet->setEnv (root);

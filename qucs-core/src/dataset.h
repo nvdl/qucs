@@ -25,6 +25,8 @@
 #ifndef __DATASET_H__
 #define __DATASET_H__
 
+#include <string>
+
 #include "object.h"
 
 namespace qucs {
@@ -33,9 +35,13 @@ class vector;
 
 class dataset : public object
 {
+ private:
+  std::string file;
+  qucs::vector * dependencies;
+  qucs::vector * variables;
  public:
   dataset ();
-  dataset (char *);
+  dataset (const std::string &);
   dataset (const dataset &);
   ~dataset ();
   void addDependency (qucs::vector *);
@@ -51,8 +57,8 @@ class dataset : public object
   void delVariable (qucs::vector *);
 
   void assignDependency (const char *const, const char * const);
-  char * getFile (void);
-  void setFile (const char *);
+  std::string getFile (void) const;
+  void setFile (const std::string &);
   void print (void);
   void printData (qucs::vector *, FILE *);
   void printDependency (qucs::vector *, FILE *);
@@ -73,11 +79,6 @@ class dataset : public object
 
   int countDependencies (void);
   int countVariables (void);
-
- private:
-  char * file;
-  qucs::vector * dependencies;
-  qucs::vector * variables;
 };
 
 } // namespace qucs

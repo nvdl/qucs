@@ -25,6 +25,8 @@
 #ifndef __INPUT_H__
 #define __INPUT_H__
 
+#include <string>
+
 namespace qucs {
 
 class net;
@@ -36,7 +38,7 @@ class input : public object
 {
  public:
   input ();
-  input (char *);
+  input (const std::string &);
   ~input ();
   int netlist (net *);
   FILE * getFile (void) { return fd; }

@@ -58,10 +58,10 @@ input::input () : object () {
 }
 
 // Constructor creates an named instance of the input class.
-input::input (char * file) : object (file) {
-  if ((fd = fopen (file, "r")) == NULL) {
+input::input (const std::string &file) : object (file) {
+  if ((fd = fopen (file.c_str(), "r")) == NULL) {
     logprint (LOG_ERROR, "cannot open file `%s': %s, using stdin instead\n",
-	      file, strerror (errno));
+	      file.c_str(), strerror (errno));
     fd = stdin;
   }
   subnet = NULL;

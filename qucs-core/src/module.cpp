@@ -438,7 +438,7 @@ void module::print (void) {
 
 
 // look for dynamic libs, load and register them
-void module::registerDynamicModules (char *proj, std::list<std::string> modlist)
+void module::registerDynamicModules (const char *proj, std::list<std::string> modlist)
 {
 /* How it is (WAS) supposed to work:
  * 1) It will list the working directory contents looking for libraries

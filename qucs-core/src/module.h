@@ -53,7 +53,7 @@ class module
   static struct define_t * getModule (char *);
   static void print (void);
 
-  static void registerDynamicModules (char *proj, std::list<std::string> modlist);
+  static void registerDynamicModules (const char *proj, std::list<std::string> modlist);
   static void closeDynamicLibs (void);
 
  private:
