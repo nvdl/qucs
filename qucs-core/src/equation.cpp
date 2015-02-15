@@ -2352,7 +2352,9 @@ void solver::checkoutDataset (void)
                 if (v->getNext () != NULL)
                 {
                     data->applyDependencies (v);
-                    data->addVariables (v);
+                    //data->addVariables (v);
+		    for(auto *vv = v; vv != NULL; vv = vv->getNext())
+		      data->addVariable (v);
                 }
                 else
                 {
@@ -2362,8 +2364,11 @@ void solver::checkoutDataset (void)
             // store independent vector(s)
             else
             {
-                if (v->getNext () != NULL)
-                    data->addDependencies (v);
+	        if (v->getNext () != NULL) {
+		   // data->addDependencies (v);
+		   for(auto * vv = v; vv!= NULL; vv = vv->getNext())
+		     data->addDependency (vv);
+		}
                 else
                     data->addDependency (v);
                 delete datadeps;

@@ -45,13 +45,9 @@ class dataset : public object
   dataset (const dataset &);
   ~dataset ();
   void addDependency (qucs::vector *);
-  void addDependencies (qucs::vector *);
   void appendDependency (qucs::vector *);
-  void appendDependencies (qucs::vector *);
   void addVariable (qucs::vector *);
-  void addVariables (qucs::vector *);
   void appendVariable (qucs::vector *);
-  void appendVariables (qucs::vector *);
   void applyDependencies (qucs::vector * v);
   void delDependency (qucs::vector *);
   void delVariable (qucs::vector *);

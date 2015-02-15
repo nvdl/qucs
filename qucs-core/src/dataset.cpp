@@ -117,16 +117,6 @@ void dataset::delDependency (vector * v) {
   delete v;
 }
 
-/* The function adds the given list of vectors to the dependency set
-   of the current dataset. */
-void dataset::addDependencies (vector * v) {
-  vector * next;
-  for (vector * t = v; t != NULL; t = next) {
-    next = (vector *) t->getNext ();
-    addDependency (t);
-  }
-}
-
 // This function appends a dependency vector to the current dataset.
 void dataset::appendDependency (vector * v) {
   vector * e;
@@ -140,16 +130,6 @@ void dataset::appendDependency (vector * v) {
     dependencies= v;
   }
   v->setNext (NULL);
-}
-
-/* The function appends the given list of vectors to the dependency
-   set of the current dataset. */
-void dataset::appendDependencies (vector * v) {
-  vector * next;
-  for (vector * t = v; t != NULL; t = next) {
-    next = (vector *) t->getNext ();
-    appendDependency (t);
-  }
 }
 
 // This function adds a variable vector to the current dataset.
@@ -175,16 +155,6 @@ void dataset::delVariable (vector * v) {
   delete v;
 }
 
-/* The function adds the given list of vectors to the variable set of
-   the current dataset. */
-void dataset::addVariables (vector * v) {
-  vector * next;
-  for (vector * t = v; t != NULL; t = next) {
-    next = (vector *) t->getNext ();
-    addVariable (t);
-  }
-}
-
 // This function appends a variable vector to the current dataset.
 void dataset::appendVariable (vector * v) {
   vector * e;
@@ -200,15 +170,7 @@ void dataset::appendVariable (vector * v) {
   v->setNext (NULL);
 }
 
-/* The function appends the given list of vectors to the variable set
-   of the current dataset. */
-void dataset::appendVariables (vector * v) {
-  vector * next;
-  for (vector * t = v; t != NULL; t = next) {
-    next = (vector *) t->getNext ();
-    appendVariable (t);
-  }
-}
+
 
 /* This function applies the dependency string list of the given
    vector to the list of vectors appended to this vector. */
