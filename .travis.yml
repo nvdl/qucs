@@ -167,7 +167,7 @@ script:
   # Only collect coverage for GCC (LINUX)
   # `make check-code-coverage` is failing due to old lcov
   - if [[ $GCC ]]; then
-      ./configure --enable-maintainer-mode --prefix=/usr --with-mkadms=`which admsXml` --disable-dependency-tracking --enable-debug --enable-code-coverage  --with-gcov=gcov-4.8 ;
+      ./configure --enable-maintainer-mode --prefix=/usr --with-mkadms=`which admsXml` --disable-dependency-tracking --enable-debug --enable-code-coverage  --with-gcov=gcov-4.8 --with-internal-libeigen3;
       make && sudo make install && make check;
     fi
 
