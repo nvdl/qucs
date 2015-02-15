@@ -25,6 +25,8 @@
 #ifndef __MATVEC_H__
 #define __MATVEC_H__
 
+#include <string>
+
 #include "matrix.h"
 
 namespace qucs {
@@ -76,8 +78,8 @@ class matvec
   int getSize (void) { return size; }
   int getCols (void) { return cols; }
   int getRows (void) { return rows; }
-  void setName (const char *);
-  char * getName (void);
+  void setName (const std::string &);
+  std::string getName (void) const;
   void set (qucs::vector, int, int);
   void set (matrix, int);
   qucs::vector get (int, int);
@@ -165,7 +167,7 @@ class matvec
   int size;
   int rows;
   int cols;
-  char * name;
+  std::string name;
   matrix * data;
 };
 

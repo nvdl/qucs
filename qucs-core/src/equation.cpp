@@ -2139,7 +2139,7 @@ void solver::findMatrixVectors (qucs::vector * v)
             if (deps == NULL)
             {
                 strlist * deps = new strlist ();
-                deps->add (mv->getName ());
+                deps->add (mv->getName ().c_str());
                 eqn->setDataDependencies (deps);
                 delete deps;
             }
@@ -2164,7 +2164,7 @@ node * solver::addEquationData (matvec * mv)
     constant * con = new constant (TAG_MATVEC);
     con->mv = mv;
     assignment * assign = new assignment ();
-    assign->result = strdup (mv->getName ());
+    assign->result = strdup (mv->getName ().c_str());
     assign->body = con;
     assign->setNext (equations);
     equations = assign;

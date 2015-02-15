@@ -50,7 +50,6 @@ namespace qucs {
 matvec::matvec () {
   size = 0;
   rows = cols = 0;
-  name = NULL;
   data = NULL;
 }
 
@@ -60,7 +59,6 @@ matvec::matvec (int length, int r, int c) {
   size = length;
   rows = r;
   cols = c;
-  name = NULL;
   if (size > 0) {
     data = new matrix[size];
     for (int i = 0; i < size; i++) data[i] = matrix (r, c);
@@ -75,7 +73,7 @@ matvec::matvec (const matvec & m) {
   size = m.size;
   rows = m.rows;
   cols = m.cols;
-  name = m.name ? strdup (m.name) : NULL;
+  name = m.name;
   data = NULL;
 
   // copy matvec elements
@@ -87,18 +85,16 @@ matvec::matvec (const matvec & m) {
 
 // Destructor deletes a matvec object.
 matvec::~matvec () {
-  if (name) free (name);
   if (data) delete[] data;
 }
 
 // Sets the name of the matvec object.
-void matvec::setName (const char * n) {
-  if (name) free (name);
-  name = n ? strdup (n) : NULL;
+void matvec::setName (const std::string &n) {
+  name = n;
 }
 
 // Returns the name of the matvec object.
-char * matvec::getName (void) {
+std::string matvec::getName (void) const {
   return name;
 }
 
@@ -118,8 +114,8 @@ qucs::vector matvec::get (int r, int c) {
   assert (r >= 0 && r < rows && c >= 0 && c < cols);
   qucs::vector res;
   for (int i = 0; i < size; i++) res.add ((data[i])(r, c));
-  if (name != NULL) {
-    res.setName (createMatrixString (name, r, c));
+  if (!name.empty()) {
+    res.setName (createMatrixString (name.c_str(), r, c));
   }
   return res;
 }
