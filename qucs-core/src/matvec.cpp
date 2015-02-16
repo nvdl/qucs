@@ -46,47 +46,16 @@
 
 namespace qucs {
 
-// Constructor creates an unnamed instance of the matvec class.
-matvec::matvec () {
-  size = 0;
-  rows = cols = 0;
-  data = NULL;
-}
+
 
 /* Constructor creates an unnamed instance of the matvec class with a
    certain number of empty matrices. */
-matvec::matvec (int length, int r, int c) {
-  size = length;
-  rows = r;
-  cols = c;
-  if (size > 0) {
-    data = new matrix[size];
-    for (int i = 0; i < size; i++) data[i] = matrix (r, c);
-  } else {
-    data = NULL;
-  }
-}
+matvec::matvec (std::size_t length, int r, int c) :
+  name(),
+  rows(r),
+  cols(c),
+  data(length,matrix(r,c))  {}
 
-/* The copy constructor creates a new instance based on the given
-   matvec object. */
-matvec::matvec (const matvec & m) {
-  size = m.size;
-  rows = m.rows;
-  cols = m.cols;
-  name = m.name;
-  data = NULL;
-
-  // copy matvec elements
-  if (size > 0) {
-    data = new matrix[size];
-    for (int i = 0; i < size; i++) data[i] = m.data[i];
-  }
-}
-
-// Destructor deletes a matvec object.
-matvec::~matvec () {
-  if (data) delete[] data;
-}
 
 // Sets the name of the matvec object.
 void matvec::setName (const std::string &n) {
@@ -101,9 +70,9 @@ std::string matvec::getName (void) const {
 /* This function saves the given vector to the matvec object with the
    appropriate matrix indices. */
 void matvec::set (qucs::vector v, int r, int c) {
-  assert (v.getSize () == size &&
+  assert (v.getSize () == data.size() &&
 	  r >= 0 && r < rows && c >= 0 && c < cols);
-  for (int i = 0; i < size; i++)
+  for (int i = 0; i < data.size(); i++)
     (data[i])(r, c)= v.get (i);
 }
 
@@ -113,7 +82,7 @@ void matvec::set (qucs::vector v, int r, int c) {
 qucs::vector matvec::get (int r, int c) {
   assert (r >= 0 && r < rows && c >= 0 && c < cols);
   qucs::vector res;
-  for (int i = 0; i < size; i++) res.add ((data[i])(r, c));
+  for (int i = 0; i < data.size(); i++) res.add ((data[i])(r, c));
   if (!name.empty()) {
     res.setName (createMatrixString (name.c_str(), r, c));
   }
@@ -230,14 +199,14 @@ matvec * matvec::getMatrixVector (qucs::vector * data, char * name) {
    specified position. */
 void matvec::set (matrix m, int idx) {
   assert (m.rows () == rows && m.cols () == cols &&
-	  idx >= 0 && idx < size);
+	  idx >= 0 && idx < data.size());
   data[idx] = m;
 }
 
 /* The function returns the matrix stored within the matrix vector at
    the given position. */
 matrix matvec::get (int idx) {
-  assert (idx >= 0 && idx < size);
+  assert (idx >= 0 && idx < data.size());
   matrix res (data[idx]);
   return res;
 }
@@ -363,8 +332,8 @@ matvec operator - (nr_double_t d, matvec a) {
 // Intrinsic matrix vector addition.
 matvec matvec::operator += (matvec a) {
   assert (a.getRows () == rows && a.getCols () == cols &&
-	  a.getSize () == size);
-  for (int i = 0; i < size; i++) data[i] = data[i] + a.get (i);
+	  a.getSize () == data.size());
+  for (int i = 0; i < data.size(); i++) data[i] = data[i] + a.get (i);
   return *this;
 }
 
@@ -410,7 +379,7 @@ matvec matvec::operator - () {
 // Intrinsic matrix vector subtraction.
 matvec matvec::operator -= (matvec a) {
   assert (a.getRows () == rows && a.getCols () == cols &&
-	  a.getSize () == size);
+	  a.getSize () == data.size());
   for (int i = 0; i < a.getSize (); i++) data[i] = data[i] - a.get (i);
   return *this;
 }

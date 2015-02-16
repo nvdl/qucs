@@ -26,8 +26,10 @@
 #define __MATVEC_H__
 
 #include <string>
+#include <vector>
 
 #include "matrix.h"
+
 
 namespace qucs {
 
@@ -70,12 +72,17 @@ matvec ytoz (matvec);
 
 class matvec
 {
+ private:
+  int rows;
+  int cols;
+  std::string name;
+  std::vector<matrix> data;
  public:
-  matvec ();
-  matvec (int, int, int);
-  matvec (const matvec &);
-  ~matvec ();
-  int getSize (void) { return size; }
+  matvec (): rows(0), cols(0), name(), data() {};
+  matvec (std::size_t, int, int);
+  matvec (const matvec &) = default;
+  ~matvec () = default;
+  std::size_t getSize (void) { return data.size(); }
   int getCols (void) { return cols; }
   int getRows (void) { return rows; }
   void setName (const std::string &);
@@ -163,12 +170,6 @@ class matvec
   friend matvec ytos (matvec, qucs::vector);
   friend matvec ytoz (matvec);
 
- private:
-  int size;
-  int rows;
-  int cols;
-  std::string name;
-  matrix * data;
 };
 
 } // namespace qucs
