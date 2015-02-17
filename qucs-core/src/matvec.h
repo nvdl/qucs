@@ -73,16 +73,25 @@ matvec ytoz (matvec);
 class matvec
 {
  private:
-  int rows;
-  int cols;
+  typedef decltype(matrix().rows()) index;
+  index rows;
+  index cols;
   std::string name;
   std::vector<matrix> data;
  public:
+  /*! default constructor: empty */
   matvec (): rows(0), cols(0), name(), data() {};
-  matvec (std::size_t, int, int);
+  /*! Constructor creates an unnamed instance of the matvec class with a
+   certain number of empty matrices. */
+  matvec (decltype(data.size()) size, index r, index c):
+	  rows(r),
+	  cols(c),
+	  name(),
+	  data(size,matrix(r,c))
+	  {};
   matvec (const matvec &) = default;
   ~matvec () = default;
-  std::size_t getSize (void) { return data.size(); }
+  std::size_t size (void) { return data.size(); }
   int getCols (void) { return cols; }
   int getRows (void) { return rows; }
   void setName (const std::string &);

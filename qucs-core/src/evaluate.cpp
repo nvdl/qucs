@@ -877,7 +877,7 @@ constant * evaluate::times_mv_mv (constant * args) {
   _DEFMV ();
   if (v1->getCols () != v2->getRows ()) {
     THROW_MATH_EXCEPTION ("nonconformant arguments in matrix multiplication");
-    res->mv = new matvec (v1->getSize (), v1->getRows (), v2->getCols ());
+    res->mv = new matvec (v1->size (), v1->getRows (), v2->getCols ());
   } else {
     res->mv = new matvec (*v1 * *v2);
   }
@@ -918,7 +918,7 @@ constant * evaluate::times_mv_m (constant * args) {
   _DEFMV ();
   if (v1->getCols () != m2->rows ()) {
     THROW_MATH_EXCEPTION ("nonconformant arguments in matrix multiplication");
-    res->mv = new matvec (v1->getSize (), v1->getRows (), m2->cols ());
+    res->mv = new matvec (v1->size (), v1->getRows (), m2->cols ());
   } else {
     res->mv = new matvec (*v1 * *m2);
   }
@@ -931,7 +931,7 @@ constant * evaluate::times_m_mv (constant * args) {
   _DEFMV ();
   if (m1->cols () != v2->getRows ()) {
     THROW_MATH_EXCEPTION ("nonconformant arguments in matrix multiplication");
-    res->mv = new matvec (v2->getSize (), m1->rows (), v2->getCols ());
+    res->mv = new matvec (v2->size (), m1->rows (), v2->getCols ());
   } else {
     res->mv = new matvec (*m1 * *v2);
   }
@@ -2177,7 +2177,7 @@ constant * evaluate::index_mv_2 (constant * args) {
     sprintf (txt, "matvec indices [%d,%d] out of bounds [1-%d,1-%d]",
 	     r, c, mv->getRows (), mv->getCols ());
     THROW_MATH_EXCEPTION (txt);
-    res->v = new qucs::vector (mv->getSize ());
+    res->v = new qucs::vector (mv->size ());
   } else {
     res->v = new qucs::vector (mv->get (r - 1, c - 1));
   }
@@ -2188,9 +2188,9 @@ constant * evaluate::index_mv_1 (constant * args) {
   _ARMV0 (mv);
   _ARI1 (i);
   _DEFM ();
-  if (i < 1 || i > mv->getSize ()) {
+  if (i < 1 || i > mv->size ()) {
     char txt[256];
-    sprintf (txt, "matvec index [%d] out of bounds [1-%d]", i, mv->getSize ());
+    sprintf (txt, "matvec index [%d] out of bounds [1-%d]", i, mv->size ());
     THROW_MATH_EXCEPTION (txt);
     res->m = new matrix (mv->getRows (), mv->getCols ());
   } else {
@@ -2513,7 +2513,7 @@ constant * evaluate::ztoy_mv (constant * args) {
 #define _CHKMV(mv) /* check square matrix vector */                        \
   if (mv->getCols () != mv->getRows ()) {                                  \
     THROW_MATH_EXCEPTION ("stos: not a square matrix");                    \
-    res->mv = new matvec (mv->getSize (), mv->getRows (), mv->getCols ()); \
+    res->mv = new matvec (mv->size (), mv->getRows (), mv->getCols ()); \
     return res; }
 #define _CHKMA(m,cond) \
   if (!(cond)) {                                            \
@@ -2523,7 +2523,7 @@ constant * evaluate::ztoy_mv (constant * args) {
 #define _CHKMVA(mv,cond) \
   if (!(cond)) {                                                           \
     THROW_MATH_EXCEPTION ("stos: nonconformant arguments");                \
-    res->mv = new matvec (mv->getSize (), mv->getRows (), mv->getCols ()); \
+    res->mv = new matvec (mv->size (), mv->getRows (), mv->getCols ()); \
     return res; }
 
 // Function -- MATRIX stos (MATRIX, DOUBLE)
@@ -2987,9 +2987,9 @@ constant * evaluate::stab_circle_l_v (constant * args) {
   qucs::vector D = norm (S->get (1, 1)) - norm (det (*S));
   qucs::vector C = (conj (S->get (1, 1)) - S->get (0, 0) * conj (det (*S))) / D;
   qucs::vector R = abs (S->get (0, 1)) * abs (S->get (1, 0)) / D;
-  qucs::vector * circle = new qucs::vector (S->getSize () * arc->getSize ());
+  qucs::vector * circle = new qucs::vector (S->size () * arc->getSize ());
   int a, d, i; nr_complex_t v;
-  for (i = 0, d = 0; i < S->getSize (); i++) {
+  for (i = 0, d = 0; i < S->size (); i++) {
     for (a = 0; a < arc->getSize (); a++, d++) {
       v = C.get (i) + R.get (i) * exp (nr_complex_t (0, 1) * deg2rad (arc->get (a)));
       circle->set (v, d);
@@ -3018,9 +3018,9 @@ constant * evaluate::stab_circle_s_v (constant * args) {
   qucs::vector D = norm (S->get (0, 0)) - norm (det (*S));
   qucs::vector C = (conj (S->get (0, 0)) - S->get (1, 1) * conj (det (*S))) / D;
   qucs::vector R = abs (S->get (0, 1)) * abs (S->get (1, 0)) / D;
-  qucs::vector * circle = new qucs::vector (S->getSize () * arc->getSize ());
+  qucs::vector * circle = new qucs::vector (S->size () * arc->getSize ());
   int a, d, i; nr_complex_t v;
-  for (i = 0, d = 0; i < S->getSize (); i++) {
+  for (i = 0, d = 0; i < S->size (); i++) {
     for (a = 0; a < arc->getSize (); a++, d++) {
       v = C.get (i) + R.get (i) * exp (nr_complex_t (0, 1) * deg2rad (arc->get (a)));
       circle->set (v, d);
@@ -3058,7 +3058,7 @@ constant * evaluate::ga_circle_d_v (constant * args) {
   C = g * conj (c) / d;
   R = sqrt (1 - 2 * k * g * abs (s) + g * g * norm (s)) / abs (d);
 
-  qucs::vector * circle = new qucs::vector (S->getSize () * arc->getSize ());
+  qucs::vector * circle = new qucs::vector (S->size () * arc->getSize ());
   int i, a, j; nr_complex_t v;
   for (i = 0, j = 0; i < C.getSize (); i++) {
     for (a = 0; a < arc->getSize (); a++, j++) {
@@ -3089,7 +3089,7 @@ constant * evaluate::ga_circle_v_v (constant * args) {
   _ARV2 (arc);
   _DEFV ();
   qucs::vector * circle =
-    new qucs::vector (S->getSize () * arc->getSize () * G->getSize ());
+    new qucs::vector (S->size () * arc->getSize () * G->getSize ());
   int i, a, j, f; nr_complex_t v; qucs::vector g, D, c, s, k, R, C, d;
   D = det (*S);
   c = S->get (0, 0) - conj (S->get (1, 1)) * D;
@@ -3143,7 +3143,7 @@ constant * evaluate::gp_circle_d_v (constant * args) {
   C = g * conj (c) / d;
   R = sqrt (1 - 2 * k * g * abs (s) + g * g * norm (s)) / abs (d);
 
-  qucs::vector * circle = new qucs::vector (S->getSize () * arc->getSize ());
+  qucs::vector * circle = new qucs::vector (S->size () * arc->getSize ());
   int i, a, j; nr_complex_t v;
   for (i = 0, j = 0; i < C.getSize (); i++) {
     for (a = 0; a < arc->getSize (); a++, j++) {
@@ -3174,7 +3174,7 @@ constant * evaluate::gp_circle_v_v (constant * args) {
   _ARV2 (arc);
   _DEFV ();
   qucs::vector * circle =
-      new qucs::vector (S->getSize () * arc->getSize () * G->getSize ());
+      new qucs::vector (S->size () * arc->getSize () * G->getSize ());
   int i, a, j, f; nr_complex_t v; qucs::vector g, D, c, s, k, R, C, d;
   D = det (*S);
   c = S->get (1, 1) - conj (S->get (0, 0)) * D;

@@ -140,7 +140,7 @@ static void matlab_save (::vector * v) {
   // is vector matrix entry
   if ((n = matvec::isMatrixVector (vn, r, c)) != NULL) {
     // valid matrix vector and simple matrix
-    if ((mv = matvec::getMatrixVector (v, n)) != NULL && mv->getSize () == 1) {
+    if ((mv = matvec::getMatrixVector (v, n)) != NULL && mv->size () == 1) {
       // only save at first matrix entry [1,1]
       if (r == 0 && c == 0) {
 	// save matrix

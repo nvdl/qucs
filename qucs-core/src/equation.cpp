@@ -231,7 +231,7 @@ char * constant::toString (void)
     break;
     case TAG_MATVEC:
         sprintf (str, "[%dx%d](%d)",
-                 mv->getRows (), mv->getCols (), mv->getSize ());
+                 mv->getRows (), mv->getCols (), mv->size ());
         txt = strdup (str);
         break;
     case TAG_CHAR:
@@ -2183,7 +2183,7 @@ int solver::dataSize (constant * eqn)
         size = eqn->getResult()->v->getSize ();
         break;
     case TAG_MATVEC: // matrix vector
-        size = eqn->getResult()->mv->getSize ();
+        size = eqn->getResult()->mv->size ();
     default:
         size = 1;
     }
