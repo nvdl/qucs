@@ -185,7 +185,7 @@ void vector::add (vector * v) {
 }
 
 // Returns the complex data item at the given position.
-nr_complex_t vector::get (int i) {
+nr_complex_t vector::get (int i) const {
   return data[i];
 }
 

@@ -1040,14 +1040,14 @@ constant * evaluate::over_mv_c (constant * args) {
   _ARMV0 (v1);
   _ARC1 (c2);
   _DEFMV ();
-  _RETMV (*v1 / *c2);
+  _RETMV ((1.0/(*c2))*(*v1));
 }
 
 constant * evaluate::over_mv_d (constant * args) {
   _ARMV0 (v1);
   _ARD1 (d2);
   _DEFMV ();
-  _RETMV (*v1 / d2);
+  _RETMV (((1.0)/d2)*(*v1));
 }
 
 constant * evaluate::over_mv_v (constant * args) {

@@ -67,7 +67,7 @@ class vector : public object
   ~vector ();
   void add (nr_complex_t);
   void add (vector *);
-  nr_complex_t get (int);
+  nr_complex_t get (int) const;
   void set (nr_double_t, int);
   void set (const nr_complex_t, int);
   int getSize (void) const;
