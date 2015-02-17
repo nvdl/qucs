@@ -192,28 +192,22 @@ void matvec::set (matrix m, int idx) {
   data[idx] = m;
 }
 
-/* The function returns the matrix stored within the matrix vector at
-   the given position. */
-matrix matvec::get (size_type idx) const {
-  assert (idx < data.size());
-  return data[idx];
-}
-
 // Matrix vector addition.
 matvec operator + (const matvec &a, const matvec &b) {
   assert (a.getRows () == b.getRows () && a.getCols () == b.getCols () &&
 	  a.size () == b.size ());
-  matvec res (a.size (), a.getRows (), a.getCols ());
-  for (int i = 0; i < a.size (); i++)
-    res.set (a.get (i) + b.get (i), i);
+  matvec res (a);
+  for (matvec::size_type i = 0; i < a.size (); i++)
+    res[i]+=b[i];
   return res;
 }
 
 // Matrix vector addition with single matrix.
 matvec operator + (const matvec &a, const matrix &b) {
   assert (a.getRows () == b.rows () && a.getCols () == b.cols ());
-  matvec res (a.size (), a.getRows (), a.getCols ());
-  for (int i = 0; i < a.size (); i++) res.set (a.get (i) + b, i);
+  matvec res (a);
+  std::for_each(res.begin(),res.end(),
+		[b](matrix &el) { el += b; });
   return res;
 }
 
@@ -239,11 +233,11 @@ matvec operator + (const matrix &a, const matvec &b) {
 
 // Matrix vector scalar addition.
 matvec operator + (const matvec &a, nr_complex_t z) {
-  matvec res (a.size (), a.getRows (), a.getCols ());
-  for (int i = 0; i < a.size (); i++) {
-    matrix m((a.get(i).array()+z).matrix());
-    res.set (m, i);
-  }
+  matvec res(a);
+  std::for_each(std::begin(res),std::end(res),
+		[z] (matrix& el) {
+		  el = (el.array()+z).matrix();
+		});
   return res;
 }
 
@@ -254,11 +248,11 @@ matvec operator + (nr_complex_t z, const matvec &a) {
 
 // Matrix vector scalar addition.
 matvec operator + (const matvec &a, nr_double_t d) {
-  matvec res (a.size (), a.getRows (), a.getCols ());
-  for (int i = 0; i < a.size (); i++) {
-    matrix m((a.get(i).array()+d).matrix());
-    res.set (m, i);
-  }
+  matvec res(a);
+  std::for_each(std::begin(res),std::end(res),
+		[d] (matrix& el) {
+		  el = (el.array()+d).matrix();
+		});
   return res;
 }
 
@@ -269,41 +263,41 @@ matvec operator + (nr_double_t d, const matvec &a) {
 
 // Matrix vector scalar subtraction.
 matvec operator - (const matvec &a, nr_complex_t z) {
-  matvec res (a.size (), a.getRows (), a.getCols ());
-  for (int i = 0; i < a.size (); i++) {
-    matrix m((a.get(i).array()-z).matrix());
-    res.set (m, i);
-  }
+  matvec res(a);
+  std::for_each(std::begin(res),std::end(res),
+		[z] (matrix& el) {
+		  el = (el.array()-z).matrix();
+		});
   return res;
 }
 
 // Matrix vector scalar subtraction in different order.
 matvec operator - (nr_complex_t z, const matvec &a) {
-  matvec res (a.size (), a.getRows (), a.getCols ());
-  for (int i = 0; i < a.size (); i++) {
-    matrix m((z-a.get(i).array()).matrix());
-    res.set (m, i);
-  }
+  matvec res(a);
+  std::for_each(std::begin(res),std::end(res),
+		[z] (matrix& el) {
+		  el = (z-el.array()).matrix();
+		});
   return res;
 }
 
 // Matrix vector scalar subtraction.
 matvec operator - (const matvec &a, nr_double_t d) {
-  matvec res (a.size (), a.getRows (), a.getCols ());
-  for (int i = 0; i < a.size (); i++) {
-    matrix m((a.get(i).array()-d).matrix());
-    res.set (m, i);
-  }
+  matvec res(a);
+  std::for_each(std::begin(res),std::end(res),
+		[d] (matrix& el) {
+		  el = (el.array()-d).matrix();
+		});
   return res;
 }
 
 // Matrix vector scalar subtraction in different order.
 matvec operator - (nr_double_t d, const matvec &a) {
-  matvec res (a.size (), a.getRows (), a.getCols ());
-  for (int i = 0; i < a.size (); i++) {
-    matrix m((d-a.get(i).array()).matrix());
-    res.set (m, i);
-  }
+  matvec res(a);
+  std::for_each(std::begin(res),std::end(res),
+		[d] (matrix& el) {
+		  el = (d-el.array()).matrix();
+		});
   return res;
 }
 
@@ -311,7 +305,8 @@ matvec operator - (nr_double_t d, const matvec &a) {
 matvec matvec::operator += (const matvec &a) {
   assert (a.getRows () == rows && a.getCols () == cols &&
 	  a.size () == data.size());
-  for (int i = 0; i < data.size(); i++) data[i] = data[i] + a.get (i);
+  for (matvec::size_type i = 0; i < data.size(); i++)
+    data[i] += a[i];
   return *this;
 }
 
@@ -319,16 +314,18 @@ matvec matvec::operator += (const matvec &a) {
 matvec operator - (const matvec &a, const matvec &b) {
   assert (a.getRows () == b.getRows () && a.getCols () == b.getCols () &&
 	  a.size () == b.size ());
-  matvec res (a.size (), a.getRows (), a.getCols ());
-  for (int i = 0; i < a.size (); i++) res.set (a.get (i) - b.get (i), i);
+  matvec res (a);
+  for (matvec::size_type i = 0; i < a.size (); i++)
+    res[i] -= b[i];
   return res;
 }
 
 // Matrix vector subtraction with single matrix.
 matvec operator - (const matvec& a, const matrix& b) {
   assert (a.getRows () == b.rows () && a.getCols () == b.cols ());
-  matvec res (a.size (), a.getRows (), a.getCols ());
-  for (int i = 0; i < a.size (); i++) res.set (a.get (i) - b, i);
+  matvec res (a);
+  for (matvec::size_type i = 0; i < a.size (); i++)
+    res[i] -= b;
   return res;
 }
 
@@ -352,23 +349,29 @@ matvec operator - (const qucs::vector &b, const matvec &a) {
 
 // Unary minus.
 matvec matvec::operator - () {
-  matvec res (size (), getRows (), getCols ());
-  for (int i = 0; i < size (); i++) res.set (-data[i], i);
-  return res;
+  std::for_each(std::begin(*this),std::end(*this),
+		[] (matrix& el) {
+		  el = -el;
+		});
+  return *this;
 }
 
 // Intrinsic matrix vector subtraction.
 matvec matvec::operator -= (const matvec &a) {
   assert (a.getRows () == rows && a.getCols () == cols &&
 	  a.size () == data.size());
-  for (int i = 0; i < a.size (); i++) data[i] = data[i] - a.get (i);
+  for (matvec::size_type i = 0; i < a.size (); i++)
+    data[i] -= a[i];
   return *this;
 }
 
 // Matrix vector scaling.
 matvec operator * (const matvec &a, nr_complex_t z) {
-  matvec res (a.size (), a.getRows (), a.getCols ());
-  for (int i = 0; i < a.size (); i++) res.set (a.get (i) * z, i);
+  matvec res (a);
+  std::for_each(std::begin(res),std::end(res),
+		[z] (matrix& el) {
+		  el = (z*el.array()).matrix();
+		});
   return res;
 }
 
@@ -379,8 +382,11 @@ matvec operator * (nr_complex_t z, const matvec &a) {
 
 // Scalar matrix vector scaling.
 matvec operator * (const matvec &a, nr_double_t d) {
-  matvec res (a.size (), a.getRows (), a.getCols ());
-  for (int i = 0; i < a.size (); i++) res.set (a.get (i) * d, i);
+  matvec res (a);
+  std::for_each(std::begin(res),std::end(res),
+		[d] (matrix& el) {
+		  el = (d*el.array()).matrix();
+		});
   return res;
 }
 
@@ -392,8 +398,9 @@ matvec operator * (nr_double_t d,const matvec &a) {
 // Matrix vector scaling by a second vector.
 matvec operator * (const matvec &a, const qucs::vector &b) {
   assert (a.size () == b.getSize ());
-  matvec res (a.size (), a.getRows (), a.getCols ());
-  for (int i = 0; i < a.size (); i++) res.set (a.get (i) * b.get (i), i);
+  matvec res (a);
+  for (matvec::size_type i = 0; i < a.size (); i++)
+    res[i]*=b.get(i);
   return res;
 }
 
@@ -404,60 +411,67 @@ matvec operator * (const qucs::vector &a, const matvec &b) {
 
 // Matrix vector scaling.
 matvec operator / (const matvec &a, const nr_complex_t z) {
-  matvec res (a.size (), a.getRows (), a.getCols ());
-  for (int i = 0; i < a.size (); i++) res.set ((1.0/z)*a.get (i) , i);
-  return res;
+  return (1.0/z)*a;
 }
 
 // Scalar matrix vector scaling.
 matvec operator / (const matvec &a, nr_double_t d) {
-  matvec res (a.size (), a.getRows (), a.getCols ());
-  for (int i = 0; i < a.size (); i++) res.set ((1.0/d)*a.get (i), i);
-  return res;
+  return (1.0/d)*a;
 }
 
 // Matrix vector scaling by a second vector.
 matvec operator / (const matvec& a, const qucs::vector &b) {
   assert (a.size () == b.getSize ());
-  matvec res (a.size (), a.getRows (), a.getCols ());
-  for (int i = 0; i < a.size (); i++) res.set (a.get (i)* (1.0/b.get (i)), i);
-  return res;
+  matvec res (a);
+  return (1.0/b)*res;
 }
 
 // Matrix vector multiplication.
 matvec operator * (const matvec &a, const matvec &b) {
   assert (a.getCols () == b.getRows () && a.size () == b.size ());
-  matvec res (a.size (), a.getRows (), b.getCols ());
-  for (int i = 0; i < a.size (); i++) res.set (a.get (i) * b.get (i), i);
+  matvec res (a);
+  for (matvec::size_type i = 0; i < a.size (); i++)
+    res[i]*=b[i];
   return res;
 }
 
 // Matrix vector multiplication with a single matrix.
 matvec operator * (const matvec &a, const matrix &b) {
   assert (a.getCols () == b.rows ());
-  matvec res (a.size (), a.getRows (), b.cols ());
-  for (int i = 0; i < a.size (); i++) res.set (a.get (i) * b, i);
+  matvec res (a);
+  std::for_each(std::begin(res),std::end(res),
+		[b] (matrix& el) {
+		  el *= b;
+		});
   return res;
 }
 
 // Matrix vector multiplication with a single matrix in different order.
 matvec operator * (const matrix &a,const matvec &b) {
-  return b * a;
+  assert (a.cols () == b.getRows ());
+  matvec res (b);
+  std::for_each(std::begin(res),std::end(res),
+		[a] (matrix& el) {
+		  el = a*el;
+		});
+  return res;
 }
 
 // Compute determinants of the given matrix vector.
 qucs::vector det (const matvec &a) {
-  qucs::vector res (a.size ());
-  for (int i = 0; i < a.size (); i++) res.set (a.get(i).determinant(), i);
+  qucs::vector res(a.size());
+  for(matvec::size_type i=0;i<a.size();i++)
+    res(i)=a[i].determinant();
   return res;
 }
 
 // Compute inverse matrices of the given matrix vector.
 matvec inverse (const matvec &a) {
-  matvec res (a.size (), a.getRows (), a.getCols ());
-  for (int i = 0; i < a.size (); i++) {
-    res.set (a.get(i).inverse(), i);
-  }
+  matvec res(a);
+  std::for_each(std::begin(res),std::end(res),
+		[] (matrix& el) {
+		  el = el.inverse();
+		});
   return res;
 }
 
@@ -468,86 +482,101 @@ matvec sqr (const matvec &a) {
 
 // Compute n-th power of the given matrix vector.
 matvec pow (const matvec &a, int n) {
-  matvec res (a.size (), a.getRows (), a.getCols ());
-  for (int i = 0; i < a.size (); i++) res.set (pow (a.get (i), n), i);
+  matvec res(a);
+  std::for_each(std::begin(res),std::end(res),
+		[n] (matrix& el) {
+		  el = pow(el,n);
+		});
   return res;
 }
 
 // Compute n-th powers in the vector of the given matrix vector.
 matvec pow (const matvec &a, const qucs::vector &v) {
   assert (a.size () == v.getSize ());
-  matvec res (a.size (), a.getRows (), a.getCols ());
-  for (int i = 0; i < a.size (); i++)
-    res.set (pow (a.get (i), (int) real (v.get (i))), i);
+  matvec res (a);
+  for (matvec::size_type i = 0; i < a.size (); i++)
+    res[i]=pow(a[i],static_cast<int>(v(i).real()));
   return res;
 }
 
 // Conjugate complex matrix vector.
 matvec conj (const matvec &a) {
-  matvec res (a.size (), a.getRows (), a.getCols ());
-  for (int i = 0; i < a.size (); i++) res.set ((a.get (i)).conjugate(), i);
+  matvec res(a);
+  std::for_each(std::begin(res),std::end(res),
+		[] (matrix& el) {
+		  el = el.conjugate();
+		});
   return res;
 }
 
 // Computes magnitude of each matrix vector element.
 matvec abs (const matvec &a) {
-  matvec res (a.size (), a.getRows (), a.getCols ());
-  for (int i = 0; i < a.size (); i++) {
-    matrix temp(a.get(i).cwiseAbs().cast<nr_complex_t>());
-    res.set (temp, i);
-  }
+  matvec res(a);
+  std::for_each(std::begin(res),std::end(res),
+		[] (matrix& el) {
+		  el = el.cwiseAbs().cast<nr_complex_t>();
+		});
   return res;
 }
 
 // Computes magnitude in dB of each matrix vector element.
 matvec dB (const matvec &a) {
-  matvec res (a.size (), a.getRows (), a.getCols ());
-  for (int i = 0; i < a.size (); i++) res.set (dB (a.get (i)), i);
+  matvec res(a);
+  std::for_each(std::begin(res),std::end(res),
+		[] (matrix& el) {
+		  el = dB(el);
+		});
   return res;
 }
 
 // Computes the argument of each matrix vector element.
 matvec arg (const matvec &a) {
-  matvec res (a.size (), a.getRows (), a.getCols ());
-  for (int i = 0; i < a.size (); i++) res.set (arg (a.get (i)), i);
+  matvec res(a);
+  std::for_each(std::begin(res),std::end(res),
+		[] (matrix& el) {
+		  el = arg(el);
+		});
   return res;
 }
 
 // Real part matrix vector.
 matvec real (const matvec &a) {
-  matvec res (a.size (), a.getRows (), a.getCols ());
-  for (int i = 0; i < a.size (); i++)
-    {
-      matrix m = a.get(i).real().cast<nr_complex_t>();
-      res.set (m, i);
-    }
+  matvec res(a);
+  std::for_each(std::begin(res),std::end(res),
+		[] (matrix& el) {
+		  el = el.real().cast<nr_complex_t>();
+		});
   return res;
 }
 
 // Real part matrix vector.
 matvec imag (const matvec &a) {
-  matvec res (a.size (), a.getRows (), a.getCols ());
-  for (int i = 0; i < a.size (); i++)
-     {
-       matrix m = a.get(i).imag().cast<nr_complex_t>();
-       res.set (m, i);
-    }
+  matvec res(a);
+  std::for_each(std::begin(res),std::end(res),
+		[] (matrix& el) {
+		  el = el.imag().cast<nr_complex_t>();
+		});
   return res;
 }
 
 /* The function returns the adjoint complex matrix vector.  This is
    also called the adjugate or transpose conjugate. */
 matvec adjoint (const matvec &a) {
-  matvec res (a.size (), a.getRows (), a.getCols ());
-  for (int i = 0; i < a.size (); i++) res.set ((a.get (i)).adjoint(), i);
+  matvec res(a);
+  std::for_each(std::begin(res),std::end(res),
+		[] (matrix& el) {
+		  el = el.adjoint();
+		});
   return res;
 }
 
 // Transpose the matrix vector.
 matvec transpose (const matvec &a) {
-  matvec res (a.size (), a.getCols (), a.getRows ());
-  for (int i = 0; i < a.size (); i++)
-    res.set (a.get (i).transpose(), i);
+  matvec res(a);
+  std::for_each(std::begin(res),std::end(res),
+		[] (matrix& el) {
+		  el = el.transpose();
+		});
   return res;
 }
 
@@ -555,10 +584,10 @@ matvec transpose (const matvec &a) {
    to scattering parameters with the reference impedance 'z0'. */
 matvec stos (const matvec &s, const qucs::vector &zref, const qucs::vector &z0) {
   assert (s.getCols () == s.getRows () &&
-	  s.getCols () == zref.getSize () && s.getCols () == z0.getSize ());
-  matvec res (s.size (), s.getCols (), s.getRows ());
-  for (int i = 0; i < s.size (); i++)
-    res.set (stos (s.get (i), zref, z0), i);
+	   s.getCols () == zref.getSize () && s.getCols () == z0.getSize ());
+  matvec res (s);
+  for (matvec::size_type i = 0; i < s.size (); i++)
+    res[i]=stos (s[i], zref, z0);
   return res;
 }
 
@@ -582,8 +611,9 @@ matvec stos (const matvec &s, nr_complex_t zref, const qucs::vector &z0) {
 // Convert scattering parameters to admittance matrix vector.
 matvec stoy (const matvec &s, const qucs::vector &z0) {
   assert (s.getCols () == s.getRows () && s.getCols () == z0.getSize ());
-  matvec res (s.size (), s.getCols (), s.getRows ());
-  for (int i = 0; i < s.size (); i++) res.set (stoy (s.get (i), z0), i);
+  matvec res (s);
+  for (matvec::size_type i = 0; i < s.size (); i++)
+    res[i]=stoy (s[i], z0);
   return res;
 }
 
@@ -594,8 +624,9 @@ matvec stoy (const matvec &s, nr_complex_t z0) {
 // Convert admittance matrix to scattering parameter matrix vector.
 matvec ytos (const matvec &y, const qucs::vector &z0) {
   assert (y.getCols () == y.getRows () && y.getCols () == z0.getSize ());
-  matvec res (y.size (), y.getCols (), y.getRows ());
-  for (int i = 0; i < y.size (); i++) res.set (ytos (y.get (i), z0), i);
+  matvec res (y);
+  for (matvec::size_type i = 0; i < y.size (); i++)
+    res[i] = ytos (y[i], z0);
   return res;
 }
 
@@ -606,8 +637,9 @@ matvec ytos (const matvec &y, nr_complex_t z0) {
 // Convert scattering parameters to impedance matrix vector.
 matvec stoz (const matvec &s, const qucs::vector &z0) {
   assert (s.getCols () == s.getRows () && s.getCols () == z0.getSize ());
-  matvec res (s.size (), s.getCols (), s.getRows ());
-  for (int i = 0; i < s.size (); i++) res.set (stoz (s.get (i), z0), i);
+  matvec res (s);
+  for (matvec::size_type i = 0; i < s.size (); i++)
+    res[i] =stoz (s[i], z0);
   return res;
 }
 
@@ -618,8 +650,9 @@ matvec stoz (const matvec &s, nr_complex_t z0) {
 // Convert impedance matrix vector scattering parameter matrix vector.
 matvec ztos (const matvec &z, const qucs::vector &z0) {
   assert (z.getCols () == z.getRows () && z.getCols () == z0.getSize ());
-  matvec res (z.size (), z.getCols (), z.getRows ());
-  for (int i = 0; i < z.size (); i++) res.set (ztos (z.get (i), z0), i);
+  matvec res (z);
+  for (matvec::size_type i = 0; i < z.size (); i++)
+    res[i] = ztos (z[i], z0);
   return res;
 }
 
@@ -630,16 +663,18 @@ matvec ztos (const matvec &z, nr_complex_t z0) {
 // Convert impedance matrix vector to admittance matrix vector.
 matvec ztoy (const matvec &z) {
   assert (z.getCols () == z.getRows ());
-  matvec res (z.size (), z.getCols (), z.getRows ());
-  for (int i = 0; i < z.size (); i++) res.set (ztoy (z.get (i)), i);
+  matvec res (z);
+  for (matvec::size_type i = 0; i < z.size (); i++)
+    res[i] = ztoy (z[i]);
   return res;
 }
 
 // Convert admittance matrix vector to impedance matrix vector.
 matvec ytoz (const matvec &y) {
   assert (y.getCols () == y.getRows ());
-  matvec res (y.size (), y.getCols (), y.getRows ());
-  for (int i = 0; i < y.size (); i++) res.set (ytoz (y.get (i)), i);
+  matvec res (y);
+  for (matvec::size_type i = 0; i < y.size (); i++)
+    res[i] = ytoz (y[i]);
   return res;
 }
 
@@ -648,9 +683,9 @@ matvec ytoz (const matvec &y) {
    and Z) matrix vectors. */
 matvec twoport (const matvec &m, char in, char out) {
   assert (m.getCols () >= 2 && m.getRows () >= 2);
-  matvec res (m.size (), 2, 2);
-  for (int i = 0; i < m.size (); i++)
-    res.set (twoport (m.get (i), in, out), i);
+  matvec res (m);
+  for (matvec::size_type i = 0; i < m.size (); i++)
+    res[i] = twoport (m[i],in,out);
   return res;
 }
 
@@ -659,7 +694,8 @@ matvec twoport (const matvec &m, char in, char out) {
 qucs::vector rollet (const matvec &m) {
   assert (m.getCols () >= 2 && m.getRows () >= 2);
   qucs::vector res (m.size ());
-  for (int i = 0; i < m.size (); i++) res.set (rollet (m.get (i)), i);
+  for (matvec::size_type i = 0; i < m.size (); i++)
+    res(i) = rollet(m[i]);
   return res;
 }
 
@@ -668,19 +704,22 @@ qucs::vector rollet (const matvec &m) {
 qucs::vector b1 (const matvec &m) {
   assert (m.getCols () >= 2 && m.getRows () >= 2);
   qucs::vector res (m.size ());
-  for (int i = 0; i < m.size (); i++) res.set (b1 (m.get (i)), i);
+  for (matvec::size_type i = 0; i < m.size (); i++)
+    res(i) = b1 (m[i]);
   return res;
 }
 
 matvec rad2deg (const matvec &a) {
-  matvec res (a.size (), a.getRows (), a.getCols ());
-  for (int i = 0; i < a.size (); i++) res.set (rad2deg (a.get (i)), i);
+  matvec res (a);
+  for (matvec::size_type i = 0; i < a.size (); i++)
+    res[i] = rad2deg (a[i]);
   return res;
 }
 
 matvec deg2rad (const matvec &a) {
-  matvec res (a.size (), a.getRows (), a.getCols ());
-  for (int i = 0; i < a.size (); i++) res.set (deg2rad (a.get (i)), i);
+  matvec res (a);
+  for (matvec::size_type i = 0; i < a.size (); i++)
+    res[i] = deg2rad (a[i]);
   return res;
 }
 

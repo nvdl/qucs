@@ -145,7 +145,7 @@ static void matlab_save (::vector * v) {
       if (r == 0 && c == 0) {
 	// save matrix
 	matlab_header (mv->getRows (), mv->getCols (), n);
-	m = mv->get (0);
+	m = (*mv)[0];
 	matlab_matrix (&m);
       }
     }

@@ -96,7 +96,7 @@ void touchstone_print (void) {
   // one-port file
   if (touchstone_data.ports == 1) {
     for (int i = 0; i < touchstone_data.vd->getSize (); i++) {
-      matrix S = touchstone_data.mv->get (i);
+      matrix S = (*(touchstone_data.mv))[i];
       nr_double_t f = real (touchstone_data.vd->get (i));
       fprintf (touchstone_out, "%." "20" "e"
 	       " %+." "20" "e" " %+." "20" "e"
@@ -106,7 +106,7 @@ void touchstone_print (void) {
   // two-port file
   else if (touchstone_data.ports == 2) {
     for (int i = 0; i < touchstone_data.vd->getSize (); i++) {
-      matrix S = touchstone_data.mv->get (i);
+      matrix S = (*(touchstone_data.mv))[i];
       nr_double_t f = real (touchstone_data.vd->get (i));
       fprintf (touchstone_out, "%." "20" "e"
 	       " %+." "20" "e" " %+." "20" "e"
@@ -123,7 +123,7 @@ void touchstone_print (void) {
   // three-port file
   else if (touchstone_data.ports == 3) {
     for (int i = 0; i < touchstone_data.vd->getSize (); i++) {
-      matrix S = touchstone_data.mv->get (i);
+      matrix S = (*(touchstone_data.mv))[i];
       nr_double_t f = real (touchstone_data.vd->get (i));
       fprintf (touchstone_out, "%." "20" "e"
 	       " %+." "20" "e" " %+." "20" "e"
@@ -153,7 +153,7 @@ void touchstone_print (void) {
   // four-port and above files
   else if (touchstone_data.ports >= 4) {
     for (int i = 0; i < touchstone_data.vd->getSize (); i++) {
-      matrix S = touchstone_data.mv->get (i);
+      matrix S = (*(touchstone_data.mv))[i];
       nr_double_t f = real (touchstone_data.vd->get (i));
       int cs = S.cols ();
       int rs = S.rows ();

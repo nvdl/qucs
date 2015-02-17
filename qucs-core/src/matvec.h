@@ -130,7 +130,6 @@ class matvec
   std::string getName (void) const;
   void set (qucs::vector, int, int);
   void set (matrix, int);
-  matrix get (size_type) const;
   qucs::vector get (int, int);
   static char * createMatrixString (const char *, int, int);
   static char * createMatrixString (char, int, int);

@@ -2194,7 +2194,7 @@ constant * evaluate::index_mv_1 (constant * args) {
     THROW_MATH_EXCEPTION (txt);
     res->m = new matrix (mv->getRows (), mv->getCols ());
   } else {
-    res->m = new matrix (mv->get (i - 1));
+    res->m = new matrix ((*mv)[i - 1]);
   }
   return res;
 }
