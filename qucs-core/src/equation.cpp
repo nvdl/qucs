@@ -231,7 +231,7 @@ char * constant::toString (void)
     break;
     case TAG_MATVEC:
         sprintf (str, "[%dx%d](%d)",
-                 mv->getRows (), mv->getCols (), mv->size ());
+                 mv->rows (), mv->cols (), mv->size ());
         txt = strdup (str);
         break;
     case TAG_CHAR:
@@ -1991,9 +1991,9 @@ qucs::vector * solver::dataVector (node * eqn)
         // convert matrix vector to a list of vectors
         matvec * mv = eqn->getResult()->mv;
         mv->setName (A(eqn)->result);
-        for (int r = 0; r < mv->getRows (); r++)
+        for (decltype(mv->rows()) r = 0; r < mv->rows (); r++)
         {
-            for (int c = 0; c < mv->getCols (); c++)
+            for (decltype(mv->cols()) c = 0; c < mv->cols (); c++)
             {
                 // name gets automatically assigned
                 qucs::vector * t = new qucs::vector (mv->get (r, c));
@@ -2386,9 +2386,9 @@ int solver::findEquationResult (node * eqn)
     if (eqn->getType () == TAG_MATVEC)
     {
         matvec * mv = eqn->getResult()->mv;
-        for (int r = 0; r < mv->getRows (); r++)
+        for (decltype(mv->rows()) r = 0; r < mv->rows (); r++)
         {
-            for (int c = 0; c < mv->getCols (); c++)
+	  for (decltype(mv->cols()) c = 0; c < mv->cols (); c++)
             {
                 char * str = matvec::createMatrixString (A(eqn)->result, r, c);
                 if (data->findDependency (str) || data->findVariable (str))

@@ -60,7 +60,7 @@ std::string matvec::getName (void) const {
    appropriate matrix indices. */
 void matvec::set (qucs::vector v, int r, int c) {
   assert (v.getSize () == data.size() &&
-	  r >= 0 && r < rows && c >= 0 && c < cols);
+	  this->rows() >= 0 && r < this->rows() && c >= 0 && c < this->cols());
   for (size_type i = 0; i < data.size(); i++)
     (data[i])(r, c)= v.get (i);
 }
@@ -69,7 +69,7 @@ void matvec::set (qucs::vector v, int r, int c) {
    indices.  If the matrix vector has a valid name 'A' the returned
    vector gets the name 'A[r,c]'. */
 qucs::vector matvec::get (int r, int c) {
-  assert (r >= 0 && r < rows && c >= 0 && c < cols);
+  assert (r >= 0 && r < this->rows() && c >= 0 && c < this->cols());
   qucs::vector res;
   for (size_type i = 0; i < data.size(); i++) res.add ((data[i])(r, c));
   if (!name.empty()) {
@@ -187,14 +187,14 @@ matvec * matvec::getMatrixVector (qucs::vector * data, char * name) {
 /* This function saves the given matrix in the matrix vector at the
    specified position. */
 void matvec::set (matrix m, int idx) {
-  assert (m.rows () == rows && m.cols () == cols &&
+  assert (m.rows () == this->rows() && m.cols () == this->cols() &&
 	  idx >= 0 && idx < data.size());
   data[idx] = m;
 }
 
 // Matrix vector addition.
 matvec operator + (const matvec &a, const matvec &b) {
-  assert (a.getRows () == b.getRows () && a.getCols () == b.getCols () &&
+  assert (a.rows () == b.rows () && a.cols () == b.cols () &&
 	  a.size () == b.size ());
   matvec res (a);
   for (matvec::size_type i = 0; i < a.size (); i++)
@@ -204,7 +204,7 @@ matvec operator + (const matvec &a, const matvec &b) {
 
 // Matrix vector addition with single matrix.
 matvec operator + (const matvec &a, const matrix &b) {
-  assert (a.getRows () == b.rows () && a.getCols () == b.cols ());
+  assert (a.rows () == b.rows () && a.cols () == b.cols ());
   matvec res (a);
   std::for_each(res.begin(),res.end(),
 		[b](matrix &el) { el += b; });
@@ -303,7 +303,7 @@ matvec operator - (nr_double_t d, const matvec &a) {
 
 // Intrinsic matrix vector addition.
 matvec matvec::operator += (const matvec &a) {
-  assert (a.getRows () == rows && a.getCols () == cols &&
+  assert (a.rows () == this->rows() && a.cols () == this->cols() &&
 	  a.size () == data.size());
   for (matvec::size_type i = 0; i < data.size(); i++)
     data[i] += a[i];
@@ -312,7 +312,7 @@ matvec matvec::operator += (const matvec &a) {
 
 // Matrix vector subtraction.
 matvec operator - (const matvec &a, const matvec &b) {
-  assert (a.getRows () == b.getRows () && a.getCols () == b.getCols () &&
+  assert (a.rows () == b.rows () && a.cols () == b.cols () &&
 	  a.size () == b.size ());
   matvec res (a);
   for (matvec::size_type i = 0; i < a.size (); i++)
@@ -322,7 +322,7 @@ matvec operator - (const matvec &a, const matvec &b) {
 
 // Matrix vector subtraction with single matrix.
 matvec operator - (const matvec& a, const matrix& b) {
-  assert (a.getRows () == b.rows () && a.getCols () == b.cols ());
+  assert (a.rows () == b.rows () && a.cols () == b.cols ());
   matvec res (a);
   for (matvec::size_type i = 0; i < a.size (); i++)
     res[i] -= b;
@@ -358,7 +358,7 @@ matvec matvec::operator - () {
 
 // Intrinsic matrix vector subtraction.
 matvec matvec::operator -= (const matvec &a) {
-  assert (a.getRows () == rows && a.getCols () == cols &&
+  assert (a.rows () == this->rows() && a.cols () == this->cols() &&
 	  a.size () == data.size());
   for (matvec::size_type i = 0; i < a.size (); i++)
     data[i] -= a[i];
@@ -428,7 +428,7 @@ matvec operator / (const matvec& a, const qucs::vector &b) {
 
 // Matrix vector multiplication.
 matvec operator * (const matvec &a, const matvec &b) {
-  assert (a.getCols () == b.getRows () && a.size () == b.size ());
+  assert (a.cols () == b.rows () && a.size () == b.size ());
   matvec res (a);
   for (matvec::size_type i = 0; i < a.size (); i++)
     res[i]*=b[i];
@@ -437,7 +437,7 @@ matvec operator * (const matvec &a, const matvec &b) {
 
 // Matrix vector multiplication with a single matrix.
 matvec operator * (const matvec &a, const matrix &b) {
-  assert (a.getCols () == b.rows ());
+  assert (a.cols () == b.rows ());
   matvec res (a);
   std::for_each(std::begin(res),std::end(res),
 		[b] (matrix& el) {
@@ -448,7 +448,7 @@ matvec operator * (const matvec &a, const matrix &b) {
 
 // Matrix vector multiplication with a single matrix in different order.
 matvec operator * (const matrix &a,const matvec &b) {
-  assert (a.cols () == b.getRows ());
+  assert (a.cols () == b.rows ());
   matvec res (b);
   std::for_each(std::begin(res),std::end(res),
 		[a] (matrix& el) {
@@ -583,8 +583,8 @@ matvec transpose (const matvec &a) {
 /* Convert scattering parameters with the reference impedance 'zref'
    to scattering parameters with the reference impedance 'z0'. */
 matvec stos (const matvec &s, const qucs::vector &zref, const qucs::vector &z0) {
-  assert (s.getCols () == s.getRows () &&
-	   s.getCols () == zref.getSize () && s.getCols () == z0.getSize ());
+  assert (s.cols () == s.rows () &&
+	   s.cols () == zref.getSize () && s.cols () == z0.getSize ());
   matvec res (s);
   for (matvec::size_type i = 0; i < s.size (); i++)
     res[i]=stos (s[i], zref, z0);
@@ -592,7 +592,7 @@ matvec stos (const matvec &s, const qucs::vector &zref, const qucs::vector &z0) 
 }
 
 matvec stos (const matvec &s, nr_complex_t zref, nr_complex_t z0) {
-  int d = s.getRows ();
+  int d = s.rows ();
   return stos (s, qucs::vector (d, zref), qucs::vector (d, z0));
 }
 
@@ -610,7 +610,7 @@ matvec stos (const matvec &s, nr_complex_t zref, const qucs::vector &z0) {
 
 // Convert scattering parameters to admittance matrix vector.
 matvec stoy (const matvec &s, const qucs::vector &z0) {
-  assert (s.getCols () == s.getRows () && s.getCols () == z0.getSize ());
+  assert (s.cols () == s.rows () && s.cols () == z0.getSize ());
   matvec res (s);
   for (matvec::size_type i = 0; i < s.size (); i++)
     res[i]=stoy (s[i], z0);
@@ -618,12 +618,12 @@ matvec stoy (const matvec &s, const qucs::vector &z0) {
 }
 
 matvec stoy (const matvec &s, nr_complex_t z0) {
-  return stoy (s, qucs::vector (s.getCols (), z0));
+  return stoy (s, qucs::vector (s.cols (), z0));
 }
 
 // Convert admittance matrix to scattering parameter matrix vector.
 matvec ytos (const matvec &y, const qucs::vector &z0) {
-  assert (y.getCols () == y.getRows () && y.getCols () == z0.getSize ());
+  assert (y.cols () == y.rows () && y.cols () == z0.getSize ());
   matvec res (y);
   for (matvec::size_type i = 0; i < y.size (); i++)
     res[i] = ytos (y[i], z0);
@@ -631,12 +631,12 @@ matvec ytos (const matvec &y, const qucs::vector &z0) {
 }
 
 matvec ytos (const matvec &y, nr_complex_t z0) {
-  return ytos (y, qucs::vector (y.getCols (), z0));
+  return ytos (y, qucs::vector (y.cols (), z0));
 }
 
 // Convert scattering parameters to impedance matrix vector.
 matvec stoz (const matvec &s, const qucs::vector &z0) {
-  assert (s.getCols () == s.getRows () && s.getCols () == z0.getSize ());
+  assert (s.cols () == s.rows () && s.cols () == z0.getSize ());
   matvec res (s);
   for (matvec::size_type i = 0; i < s.size (); i++)
     res[i] =stoz (s[i], z0);
@@ -644,12 +644,12 @@ matvec stoz (const matvec &s, const qucs::vector &z0) {
 }
 
 matvec stoz (const matvec &s, nr_complex_t z0) {
-  return stoz (s, qucs::vector (s.getCols (), z0));
+  return stoz (s, qucs::vector (s.cols (), z0));
 }
 
 // Convert impedance matrix vector scattering parameter matrix vector.
 matvec ztos (const matvec &z, const qucs::vector &z0) {
-  assert (z.getCols () == z.getRows () && z.getCols () == z0.getSize ());
+  assert (z.cols () == z.rows () && z.cols () == z0.getSize ());
   matvec res (z);
   for (matvec::size_type i = 0; i < z.size (); i++)
     res[i] = ztos (z[i], z0);
@@ -657,12 +657,12 @@ matvec ztos (const matvec &z, const qucs::vector &z0) {
 }
 
 matvec ztos (const matvec &z, nr_complex_t z0) {
-  return ztos (z, qucs::vector (z.getCols (), z0));
+  return ztos (z, qucs::vector (z.cols (), z0));
 }
 
 // Convert impedance matrix vector to admittance matrix vector.
 matvec ztoy (const matvec &z) {
-  assert (z.getCols () == z.getRows ());
+  assert (z.cols () == z.rows ());
   matvec res (z);
   for (matvec::size_type i = 0; i < z.size (); i++)
     res[i] = ztoy (z[i]);
@@ -671,7 +671,7 @@ matvec ztoy (const matvec &z) {
 
 // Convert admittance matrix vector to impedance matrix vector.
 matvec ytoz (const matvec &y) {
-  assert (y.getCols () == y.getRows ());
+  assert (y.cols () == y.rows ());
   matvec res (y);
   for (matvec::size_type i = 0; i < y.size (); i++)
     res[i] = ytoz (y[i]);
@@ -682,7 +682,7 @@ matvec ytoz (const matvec &y) {
    forms Y, Z, H, G and A to any other.  Also converts S<->(A, T, H, Y
    and Z) matrix vectors. */
 matvec twoport (const matvec &m, char in, char out) {
-  assert (m.getCols () >= 2 && m.getRows () >= 2);
+  assert (m.cols () >= 2 && m.rows () >= 2);
   matvec res (m);
   for (matvec::size_type i = 0; i < m.size (); i++)
     res[i] = twoport (m[i],in,out);
@@ -692,7 +692,7 @@ matvec twoport (const matvec &m, char in, char out) {
 /* The function returns the Rollet stability factor vector of the
    given S-parameter matrix vector. */
 qucs::vector rollet (const matvec &m) {
-  assert (m.getCols () >= 2 && m.getRows () >= 2);
+  assert (m.cols () >= 2 && m.rows () >= 2);
   qucs::vector res (m.size ());
   for (matvec::size_type i = 0; i < m.size (); i++)
     res(i) = rollet(m[i]);
@@ -702,7 +702,7 @@ qucs::vector rollet (const matvec &m) {
 /* The function returns the stability measure B1 vector of the given
    S-parameter matrix vector. */
 qucs::vector b1 (const matvec &m) {
-  assert (m.getCols () >= 2 && m.getRows () >= 2);
+  assert (m.cols () >= 2 && m.rows () >= 2);
   qucs::vector res (m.size ());
   for (matvec::size_type i = 0; i < m.size (); i++)
     res(i) = b1 (m[i]);

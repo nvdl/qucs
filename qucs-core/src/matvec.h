@@ -75,8 +75,8 @@ class matvec
  private:
   typedef decltype(matrix().rows()) index;
   typedef std::vector<matrix> data_type;
-  index rows;
-  index cols;
+  index r;
+  index c;
   std::string name;
   data_type data;
  public:
@@ -112,20 +112,20 @@ class matvec
   }
   
   /*! default constructor: empty */
-  matvec (): rows(0), cols(0), name(), data() {};
+  matvec (): r(0), c(0), name(), data() {};
   /*! Constructor creates an unnamed instance of the matvec class with a
    certain number of empty matrices. */
-  matvec (decltype(data.size()) size, index r, index c):
-	  rows(r),
-	  cols(c),
+  matvec (decltype(data.size()) size, index rp, index cp):
+	  r(rp),
+	  c(cp),
 	  name(),
-	  data(size,matrix(r,c))
+	  data(size,matrix(rp,cp))
 	  {};
   matvec (const matvec &) = default;
   ~matvec () = default;
   std::size_t size (void) const { return data.size(); }
-  int getCols (void) const { return cols; }
-  int getRows (void) const { return rows; }
+  index cols (void) const { return c; }
+  index rows (void) const { return r; }
   void setName (const std::string &);
   std::string getName (void) const;
   void set (qucs::vector, int, int);
