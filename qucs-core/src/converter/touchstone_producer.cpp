@@ -230,7 +230,8 @@ void touchstone_find_data (dataset * data, const char * name) {
       vn = v->getName ();
       if (strstr (vn, name) == vn) {
 	if ((n = matvec::isMatrixVector (vn, r, c)) != NULL) {
-	  mv->set (*v, r, c);
+	  for(matvec::size_type ii=0;ii<(*mv).size();ii++)
+	    ((*mv)[ii])(r,c) = (*v)(ii);
 	  free (n);
 	}
       }

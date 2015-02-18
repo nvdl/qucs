@@ -56,14 +56,6 @@ std::string matvec::getName (void) const {
   return name;
 }
 
-/* This function saves the given vector to the matvec object with the
-   appropriate matrix indices. */
-void matvec::set (qucs::vector v, int r, int c) {
-  assert (v.getSize () == data.size() &&
-	  this->rows() >= 0 && r < this->rows() && c >= 0 && c < this->cols());
-  for (size_type i = 0; i < data.size(); i++)
-    (data[i])(r, c)= v.get (i);
-}
 
 /* The function returns the vector specified by the given matrix
    indices.  If the matrix vector has a valid name 'A' the returned
@@ -174,7 +166,8 @@ matvec * matvec::getMatrixVector (qucs::vector * data, char * name) {
       vn = v->getName ();
       if (strstr (vn, name) == vn) {
         if ((n = matvec::isMatrixVector (vn, r, c)) != NULL) {
-          mv->set (*v, r, c);
+	  for(matvec::size_type ii=0;ii<(*mv).size();ii++)
+	    ((*mv)[ii])(r,c)=(*v)(ii);
           free (n);
         }
       }
@@ -182,14 +175,6 @@ matvec * matvec::getMatrixVector (qucs::vector * data, char * name) {
     return mv;
   }
   return NULL;
-}
-
-/* This function saves the given matrix in the matrix vector at the
-   specified position. */
-void matvec::set (matrix m, int idx) {
-  assert (m.rows () == this->rows() && m.cols () == this->cols() &&
-	  idx >= 0 && idx < data.size());
-  data[idx] = m;
 }
 
 // Matrix vector addition.

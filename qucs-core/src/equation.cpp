@@ -2127,7 +2127,8 @@ void solver::findMatrixVectors (qucs::vector * v)
                 if (vec->getRequested () == n)
                 {
                     p = matvec::isMatrixVector (vec->getName (), a, b);
-                    mv->set (*vec, a, b);
+		    for(matvec::size_type ii=0;ii<(*mv).size();ii++)
+		      (*mv)[ii](a,b)=(*vec)(ii);
                     free (p);
                     vec->setRequested (-1);
                 }

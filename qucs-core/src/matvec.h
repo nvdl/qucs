@@ -128,8 +128,7 @@ class matvec
   index rows (void) const { return r; }
   void setName (const std::string &);
   std::string getName (void) const;
-  void set (qucs::vector, int, int);
-  void set (matrix, int);
+  
   qucs::vector get (int, int);
   static char * createMatrixString (const char *, int, int);
   static char * createMatrixString (char, int, int);
