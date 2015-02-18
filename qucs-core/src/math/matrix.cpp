@@ -1139,7 +1139,21 @@ nr_double_t b1 (matrix m) {
   return res;
 }
 
+nr_double_t mu1(const matrix &m) {
+  return
+    (1 - norm (m(0, 0))) /
+    (abs (m(1, 1) - conj (m(0, 0)) * m.determinant()) +
+     abs (m(0, 1) * (m(1, 0))));
+}
 
+nr_double_t mu2(const matrix &m) {
+  return 
+    (1 - norm (m(1, 1))) /
+    (abs (m(0, 0) - conj (m(1, 1)) * m.determinant()) +
+     abs (m(0, 1) * m(1, 0)));
+}
+  
+  
 matrix rad2deg (matrix a) {
   matrix res (a.rows (), a.cols ());
   for (int r = 0; r < a.rows (); r++)

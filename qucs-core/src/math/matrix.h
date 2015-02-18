@@ -69,6 +69,8 @@ matrix cstocy (matrix, matrix);
 matrix cytocz (matrix, matrix);
 matrix cstocz (matrix, matrix);
 matrix twoport (matrix, char, char);
+nr_double_t mu1(const matrix&);
+nr_double_t mu2(const matrix&);
 nr_double_t rollet (matrix);
 nr_double_t b1 (matrix);
 matrix rad2deg     (matrix);
