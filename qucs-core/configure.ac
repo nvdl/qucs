@@ -640,8 +640,7 @@ AS_IF([test "X$with_internal_libeigen3" = Xno],
 			 [AC_MSG_ERROR([Missing libeigen3 you could use --with-internal-libeigen3])])
       ],
       [
-       EIGEN3_CFLAGS="-I$(abs_top_srcdir)/deps/eigen/"
-       AC_SUBST([EIGEN3_CFLAGS])
+       AC_SUBST([EIGEN3_CFLAGS],['-I$(top_srcdir)/deps/eigen/'])
       ])
 
 dnl Checks for libraries.
