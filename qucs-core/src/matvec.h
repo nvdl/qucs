@@ -69,61 +69,18 @@ matvec stoy (const matvec&, const qucs::vector &);
 matvec ytos (const matvec&, nr_complex_t z0 = 50.0);
 matvec ytos (const matvec&, const qucs::vector &);
 matvec ytoz (const matvec&);
-
-class matvec
+ 
+class matvec : public std::vector<matrix>
 {
  private:
   typedef decltype(matrix().rows()) index;
-  typedef std::vector<matrix> data_type;
-  index r;
-  index c;
-  std::string name;
-  data_type data;
+  index r = 0;
+  index c = 0;
+  std::string name = "";
  public:
-  typedef data_type::value_type value_type;
-  typedef data_type::allocator_type allocator_type;
-  typedef data_type::reference reference;
-  typedef data_type::const_reference const_reference;
-  typedef data_type::iterator iterator;
-  typedef data_type::const_iterator const_iterator;
-  typedef data_type::size_type size_type;
-
-  /* begin iterator */
-  iterator begin() noexcept {
-    return data.begin();
+  using std::vector<matrix>::vector;
+  matvec(int s,int rr, int cc) : vector(s,matrix(rr,cc)), r(rr), c(cc) {
   }
-  const_iterator begin() const noexcept {
-    return data.begin();
-  }
-
-  /* end iterator */
-  iterator end() noexcept {
-    return data.begin();
-  }
-  const_iterator end() const noexcept {
-    return data.begin();
-  }
-
-  reference operator[] (const size_type n) {
-    return data[n];
-  };
-  const_reference operator[] (const size_type n) const {
-    return data[n];
-  }
-  
-  /*! default constructor: empty */
-  matvec (): r(0), c(0), name(), data() {};
-  /*! Constructor creates an unnamed instance of the matvec class with a
-   certain number of empty matrices. */
-  matvec (decltype(data.size()) size, index rp, index cp):
-	  r(rp),
-	  c(cp),
-	  name(),
-	  data(size,matrix(rp,cp))
-	  {};
-  matvec (const matvec &) = default;
-  ~matvec () = default;
-  std::size_t size (void) const { return data.size(); }
   index cols (void) const { return c; }
   index rows (void) const { return r; }
   void setName (const std::string &);
@@ -136,77 +93,10 @@ class matvec
   static matvec * getMatrixVector (qucs::vector *, char *);
   static void getMatrixVectorSize (qucs::vector *, char *, int&, int&, int&);
 
-  // operator functions
-  friend matvec operator + (const matvec&, const matvec&);
-  friend matvec operator + (const matvec&, const matrix&);
-  friend matvec operator + (const matrix&, const matvec&);
-  friend matvec operator + (const matvec&, const nr_complex_t);
-  friend matvec operator + (const nr_complex_t, const matvec&);
-  friend matvec operator + (const matvec&, const nr_double_t);
-  friend matvec operator + (const nr_double_t, const matvec&);
-  friend matvec operator + (const matvec&, const qucs::vector&);
-  friend matvec operator + (const qucs::vector&, const matvec&);
-  friend matvec operator - (const matvec&, const matvec&);
-  friend matvec operator - (const matvec&, const matrix&);
-  friend matvec operator - (const matrix&, const matvec&);
-  friend matvec operator - (const matvec&, nr_complex_t);
-  friend matvec operator - (nr_complex_t, const matvec&);
-  friend matvec operator - (const matvec&, nr_double_t);
-  friend matvec operator - (nr_double_t, const matvec&);
-  friend matvec operator - (const matvec&, const qucs::vector&);
-  friend matvec operator - (const qucs::vector&, const matvec&);
-  friend matvec operator / (const matvec&, const qucs::vector&);
-  friend matvec operator * (const matvec&, const qucs::vector&);
-  friend matvec operator * (const qucs::vector&, const matvec&);
-  friend matvec operator * (const matvec&, nr_complex_t);
-  friend matvec operator * (nr_complex_t, const matvec&);
-  friend matvec operator * (const matvec&, nr_double_t);
-  friend matvec operator * (nr_double_t, const matvec&);
-  friend matvec operator * (const matvec&, const matvec&);
-  friend matvec operator * (const matvec&, const matrix&);
-  friend matvec operator * (const matrix&, const matvec&);
-
   // intrinsic operator functions
   matvec operator  - ();
   matvec operator += (const matvec&);
   matvec operator -= (const matvec&);
-
-  // other operations
-  friend matvec transpose (const matvec&);
-  friend matvec conj      (const matvec&);
-  friend qucs::vector det       (const matvec&);
-  friend matvec inverse   (const matvec&);
-  friend matvec sqr       (const matvec&);
-  friend matvec pow       (const matvec&, int);
-  friend matvec pow       (const matvec&, const qucs::vector&);
-  friend matvec twoport   (const matvec&, char, char);
-  friend matvec real      (const matvec&);
-  friend matvec imag      (const matvec&);
-  friend matvec abs       (const matvec&);
-  friend matvec dB        (const matvec&);
-  friend matvec arg       (const matvec&);
-  friend matvec adjoint   (const matvec&);
-  friend qucs::vector rollet    (const matvec&);
-  friend qucs::vector b1        (const matvec&);
-  friend matvec rad2deg       (const matvec&);
-  friend matvec deg2rad       (const matvec&);
-
-  friend matvec stos (const matvec&, nr_complex_t, nr_complex_t);
-  friend matvec stos (const matvec&, nr_double_t, nr_double_t);
-  friend matvec stos (const matvec&, const qucs::vector&, nr_complex_t);
-  friend matvec stos (const matvec&, nr_complex_t, const qucs::vector&);
-  friend matvec stos (const matvec&, const qucs::vector&, const qucs::vector&);
-  friend matvec stoz (const matvec&, nr_complex_t);
-  friend matvec stoz (const matvec&, const qucs::vector&);
-  friend matvec ztos (const matvec&, nr_complex_t);
-  friend matvec ztos (const matvec&, const qucs::vector&);
-  friend matvec ztoy (const matvec&);
-  friend matvec stoy (const matvec&, nr_complex_t);
-  friend matvec stoy (const matvec&, const qucs::vector&);
-  friend matvec ytos (const matvec&, nr_complex_t);
-  friend matvec ytos (const matvec&, const qucs::vector&);
-  friend matvec ytoz (const matvec&);
-
 };
 
 

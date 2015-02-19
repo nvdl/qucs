@@ -63,7 +63,8 @@ std::string matvec::getName (void) const {
 qucs::vector matvec::get (int r, int c) {
   assert (r >= 0 && r < this->rows() && c >= 0 && c < this->cols());
   qucs::vector res;
-  for (size_type i = 0; i < data.size(); i++) res.add ((data[i])(r, c));
+  for (size_type i = 0; i < this->size(); i++)
+    res.add (((*this)[i])(r, c));
   if (!name.empty()) {
     res.setName (createMatrixString (name.c_str(), r, c));
   }
@@ -289,9 +290,9 @@ matvec operator - (nr_double_t d, const matvec &a) {
 // Intrinsic matrix vector addition.
 matvec matvec::operator += (const matvec &a) {
   assert (a.rows () == this->rows() && a.cols () == this->cols() &&
-	  a.size () == data.size());
-  for (matvec::size_type i = 0; i < data.size(); i++)
-    data[i] += a[i];
+	  a.size () == this->size());
+  for (matvec::size_type i = 0; i < this->size(); i++)
+    (*this)[i] += a[i];
   return *this;
 }
 
@@ -344,9 +345,9 @@ matvec matvec::operator - () {
 // Intrinsic matrix vector subtraction.
 matvec matvec::operator -= (const matvec &a) {
   assert (a.rows () == this->rows() && a.cols () == this->cols() &&
-	  a.size () == data.size());
+	  a.size () == this->size());
   for (matvec::size_type i = 0; i < a.size (); i++)
-    data[i] -= a[i];
+    (*this)[i] -= a[i];
   return *this;
 }
 
