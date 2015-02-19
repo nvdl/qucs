@@ -69,6 +69,35 @@ matvec stoy (const matvec&, const qucs::vector &);
 matvec ytos (const matvec&, nr_complex_t z0 = 50.0);
 matvec ytos (const matvec&, const qucs::vector &);
 matvec ytoz (const matvec&);
+
+matvec operator + (const matvec&, const matvec&);
+matvec operator + (const matvec&, const matrix&);
+matvec operator + (const matrix&, const matvec&);
+matvec operator + (const matvec&, const nr_complex_t);
+matvec operator + (const nr_complex_t, const matvec&);
+matvec operator + (const matvec&, const nr_double_t);
+matvec operator + (const nr_double_t, const matvec&);
+matvec operator + (const matvec&, const qucs::vector&);
+matvec operator + (const qucs::vector&, const matvec&);
+matvec operator - (const matvec&, const matvec&);
+matvec operator - (const matvec&, const matrix&);
+matvec operator - (const matrix&, const matvec&);
+matvec operator - (const matvec&, nr_complex_t);
+matvec operator - (nr_complex_t, const matvec&);
+matvec operator - (const matvec&, nr_double_t);
+matvec operator - (nr_double_t, const matvec&);
+matvec operator - (const matvec&, const qucs::vector&);
+matvec operator - (const qucs::vector&, const matvec&);
+matvec operator / (const matvec&, const qucs::vector&);
+matvec operator * (const matvec&, const qucs::vector&);
+matvec operator * (const qucs::vector&, const matvec&);
+matvec operator * (const matvec&, nr_complex_t);
+matvec operator * (nr_complex_t, const matvec&);
+matvec operator * (const matvec&, nr_double_t);
+matvec operator * (nr_double_t, const matvec&);
+matvec operator * (const matvec&, const matvec&);
+matvec operator * (const matvec&, const matrix&);
+matvec operator * (const matrix&, const matvec&);
  
 class matvec : public std::vector<matrix>
 {
