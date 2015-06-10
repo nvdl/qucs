@@ -970,6 +970,7 @@ void MouseActions::MMovePanning(Schematic *Doc, QMouseEvent *Event)
   panningDone = true;
 
   //Doc->viewport()->update();
+  Doc->viewport()->repaint();
 }
 
 /**
@@ -2722,6 +2723,8 @@ void MouseActions::keyReleaseEvent(Schematic *doc, QKeyEvent *event) {
     movingElements.clear();
     defaultState(); // Due to "MPressSelect()" capture
     doc->releaseKeyboard();
+    //doc->updateContents();
+    doc->viewport()->update();
     break;
 
   /*case Qt::Key_A: //case Qt::Key_Left:
