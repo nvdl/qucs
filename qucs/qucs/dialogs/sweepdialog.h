@@ -24,6 +24,7 @@
 
 #include <QSpinBox>
 #include <QGridLayout>
+#include <QDebug>
 
 #include "node.h"
 
@@ -42,7 +43,7 @@ protected:
   QValidator::State validate ( QString & text, int & pos ) const;
 
 private:
-  double *Values;
+  double *Values = NULL;
   int ValueSize;
 };
 

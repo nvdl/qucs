@@ -46,12 +46,22 @@ mySpinBox::mySpinBox(int Min, int Max, int Step, double *Val, QWidget *Parent)
 using namespace std;
 QString mySpinBox::textFromValue(int Val) const
 {
+  qDebug() << "mySpinBox::textFromValue()";
+  qDebug() << "Values: " << Values;
+
+  if (Values == NULL) return "";
+
   cout<<"Values + Val"<<*(Values+Val)<<endl;
   return QString::number(*(Values+Val));
 }
 
 QValidator::State mySpinBox::validate ( QString & text, int & pos ) const
 {
+  qDebug() << "mySpinBox::validate()";
+  qDebug() << "Values: " << Values;
+
+  if (Values == NULL) return QValidator::Invalid;
+
   if(pos>ValueSize)return QValidator::Invalid; 
   if(QString::number(*(Values+pos))==text)
   return QValidator::Acceptable;
@@ -128,16 +138,20 @@ void SweepDialog::slotNewValue(int)
   DataX *pD = pGraph->cPointsX.first();
   int Factor = 1, Index = 0;
   QList<mySpinBox *>::const_iterator it;
-  for(it = BoxList.constBegin(); it != BoxList.constEnd(); it++) {
+
+  for (it = BoxList.constBegin(); it != BoxList.constEnd(); it++) {
     Index  += (*it)->value() * Factor;
     Factor *= pD->count;
   }
+
   Index *= 2;  // because of complex values
 
   QList<Node *>::iterator node_it;
-  QList<double *>::const_iterator value_it;
-  for(node_it = NodeList.begin(); node_it != NodeList.end(); node_it++) {
+  QList<double *>::const_iterator value_it = ValueList.begin();
+
+  for (node_it = NodeList.begin(); node_it != NodeList.end(); node_it++) {
     (*node_it)->Name = misc::num2str(*((*value_it)+Index));
+    //(*node_it)->Name = "x"; //misc::num2str(Index);
     (*node_it)->Name += ((*node_it)->x1 & 0x10)? "A" : "V";
     value_it++;
   }
