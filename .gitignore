@@ -206,3 +206,7 @@ CMakeScripts
 *.cxx_parameters
 shadow
 
+#Eclipse
+.cproject
+.project
+.settings
