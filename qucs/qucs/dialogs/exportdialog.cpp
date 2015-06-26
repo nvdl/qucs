@@ -156,34 +156,39 @@ int ExportDialog::Ypixels()
 
 void ExportDialog::setFileName()
 {
-    /*QString nam = dialog.getSaveFileName(this,tr("Export diagram to file"),QDir::homeDirPath(),
-                                         "SVG vector graphics (*.svg) ;;"
-                                         "PNG images (*.png) ;;"
-                                         "JPEG images (*.jpg *.jpeg)");
-    */
-    //QFileInfo inf(filename);
-    QFileDialog dialog(this, tr("Export to image"), editFilename->text(),
-                       "SVG vector graphics (*.svg) ;;"
-                       "PNG images (*.png) ;;"
-                       "JPEG images (*.jpg *.jpeg) ;;"
-                       "PDF (*.pdf) ;;"
-                       "PDF + LaTeX (*.pdf_tex) ;;"
-                       "EPS Encapsulated Postscript (*.eps)");
-    dialog.setAcceptMode(QFileDialog::AcceptSave);
-    if(dialog.exec())
-    {
-        QString nam = dialog.selectedFile();
-        QString extension;
-        if(dialog.selectedNameFilter().contains("*.png")) extension=QString(".png");
-        if(dialog.selectedNameFilter().contains("*.jpg")) extension=QString(".jpg");
-        if(dialog.selectedNameFilter().contains("*.svg")) extension=QString(".svg");
-        if(dialog.selectedNameFilter().contains("*.pdf")) extension=QString(".pdf");
-        if(dialog.selectedNameFilter().contains("*.pdf_tex")) extension=QString(".pdf_tex");
-        if(dialog.selectedNameFilter().contains("*.eps")) extension=QString(".eps");
-        if(nam.toLower().section("/",-1,-1).contains(".")) //has the user specified an extension?
-            editFilename->setText(nam); //yes, just leave unchanged
-        else
-            editFilename->setText(nam+extension); //no, add extension
+  QString selectedFilter;
+  QString currentExtension;
+  QString extension;
+
+  QString fileName = QFileDialog::getSaveFileName(this, tr("Export Schematic to Image"),
+      editFilename->text(),
+      "SVG vector graphics (*.svg) ;;"
+      "PNG images (*.png) ;;"
+      "JPEG images (*.jpg *.jpeg) ;;"
+      "PDF (*.pdf) ;;"
+      "PDF + LaTeX (*.pdf_tex) ;;"
+      "EPS Encapsulated Postscript (*.eps)",
+      &selectedFilter);
+
+    if (fileName != "") {
+        // The selected filter overrides the file extension
+        if (selectedFilter.contains("*.svg", Qt::CaseInsensitive)) extension = QString(".svg");
+        if (selectedFilter.contains("*.png", Qt::CaseInsensitive)) extension = QString(".png");
+        if (selectedFilter.contains("*.jpg", Qt::CaseInsensitive)) extension = QString(".jpg");
+        if (selectedFilter.contains("*.pdf", Qt::CaseInsensitive)) extension = QString(".pdf");
+        if (selectedFilter.contains("*.pdf_tex", Qt::CaseInsensitive)) extension = QString(".pdf_tex");
+        if (selectedFilter.contains("*.eps", Qt::CaseInsensitive)) extension = QString(".eps");
+
+        QFileInfo fileInfo(fileName);
+        currentExtension = "." + fileInfo.suffix();
+
+        if (currentExtension == ".") { // If no extension has been specified
+          fileName.append(extension);
+        } else {
+          fileName.replace(currentExtension, extension);
+        }
+
+      editFilename->setText(fileName);
     }
 }
 

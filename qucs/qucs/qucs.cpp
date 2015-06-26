@@ -2071,8 +2071,6 @@ void QucsApp::slotAfterSimulation(int Status, SimMessage *sim)
   while((w=DocumentTab->widget(i++)) != 0)
     if(w == sim->DocWidget)
       break;
-    }
-  }
 
   if (sim->showBias == 0) {  // paint dc bias into schematic ?
 

@@ -1697,10 +1697,10 @@ void MouseActions::MPressElement(Schematic *Doc, QMouseEvent *Event, float, floa
 
     Diagram *Diag = (Diagram*) selElem;
     QFileInfo Info(Doc->DocName);
+
     // dialog is Qt::WDestructiveClose !!!
     DiagramDialog *dia =
-       new DiagramDialog(Diag,
-           Info.dirPath() + QDir::separator() + Doc->DataSet, Doc);
+    new DiagramDialog(Diag, Doc);
 
     if (dia->exec() == QDialog::Rejected) {  // don't insert if dialog canceled
       Doc->viewport()->update();
@@ -2620,7 +2620,7 @@ void MouseActions::editElement(Schematic *Doc, QMouseEvent *Event)
            }
          }
 
-         ddia = new DiagramDialog(dia, Info.dirPath() + QDir::separator() + Doc->DataSet, Doc);
+         ddia = new DiagramDialog(dia, Doc);
          if (ddia->exec() != QDialog::Rejected) { // is WDestructiveClose
            Doc->setChanged(true, true);
          }
@@ -2640,7 +2640,7 @@ void MouseActions::editElement(Schematic *Doc, QMouseEvent *Event)
 
       if(!dia) break;
 
-      ddia = new DiagramDialog(dia, Info.dirPath() + QDir::separator() + Doc->DataSet, Doc, pg);
+      ddia = new DiagramDialog(dia, Doc, pg);
 
       if (ddia->exec() != QDialog::Rejected) {  // is WDestructiveClose
         Doc->setChanged(true, true);
