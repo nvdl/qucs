@@ -239,7 +239,11 @@ void QucsApp::initView()
   editText = new QLineEdit(this);  // for editing component properties
   editText->setFrame(false);
   editText->setHidden(true);
-  editText->setPaletteBackgroundColor(QucsSettings.BGColor);
+
+  QPalette p = palette();
+  p.setColor(backgroundRole(), QucsSettings.BGColor);
+  editText->setPalette(p);
+
   connect(editText, SIGNAL(returnPressed()), SLOT(slotApplyCompText()));
   connect(editText, SIGNAL(textChanged(const QString&)),
           SLOT(slotResizePropEdit(const QString&)));
@@ -280,7 +284,6 @@ void QucsApp::initView()
   // "Content" Tab of the left QTabWidget
   Content = new ProjectView(this);
   Content->setContextMenuPolicy(Qt::CustomContextMenu);
-
 
   TabView->addTab(Content, tr("Content"));
   TabView->setTabToolTip(TabView->indexOf(Content), tr("content of current project"));
@@ -362,7 +365,7 @@ void QucsApp::initView()
   dock->setWidget(TabView);
   dock->setAllowedAreas(Qt::LeftDockWidgetArea);
   this->addDockWidget(Qt::LeftDockWidgetArea, dock);
-  TabView->setCurrentPage(0);
+  TabView->setCurrentIndex(0);
 
   // ----------------------------------------------------------
   // Octave docking window
@@ -567,9 +570,9 @@ QucsDoc* QucsApp::getDoc(int No)
 {
   QWidget *w;
   if(No < 0)
-    w = DocumentTab->currentPage();
+    w = DocumentTab->currentWidget();
   else
-    w = DocumentTab->page(No);
+    w = DocumentTab->widget(No);
 
   if(w) {
     if(isTextDocument (w))
@@ -608,11 +611,11 @@ void QucsApp::fillComboBox (bool setAll)
   CompChoose->clear ();
 
   if (!setAll) {
-    CompChoose->insertItem(QObject::tr("paintings"));
+    CompChoose->insertItem(CompChoose->count(), QObject::tr("paintings"));
   } else {
     QStringList cats = Category::getCategories ();
     foreach (QString it, cats) {
-      CompChoose->insertItem (it);
+      CompChoose->insertItem(CompChoose->count(), it);
     }
   }
 }
@@ -631,7 +634,7 @@ void QucsApp::slotSetCompView (int index)
   CompComps->clear ();   // clear the IconView
   if (CompChoose->count () <= 0) return;
 
-  QString item = CompChoose->text (index);
+  QString item = CompChoose->itemText (index);
 
   Comps = Category::getModules(item);
   QString Name;
@@ -685,7 +688,7 @@ void QucsApp::slotSetCompView (int index)
     for (it = Comps.constBegin(); it != Comps.constEnd(); it++) {
       if ((*it)->info) {
         /// \todo warning: expression result unused, can we rewrite this?
-        *((*it)->info) (Name, File, false);
+        (void) *((*it)->info) (Name, File, false);
         QListWidgetItem *icon = new QListWidgetItem(QPixmap(":/bitmaps/" + QString (File) + ".png"), Name);
         icon->setToolTip(Name);
         CompComps->addItem(icon);
@@ -718,7 +721,7 @@ void QucsApp::slotSearchComponent(const QString &searchText)
       for (modit = Comps.constBegin(); modit != Comps.constEnd(); modit++) {
         if ((*modit)->info) {
           /// \todo warning: expression result unused, can we rewrite this?
-          *((*modit)->info) (Name, File, false);
+          (void) *((*modit)->info) (Name, File, false);
 
           if((Name.indexOf(searchText, 0, Qt::CaseInsensitive)) != -1) {
             //match
@@ -789,7 +792,7 @@ void QucsApp::slotSelectComponent(QListWidgetItem *item)
   }
 
   if(view->drawn)
-    ((Q3ScrollView*)DocumentTab->currentPage())->viewport()->update();
+    ((Q3ScrollView*)DocumentTab->currentWidget())->viewport()->update();
   view->drawn = false;
 
   // toggle last toolbar button off
@@ -960,7 +963,7 @@ void QucsApp::slotCMenuCopy()
   int z = 0; //search if the doc is loaded
   QucsDoc *d = findDoc(file, &z);
   if (d != NULL && d->DocChanged) {
-    DocumentTab->setCurrentPage(z);
+    DocumentTab->setCurrentIndex(z);
     int ret = QMessageBox::question(this, tr("Copying Qucs document"), 
         tr("The document contains unsaved changes!\n") + 
         tr("Do you want to save the changes before copying?"),
@@ -986,8 +989,8 @@ void QucsApp::slotCMenuCopy()
   }
 
   bool ok;
-  QString s = QInputDialog::getText(tr("Copy file"), tr("Enter new name:"),
-      QLineEdit::Normal, defaultName, &ok, this);
+  QString s = QInputDialog::getText(this, tr("Copy file"), tr("Enter new name:"), QLineEdit::Normal, defaultName, &ok);
+
   if(ok && !s.isEmpty()) {
     if (!s.endsWith(suffix)) {
       s += QString(".") + suffix;
@@ -1036,8 +1039,8 @@ void QucsApp::slotCMenuRename()
   }
 
   bool ok;
-  QString s = QInputDialog::getText(tr("Rename file"), tr("Enter new filename:"),
-		QLineEdit::Normal, base, &ok, this);
+  QString s = QInputDialog::getText(this, tr("Rename file"), tr("Enter new filename:"), QLineEdit::Normal, base, &ok);
+
   if(ok && !s.isEmpty()) { 
     if (!s.endsWith(suffix)) {
       s += QString(".") + suffix;
@@ -1159,7 +1162,7 @@ void QucsApp::openProject(const QString& Path)
 
   slotResetWarnings();
 
-  QDir ProjDir(QDir::cleanDirPath(Path));
+  QDir ProjDir(QDir::cleanPath(Path));
   if(!ProjDir.exists() || !ProjDir.isReadable()) { // check project directory
     QMessageBox::critical(this, tr("Error"),
                           tr("Cannot access project directory: ")+Path);
@@ -1170,7 +1173,7 @@ void QucsApp::openProject(const QString& Path)
 
   Content->setProjPath(QucsSettings.QucsWorkDir.absolutePath());
 
-  TabView->setCurrentPage(1);   // switch to "Content"-Tab
+  TabView->setCurrentIndex(1);   // switch to "Content"-Tab
   ProjName = Name;   // remember the name of project
 
   // show name in title of main window
@@ -1228,12 +1231,12 @@ void QucsApp::slotMenuProjClose()
 
   slotResetWarnings();
   setWindowTitle("Qucs " PACKAGE_VERSION + tr(" - Project: "));
-  QucsSettings.QucsWorkDir.setPath(QDir::homeDirPath()+QDir::convertSeparators ("/.qucs"));
+  QucsSettings.QucsWorkDir.setPath(QDir::homePath()+QDir::convertSeparators ("/.qucs"));
   octave->adjustDirectory();
 
   Content->setProjPath("");
 
-  TabView->setCurrentPage(0);   // switch to "Projects"-Tab
+  TabView->setCurrentIndex(0);   // switch to "Projects"-Tab
   ProjName = "";
 }
 
@@ -1339,26 +1342,26 @@ void QucsApp::slotButtonProjDel()
 
 void QucsApp::slotFileNew()
 {
-  statusBar()->message(tr("Creating new schematic..."));
+  statusBar()->showMessage(tr("Creating new schematic..."));
   slotHideEdit(); // disable text edit of component property
 
   Schematic *d = new Schematic(this, "");
   int i = DocumentTab->addTab(d, QPixmap(empty_xpm), QObject::tr("untitled"));
   DocumentTab->setCurrentIndex(i);
 
-  statusBar()->message(tr("Ready."));
+  statusBar()->showMessage(tr("Ready."));
 }
 
 // --------------------------------------------------------------
 void QucsApp::slotTextNew()
 {
-  statusBar()->message(tr("Creating new text editor..."));
+  statusBar()->showMessage(tr("Creating new text editor..."));
   slotHideEdit(); // disable text edit of component property
   TextDoc *d = new TextDoc(this, "");
   int i = DocumentTab->addTab(d, QPixmap(empty_xpm), QObject::tr("untitled"));
   DocumentTab->setCurrentIndex(i);
 
-  statusBar()->message(tr("Ready."));
+  statusBar()->showMessage(tr("Ready."));
 }
 
 // --------------------------------------------------------------
@@ -1366,20 +1369,20 @@ void QucsApp::slotTextNew()
 // directly, otherwise it loads it.
 bool QucsApp::gotoPage(const QString& Name)
 {
-  int No = DocumentTab->currentPageIndex();
+  int No = DocumentTab->currentIndex();
 
   int i = 0;
   QucsDoc * d = findDoc (Name, &i);  // search, if page is already loaded
 
   if(d) {   // open page found ?
     d->becomeCurrent(true);
-    DocumentTab->setCurrentPage(i);  // make new document the current
+    DocumentTab->setCurrentIndex(i);  // make new document the current
     return true;
   }
 
   QFileInfo Info(Name);
-  if(Info.extension(false) == "sch" || Info.extension(false) == "dpl" ||
-     Info.extension(false) == "sym") {
+  if(Info.suffix() == "sch" || Info.suffix() == "dpl" ||
+     Info.suffix() == "sym") {
     d = new Schematic(this, Name);
     i = DocumentTab->addTab((Schematic *)d, QPixmap(empty_xpm), Info.fileName()); 
   }
@@ -1391,16 +1394,16 @@ bool QucsApp::gotoPage(const QString& Name)
 
   if(!d->load()) {    // load document if possible
     delete d;
-    DocumentTab->setCurrentPage(No);
+    DocumentTab->setCurrentIndex(No);
     view->drawn = false;
     return false;
   }
-  slotChangeView(DocumentTab->currentPage());
+  slotChangeView(DocumentTab->currentWidget());
 
   // if only an untitled document was open -> close it
   if(getDoc(0)->DocName.isEmpty())
     if(!getDoc(0)->DocChanged)
-      delete DocumentTab->page(0);
+      delete DocumentTab->widget(0);
 
   view->drawn = false;
   return true;
@@ -1413,20 +1416,20 @@ void QucsApp::slotFileOpen()
 {
   slotHideEdit(); // disable text edit of component property
 
-  statusBar()->message(tr("Opening file..."));
+  statusBar()->showMessage(tr("Opening file..."));
 
   QString s = QFileDialog::getOpenFileName(this, tr("Enter a Schematic Name"),
     lastDirOpenSave.isEmpty() ? QString(".") : lastDirOpenSave, QucsFileFilter);
 
   if(s.isEmpty())
-    statusBar()->message(tr("Opening aborted"), 2000);
+    statusBar()->showMessage(tr("Opening aborted"), 2000);
   else {
     updateRecentFilesList(s);
 
     gotoPage(s);
     lastDirOpenSave = s;   // remember last directory and file
 
-    statusBar()->message(tr("Ready."));
+    statusBar()->showMessage(tr("Ready."));
   }
 }
 
@@ -1450,19 +1453,19 @@ bool QucsApp::saveFile(QucsDoc *Doc)
 // --------------------------------------------------------------
 void QucsApp::slotFileSave()
 {
-  statusBar()->message(tr("Saving file..."));
+  statusBar()->showMessage(tr("Saving file..."));
   DocumentTab->blockSignals(true);   // no user interaction during that time
   slotHideEdit(); // disable text edit of component property
 
   if(!saveFile()) {
     DocumentTab->blockSignals(false);
-    statusBar()->message(tr("Saving aborted"), 2000);
-    statusBar()->message(tr("Ready."));
+    statusBar()->showMessage(tr("Saving aborted"), 2000);
+    statusBar()->showMessage(tr("Ready."));
     return;
   }
 
   DocumentTab->blockSignals(false);
-  statusBar()->message(tr("Ready."));
+  statusBar()->showMessage(tr("Ready."));
 
   if(!ProjName.isEmpty())
     slotUpdateTreeview();
@@ -1471,7 +1474,7 @@ void QucsApp::slotFileSave()
 // --------------------------------------------------------------
 bool QucsApp::saveAs()
 {
-  QWidget *w = DocumentTab->currentPage();
+  QWidget *w = DocumentTab->currentWidget();
   QucsDoc *Doc = getDoc();
 
   int n = -1;
@@ -1484,7 +1487,7 @@ bool QucsApp::saveAs()
     Info.setFile(s);
     if(s.isEmpty()) {   // which is default directory ?
       if(ProjName.isEmpty()) {
-        if(lastDirOpenSave.isEmpty())  s = QDir::currentDirPath();
+        if(lastDirOpenSave.isEmpty())  s = QDir::currentPath();
         else  s = lastDirOpenSave;
       }
       else s = QucsSettings.QucsWorkDir.path();
@@ -1492,7 +1495,7 @@ bool QucsApp::saveAs()
 
     // list of known file extensions
     QString ext = "vhdl;vhd;v;va;sch;dpl;m;oct;net;qnet;txt";
-    QStringList extlist = QStringList::split (';', ext);
+    QStringList extlist = ext.split (';');
 
     if(isTextDocument (w))
       Filter = tr("VHDL Sources")+" (*.vhdl *.vhd);;" +
@@ -1510,7 +1513,7 @@ bool QucsApp::saveAs()
                                      Filter);
     if(s.isEmpty())  return false;
     Info.setFile(s);               // try to guess the best extension ...
-    ext = Info.extension(false);
+    ext = Info.suffix();
 
     if(ext.isEmpty() || !extlist.contains(ext))
     {
@@ -1545,7 +1548,7 @@ bool QucsApp::saveAs()
   }
   Doc->setName(s);
   DocumentTab->setTabText(DocumentTab->indexOf(w), misc::properFileName(s));
-  lastDirOpenSave = Info.dirPath(true);  // remember last directory and file
+  lastDirOpenSave = Info.absolutePath();  // remember last directory and file
   updateRecentFilesList(s);
 
   n = Doc->save();   // SAVE
@@ -1559,19 +1562,19 @@ bool QucsApp::saveAs()
 // --------------------------------------------------------------
 void QucsApp::slotFileSaveAs()
 {
-  statusBar()->message(tr("Saving file under new filename..."));
+  statusBar()->showMessage(tr("Saving file under new filename..."));
   DocumentTab->blockSignals(true);   // no user interaction during the time
   slotHideEdit(); // disable text edit of component property
 
   if(!saveAs()) {
     DocumentTab->blockSignals(false);
-    statusBar()->message(tr("Saving aborted"), 3000);
-    statusBar()->message(tr("Ready."));
+    statusBar()->showMessage(tr("Saving aborted"), 3000);
+    statusBar()->showMessage(tr("Ready."));
     return;
   }
 
   DocumentTab->blockSignals(false);
-  statusBar()->message(tr("Ready."));
+  statusBar()->showMessage(tr("Ready."));
 
   // refresh the schematic file path
   slotRefreshSchPath();
@@ -1584,7 +1587,7 @@ void QucsApp::slotFileSaveAs()
 // --------------------------------------------------------------
 void QucsApp::slotFileSaveAll()
 {
-  statusBar()->message(tr("Saving all files..."));
+  statusBar()->showMessage(tr("Saving all files..."));
   slotHideEdit(); // disable text edit of component property
   DocumentTab->blockSignals(true);   // no user interaction during the time
 
@@ -1592,19 +1595,20 @@ void QucsApp::slotFileSaveAll()
   QucsDoc *Doc;  // search, if page is already loaded
   while((Doc=getDoc(No++)) != 0) {
     if(Doc->DocName.isEmpty())  // make document the current ?
-      DocumentTab->setCurrentPage(No-1);
+      DocumentTab->setCurrentIndex(No-1);
     saveFile(Doc);
   }
 
   DocumentTab->blockSignals(false);
   // Call update() to update subcircuit symbols in current Schematic document.
   // TextDoc has no viewport, it needs no update.
-  QString tabType = DocumentTab->currentWidget()->className();
+  QString tabType = DocumentTab->currentWidget()->metaObject()->className();
+
   if (tabType == "Schematic") {
-    ((Q3ScrollView*)DocumentTab->currentPage())->viewport()->update();
+    ((Q3ScrollView*)DocumentTab->currentWidget())->viewport()->update();
   }
   view->drawn = false;
-  statusBar()->message(tr("Ready."));
+  statusBar()->showMessage(tr("Ready."));
 
   // refresh the schematic file path
   slotRefreshSchPath();
@@ -1633,7 +1637,7 @@ void QucsApp::slotFileClose(int index)
 // index == -1, the active document will be closed
 void QucsApp::closeFile(int index)
 {
-    statusBar()->message(tr("Closing file..."));
+    statusBar()->showMessage(tr("Closing file..."));
 
     slotHideEdit(); // disable text edit of component property
 
@@ -1659,7 +1663,7 @@ void QucsApp::closeFile(int index)
       DocumentTab->setCurrentIndex(0);
     }
 
-    statusBar()->message(tr("Ready."));
+    statusBar()->showMessage(tr("Ready."));
 }
 
 
@@ -1691,10 +1695,10 @@ bool QucsApp::closeAllFiles()
 
 void QucsApp::slotFileExamples()
 {
-  statusBar()->message(tr("Open examples directory..."));
+  statusBar()->showMessage(tr("Open examples directory..."));
   QString path = QDir::toNativeSeparators(QucsSettings.ExamplesDir);
   QDesktopServices::openUrl(QUrl("file:///" + path.replace("\\","/")));
-  statusBar()->message(tr("Ready."));
+  statusBar()->showMessage(tr("Ready."));
 }
 
 void QucsApp::slotHelpTutorial()
@@ -1766,7 +1770,7 @@ void QucsApp::slotFileSettings ()
 {
   editText->setHidden (true); // disable text edit of component property
 
-  QWidget * w = DocumentTab->currentPage ();
+  QWidget * w = DocumentTab->currentWidget ();
   if (isTextDocument (w)) {
     QucsDoc * Doc = (QucsDoc *) ((TextDoc *) w);
     QString ext = Doc->fileSuffix ();
@@ -1808,8 +1812,7 @@ void QucsApp::slotRefreshSchPath()
   this->updateSchNameHash();
   this->updateSpiceNameHash();
 
-  int exit = QMessageBox::information(this, tr("Update schematic path"),
-      tr("The schematic file path has been refreshed."), tr("OK"));
+  statusBar()->showMessage(tr("The schematic search path has been refreshed."), 2000);
 }
 
 // --------------------------------------------------------------
@@ -1836,7 +1839,7 @@ void QucsApp::updatePortNumber(QucsDoc *currDoc, int No)
   No = 0;
   QWidget *w;
   Component *pc_tmp;
-  while((w=DocumentTab->page(No++)) != 0) {
+  while((w=DocumentTab->widget(No++)) != 0) {
     if(isTextDocument (w))  continue;
 
     // start from the last to omit re-appended components
@@ -1863,15 +1866,15 @@ void QucsApp::updatePortNumber(QucsDoc *currDoc, int No)
 // printCurrentDocument: call printerwriter to print document
 void QucsApp::printCurrentDocument(bool fitToPage)
 {
-  statusBar()->message(tr("Printing..."));
+  statusBar()->showMessage(tr("Printing..."));
   slotHideEdit(); // disable text edit of component property
 
   PrinterWriter *writer = new PrinterWriter();
   writer->setFitToPage(fitToPage);
-  writer->print(DocumentTab->currentPage());
+  writer->print(DocumentTab->currentWidget());
   delete writer;
 
-  statusBar()->message(tr("Ready."));
+  statusBar()->showMessage(tr("Ready."));
   return;
 }
 
@@ -1892,7 +1895,7 @@ void QucsApp::slotFilePrintFit()
 // Exits the application.
 void QucsApp::slotFileQuit()
 {
-  statusBar()->message(tr("Exiting application..."));
+  statusBar()->showMessage(tr("Exiting application..."));
   slotHideEdit(); // disable text edit of component property
 
   int exit = QMessageBox::information(this,
@@ -1905,7 +1908,7 @@ void QucsApp::slotFileQuit()
       qApp->quit();
     }
 
-  statusBar()->message(tr("Ready."));
+  statusBar()->showMessage(tr("Ready."));
 }
 
 //-----------------------------------------------------------------
@@ -1936,7 +1939,7 @@ void QucsApp::slotIntoHierarchy()
 {
   slotHideEdit(); // disable text edit of component property
 
-  Schematic *Doc = (Schematic*)DocumentTab->currentPage();
+  Schematic *Doc = (Schematic*)DocumentTab->currentWidget();
   Component *pc = Doc->searchSelSubcircuit();
   if(pc == 0) { return; }
 
@@ -1999,7 +2002,7 @@ void QucsApp::slotSimulate()
   slotHideEdit(); // disable text edit of component property
 
   QucsDoc *Doc;
-  QWidget *w = DocumentTab->currentPage();
+  QWidget *w = DocumentTab->currentWidget();
   if(isTextDocument (w)) {
     Doc = (QucsDoc*)((TextDoc*)w);
     if(Doc->SimTime.isEmpty() && ((TextDoc*)Doc)->simulation) {
@@ -2029,7 +2032,7 @@ void QucsApp::slotSimulate()
 
   slotResetWarnings();
 
-  if(Info.extension(false) == "m" || Info.extension(false) == "oct") {
+  if(Info.suffix() == "m" || Info.suffix() == "oct") {
     // It is an Octave script.
     if(Doc->DocChanged)
       Doc->save();
@@ -2065,9 +2068,8 @@ void QucsApp::slotAfterSimulation(int Status, SimMessage *sim)
 
   int i = 0;
   QWidget *w;  // search, if page is still open
-
-  while ((w=DocumentTab->page(i++)) != 0) {
-    if (w == sim->DocWidget) {
+  while((w=DocumentTab->widget(i++)) != 0)
+    if(w == sim->DocWidget)
       break;
     }
   }
@@ -2075,9 +2077,7 @@ void QucsApp::slotAfterSimulation(int Status, SimMessage *sim)
   if (sim->showBias == 0) {  // paint dc bias into schematic ?
 
     sim->slotClose();   // close and delete simulation window
-
-    if (w) {  // schematic still open ?
-      qDebug() << "Segmentation fault zone"; // nvdl: todo: Segmentation fault
+    if(w) {  // schematic still open ?
       SweepDialog *Dia = new SweepDialog((Schematic*)sim->DocWidget);
 
       // silence warning about unused variable.
@@ -2128,15 +2128,15 @@ void QucsApp::slotChangePage(QString& DocName, QString& DataDisplay)
   if(DataDisplay.isEmpty())  return;
 
   QFileInfo Info(DocName);
-  QString Name = Info.dirPath() + QDir::separator() + DataDisplay;
+  QString Name = Info.path() + QDir::separator() + DataDisplay;
 
-  QWidget  *w = DocumentTab->currentPage();
+  QWidget  *w = DocumentTab->currentWidget();
 
   int z = 0;  // search, if page is already loaded
   QucsDoc * d = findDoc (Name, &z);
 
   if(d)
-    DocumentTab->setCurrentPage(z);
+    DocumentTab->setCurrentIndex(z);
   else {   // no open page found ?
     QString ext = QucsDoc::fileSuffix (DataDisplay);
 
@@ -2177,14 +2177,14 @@ void QucsApp::slotChangePage(QString& DocName, QString& DataDisplay)
   }
 
 
-  if(DocumentTab->currentPage() == w)      // if page not ...
+  if(DocumentTab->currentWidget() == w)      // if page not ...
     if(!isTextDocument (w))
       ((Schematic*)w)->reloadGraphs();  // ... changes, reload here !
 
-  TabView->setCurrentPage (2);   // switch to "Component"-Tab
+  TabView->setCurrentIndex(2);   // switch to "Component"-Tab
   if (Name.right(4) == ".dpl") {
     int i = Category::getModulesNr (QObject::tr("diagrams"));
-    CompChoose->setCurrentItem (i);   // switch to diagrams
+    CompChoose->setCurrentIndex(i);   // switch to diagrams
     slotSetCompView (i);
   }
 }
@@ -2224,8 +2224,8 @@ void QucsApp::slotOpenContent(const QModelIndex &idx)
   if (extName == "sch" || extName == "dpl" || extName == "vhdl" ||
       extName == "vhd" || extName == "v" || extName == "va" ||
       extName == "m" || extName == "oct") {
-    gotoPage(Info.absFilePath());
-    updateRecentFilesList(Info.absFilePath());
+    gotoPage(Info.absoluteFilePath());
+    updateRecentFilesList(Info.absoluteFilePath());
     slotUpdateRecentFiles();
 
     if(note.isEmpty())     // is subcircuit ?
@@ -2244,7 +2244,7 @@ void QucsApp::slotOpenContent(const QModelIndex &idx)
   }
 
   if(extName == "dat") {
-    editFile(Info.absFilePath());  // open datasets with text editor
+    editFile(Info.absoluteFilePath());  // open datasets with text editor
     return;
   }
 
@@ -2254,8 +2254,9 @@ void QucsApp::slotOpenContent(const QModelIndex &idx)
   QStringList::const_iterator it = QucsSettings.FileTypes.constBegin();
   while(it != QucsSettings.FileTypes.constEnd()) {
     if(extName == (*it).section('/',0,0)) {
-      com = QStringList::split(" ", (*it).section('/',1,1));
-      com << Info.absFilePath();
+      QString progName = (*it).section('/',1,1);
+      com = progName.split(" ");
+      com << Info.absoluteFilePath();
 
       QProcess *Program = new QProcess();
       //Program->setCommunication(0);
@@ -2266,7 +2267,7 @@ void QucsApp::slotOpenContent(const QModelIndex &idx)
       if(Program->state()!=QProcess::Running&&
               Program->state()!=QProcess::Starting) {
         QMessageBox::critical(this, tr("Error"),
-               tr("Cannot start \"%1\"!").arg(Info.absFilePath()));
+               tr("Cannot start \"%1\"!").arg(Info.absoluteFilePath()));
         delete Program;
       }
       return;
@@ -2275,7 +2276,7 @@ void QucsApp::slotOpenContent(const QModelIndex &idx)
   }
 
   // If no appropriate program was found, open as text file.
-  editFile(Info.absFilePath());  // open datasets with text editor
+  editFile(Info.absoluteFilePath());  // open datasets with text editor
 }
 
 // ---------------------------------------------------------
@@ -2309,6 +2310,10 @@ void QucsApp::slotSelectSubcircuit(const QModelIndex &idx)
 
   QString filename = idx.sibling(idx.row(), 0).data().toString();
   QString note = idx.sibling(idx.row(), 1).data().toString();
+  int idx_pag = DocumentTab->currentIndex();
+  QString tab_titl = "";
+  if (idx_pag>=0) tab_titl = DocumentTab->tabText(idx_pag);
+  if (filename == tab_titl ) return; // Forbid to paste subcircuit into itself.
 
   // delete previously selected elements
   if(view->selElem != 0)  delete view->selElem;
@@ -2334,7 +2339,7 @@ void QucsApp::slotSelectSubcircuit(const QModelIndex &idx)
   view->selElem = Comp;
 
   if(view->drawn)
-    ((Q3ScrollView*)DocumentTab->currentPage())->viewport()->update();
+    ((Q3ScrollView*)DocumentTab->currentWidget())->viewport()->update();
   view->drawn = false;
   MouseMoveAction = &MouseActions::MMoveElement;
   MousePressAction = &MouseActions::MPressElement;
@@ -2347,7 +2352,7 @@ void QucsApp::slotSelectSubcircuit(const QModelIndex &idx)
 void QucsApp::slotSelectLibComponent(QTreeWidgetItem *item)
 {
     // get the current document
-    Schematic *Doc = (Schematic*)DocumentTab->currentPage();
+    Schematic *Doc = (Schematic*)DocumentTab->currentWidget();
 
     // if the current document is a schematic activate the paste
     if(!isTextDocument(Doc))
@@ -2383,12 +2388,12 @@ void QucsApp::switchSchematicDoc (bool SchematicMode)
   if (!SchematicMode) {
     if (activeAction) {
       activeAction->blockSignals (true); // do not call toggle slot
-      activeAction->setOn (false);       // set last toolbar button off
+      activeAction->setChecked(false);       // set last toolbar button off
       activeAction->blockSignals (false);
     }
     activeAction = select;
     select->blockSignals (true);
-    select->setOn (true);
+    select->setChecked(true);
     select->blockSignals (false);
   }
   // schematic document
@@ -2476,14 +2481,14 @@ bool QucsApp::isTextDocument(QWidget *w) {
 // symbol.
 void QucsApp::slotSymbolEdit()
 {
-  QWidget *w = DocumentTab->currentPage();
+  QWidget *w = DocumentTab->currentWidget();
 
   // in a text document (e.g. VHDL)
   if (isTextDocument (w)) {
     TextDoc *TDoc = (TextDoc*)w;
     // set 'DataDisplay' document of text file to symbol file
     QFileInfo Info(TDoc->DocName);
-    QString sym = Info.baseName(true)+".sym";
+    QString sym = Info.completeBaseName()+".sym";
     TDoc->DataDisplay = sym;
 
     // symbol file already loaded?
@@ -2495,7 +2500,7 @@ void QucsApp::slotSymbolEdit()
     slotChangePage(TDoc->DocName,TDoc->DataDisplay);
 
     // set 'DataDisplay' document of symbol file to original text file
-    Schematic *SDoc = (Schematic*)DocumentTab->currentPage();
+    Schematic *SDoc = (Schematic*)DocumentTab->currentWidget();
     SDoc->DataDisplay = Info.fileName();
 
     // change into symbol mode
@@ -2535,7 +2540,7 @@ void QucsApp::slotPowerMatching()
 
 //  double Z0 = 50.0;
   QString Var = pm->pGraph->Var;
-  double Imag = pm->VarPos[pm->nVarPos+1];
+  double Imag = pm->powImag();
   if(Var == "Sopt")  // noise matching ?
     Imag *= -1.0;
 
@@ -2543,9 +2548,9 @@ void QucsApp::slotPowerMatching()
   Dia->TwoCheck->setChecked(false);
   Dia->TwoCheck->setEnabled(false);
 //  Dia->Ref1Edit->setText(QString::number(Z0));
-  Dia->S11magEdit->setText(QString::number(pm->VarPos[pm->nVarPos]));
+  Dia->S11magEdit->setText(QString::number(pm->powReal()));
   Dia->S11degEdit->setText(QString::number(Imag));
-  Dia->setFrequency(pm->VarPos[0]);
+  Dia->setFrequency(pm->powFreq());
 
   slotToPage();
   if(Dia->exec() != QDialog::Accepted)
@@ -2560,46 +2565,47 @@ void QucsApp::slot2PortMatching()
   Marker *pm = (Marker*)view->focusElement;
 
   QString DataSet;
-  Schematic *Doc = (Schematic*)DocumentTab->currentPage();
+  Schematic *Doc = (Schematic*)DocumentTab->currentWidget();
   int z = pm->pGraph->Var.indexOf(':');
   if(z <= 0)  DataSet = Doc->DataSet;
   else  DataSet = pm->pGraph->Var.mid(z+1);
-  double Freq = pm->VarPos[0];
+  double Freq = pm->powFreq();
 
   QFileInfo Info(Doc->DocName);
-  DataSet = Info.dirPath()+QDir::separator()+DataSet;
+  DataSet = Info.path()+QDir::separator()+DataSet;
 
   Diagram *Diag = new Diagram();
 
+  // FIXME: use normal Diagrams.
   Graph *pg = new Graph("S[1,1]");
   Diag->Graphs.append(pg);
-  if(!Diag->loadVarData(DataSet, pg)) {
+  if(!pg->loadDatFile(DataSet)) {
     QMessageBox::critical(0, tr("Error"), tr("Could not load S[1,1]."));
     return;
   }
 
   pg = new Graph("S[1,2]");
   Diag->Graphs.append(pg);
-  if(!Diag->loadVarData(DataSet, pg)) {
+  if(!pg->loadDatFile(DataSet)) {
     QMessageBox::critical(0, tr("Error"), tr("Could not load S[1,2]."));
     return;
   }
 
   pg = new Graph("S[2,1]");
   Diag->Graphs.append(pg);
-  if(!Diag->loadVarData(DataSet, pg)) {
+  if(!pg->loadDatFile(DataSet)) {
     QMessageBox::critical(0, tr("Error"), tr("Could not load S[2,1]."));
     return;
   }
 
   pg = new Graph("S[2,2]");
   Diag->Graphs.append(pg);
-  if(!Diag->loadVarData(DataSet, pg)) {
+  if(!pg->loadDatFile(DataSet)) {
     QMessageBox::critical(0, tr("Error"), tr("Could not load S[2,2]."));
     return;
   }
 
-  DataX *Data = Diag->Graphs.first()->cPointsX.first();
+  DataX *Data = Diag->Graphs.first()->axis(0);
   if(Data->Var != "frequency") {
     QMessageBox::critical(0, tr("Error"), tr("Wrong dependency!"));
     return;
@@ -2643,7 +2649,7 @@ void QucsApp::slot2PortMatching()
 void QucsApp::slotEditElement()
 {
   if(view->focusMEvent)
-    view->editElement((Schematic*)DocumentTab->currentPage(), view->focusMEvent);
+    view->editElement((Schematic*)DocumentTab->currentWidget(), view->focusMEvent);
 }
 
 // -----------------------------------------------------------
@@ -2810,11 +2816,10 @@ void QucsApp::slotSaveSchematicToGraphicsFile(bool diagram)
 {
   ImageWriter *writer = new ImageWriter(lastExportFilename);
   writer->setDiagram(diagram);
-  writer->print(DocumentTab->currentPage());
+  writer->print(DocumentTab->currentWidget());
   lastExportFilename = writer->getLastSavedFile();
   delete writer;
 }
-
 
 void QucsApp::slotSimulateWithSpice()
 {

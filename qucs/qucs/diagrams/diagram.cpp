@@ -48,6 +48,7 @@
 #include <QRegExp>
 #include <QDateTime>
 #include <QPainter>
+#include <QDebug>
 
 Diagram::Diagram(int _cx, int _cy)
 {
@@ -172,7 +173,7 @@ void Diagram::createAxisLabels()
   if(xAxis.Label.isEmpty()) {
     // write all x labels ----------------------------------------
     foreach(Graph *pg, Graphs) {
-	DataX *pD = pg->cPointsX.getFirst();
+	DataX *pD = pg->axis(0);
 	if(!pD) continue;
 	y -= LineSpacing;
 	if(Name[0] != 'C') {   // locus curve ?
@@ -288,7 +289,7 @@ void Diagram::createAxisLabels()
 }
 
 // ------------------------------------------------------------
-int Diagram::regionCode(float x, float y)
+int Diagram::regionCode(float x, float y) const
 {
   int code=0;   // code for clipping
   if(x < 0.0)
@@ -306,7 +307,7 @@ int Diagram::regionCode(float x, float y)
 
 // ------------------------------------------------------------
 // Is virtual. This one is for round diagrams only.
-bool Diagram::insideDiagram(float x, float y)
+bool Diagram::insideDiagram(float x, float y) const
 {
   float R = float(x2)/2.0 + 1.0; // +1 seems better (graph sometimes little outside)
   x -= R;
@@ -315,30 +316,49 @@ bool Diagram::insideDiagram(float x, float y)
 }
 
 /*!
+   (try to) set a Marker to a diagram
+*/
+Marker* Diagram::setMarker(int x, int y)
+{
+  if(getSelected(x, y)) {
+    // test all graphs of the diagram
+    foreach(Graph *pg,Graphs) {
+      int n  = pg->getSelected(x-cx, cy-y); // sic!
+      if(n >= 0) {
+	Marker *pm = new Marker(this, pg, n, x-cx, y-cy);
+	pg->Markers.append(pm);
+	return pm;
+      }
+    }
+  }
+  return NULL;
+}
+
+/*!
    Cohen-Sutherland clipping algorithm
 */
-void Diagram::rectClip(float* &p)
+void Diagram::rectClip(Graph::iterator &p) const
 {
   int code, z=0;
   float x=0, y=0, dx, dy;
-  float x_1 = *(p-4), y_1 = *(p-3);
-  float x_2 = *(p-2), y_2 = *(p-1);
+  float x_1 = (p-4)->Scr, y_1 = (p-3)->Scr;
+  float x_2 = (p-2)->Scr, y_2 = (p-1)->Scr;
 
   int code1 = regionCode(x_1, y_1);
   int code2 = regionCode(x_2, y_2);
   if((code1 | code2) == 0)  return;  // line completly inside ?
 
-  if(code1 != 0) if(*(p-5) >= 0) { // is there already a line end flag ?
+  if(code1 != 0) if((p-5)->Scr >= 0) { // is there already a line end flag ?
     p++;
-    *(p-5) = STROKEEND;
+    (p-5)->setStrokeEnd();
   }
   if(code1 & code2)   // line not visible at all ?
     goto endWithHidden;
 
   if(code2 != 0) {
-    *p = STROKEEND;
-    *(p+1) = x_2;
-    *(p+2) = y_2;
+    p->setStrokeEnd();
+    (p+1)->Scr = x_2;
+    (p+2)->Scr = y_2;
     z += 3;
   }
 
@@ -382,27 +402,27 @@ void Diagram::rectClip(float* &p)
       goto endWithHidden; // line not visible at all ?
   }
 
-  *(p-4) = x_1;
-  *(p-3) = y_1;
-  *(p-2) = x_2;
-  *(p-1) = y_2;
+  (p-4)->Scr = x_1;
+  (p-3)->Scr = y_1;
+  (p-2)->Scr = x_2;
+  (p-1)->Scr = y_2;
   p += z;
   return;
 
 endWithHidden:
-    *(p-4) = x_2;
-    *(p-3) = y_2;
+    (p-4)->Scr = x_2;
+    (p-3)->Scr = y_2;
     p -= 2;
 }
 
 /*!
    Clipping for round diagrams (smith, polar, ...)
 */
-void Diagram::clip(float* &p)
+void Diagram::clip(Graph::iterator &p) const
 {
   float R = float(x2) / 2.0;
-  float x_1 = *(p-4) - R, y_1 = *(p-3) - R;
-  float x_2 = *(p-2) - R, y_2 = *(p-1) - R;
+  float x_1 = (p-4)->Scr - R, y_1 = (p-3)->Scr - R;
+  float x_2 = (p-2)->Scr - R, y_2 = (p-1)->Scr - R;
 
   float dt1 = R*R;   // square of radius
   float dt2 = dt1 - x_2*x_2 - y_2*y_2;
@@ -410,9 +430,9 @@ void Diagram::clip(float* &p)
 
   if(dt1 >= 0.0) if(dt2 >= 0.0)  return;  // line completly inside ?
 
-  if(dt1 < 0.0) if(*(p-5) >= 0.0) { // is there already a line end flag ?
+  if(dt1 < 0.0) if((p-5)->Scr >= 0.0) { // is there already a line end flag ?
     p++;
-    *(p-5) = STROKEEND;
+    (p-5)->setStrokeEnd();
   }
 
   float x = x_1-x_2;
@@ -426,8 +446,8 @@ void Diagram::clip(float* &p)
   x_2 += R;
   y_2 += R;
   if(F <= 0.0) {   // line not visible at all ?
-    *(p-4) = x_2;
-    *(p-3) = y_2;
+    (p-4)->Scr = x_2;
+    (p-3)->Scr = y_2;
     p -= 2;
     return;
   }
@@ -436,29 +456,29 @@ void Diagram::clip(float* &p)
   R   = sqrt(F);
   dt1 = C - R;
   if((dt1 > 0.0) && (dt1 < D)) { // intersection outside start/end point ?
-    *(p-4) = x_1 - x*dt1 / D;
-    *(p-3) = y_1 - y*dt1 / D;
+    (p-4)->Scr = x_1 - x*dt1 / D;
+    (p-3)->Scr = y_1 - y*dt1 / D;
     code |= 1;
   }
   else {
-    *(p-4) = x_1;
-    *(p-3) = y_1;
+    (p-4)->Scr = x_1;
+    (p-3)->Scr = y_1;
   }
 
   dt2 = C + R;
   if((dt2 > 0.0) && (dt2 < D)) { // intersection outside start/end point ?
-    *(p-2) = x_1 - x*dt2 / D;
-    *(p-1) = y_1 - y*dt2 / D;
-    *p = STROKEEND;
+    (p-2)->Scr = x_1 - x*dt2 / D;
+    (p-1)->Scr = y_1 - y*dt2 / D;
+    p->setStrokeEnd();
     p += 3;
     code |= 2;
   }
-  *(p-2) = x_2;
-  *(p-1) = y_2;
+  (p-2)->Scr = x_2;
+  (p-1)->Scr = y_2;
 
   if(code == 0) {   // intersections both lie outside ?
-    *(p-4) = x_2;
-    *(p-3) = y_2;
+    (p-4)->Scr = x_2;
+    (p-3)->Scr = y_2;
     p -= 2;
   }
 
@@ -467,16 +487,17 @@ void Diagram::clip(float* &p)
 
 // ------------------------------------------------------------
 // g->Points must already be empty!!!
+// is this a Graph Member?
 void Diagram::calcData(Graph *g)
 {
   double *px;
   double *pz = g->cPointsY;
   if(!pz)  return;
-  if(g->cPointsX.count() < 1) return;
+  if(g->numAxes() < 1) return;
 
-  int i, z, tmp, Counter=2;
+  int i, z, Counter=2;
   float dx, dy, xtmp, ytmp;
-  int Size = ((2*(g->cPointsX.getFirst()->count) + 1) * g->countY) + 10;
+  int Size = ((2*(g->axis(0)->count) + 1) * g->countY) + 10;
   
   if(xAxis.autoScale)  if(yAxis.autoScale)  if(zAxis.autoScale)
     Counter = -50000;
@@ -484,11 +505,13 @@ void Diagram::calcData(Graph *g)
   double Dummy = 0.0;  // not used
   double *py = &Dummy;
 
-  float *p = (float*)malloc( Size*sizeof(float) ); // create memory for points
-  float *p_end;
-  g->ScrPoints = p_end = p;
+  g->resizeScrPoints(Size);
+  auto p = g->begin();
+  auto p_end = g->begin();
   p_end += Size - 9;   // limit of buffer
-  *(p++) = STROKEEND;
+  p->setStrokeEnd();
+  ++p;
+  assert(p!=g->end());
 
   Axis *pa;
   if(g->yAxisNo == 0)  pa = &yAxis;
@@ -498,27 +521,30 @@ void Diagram::calcData(Graph *g)
   switch(g->Style) {
     case GRAPHSTYLE_SOLID: // ***** solid line ****************************
       for(i=g->countY; i>0; i--) {  // every branch of curves
-	px = g->cPointsX.getFirst()->Points;
-	calcCoordinate(px, pz, py, p, p+1, pa);
+	px = g->axis(0)->Points;
+	calcCoordinate(px, pz, py, &p->Scr, &(p+1)->Scr, pa);
+	++px;
+	pz += 2;
 	p += 2;
-	for(z=g->cPointsX.getFirst()->count-1; z>0; z--) {  // every point
+	for(z=g->axis(0)->count-1; z>0; z--) {  // every point
 	  FIT_MEMORY_SIZE;  // need to enlarge memory block ?
-	  calcCoordinate(px, pz, py, p, p+1, pa);
+	  calcCoordinate(px, pz, py, &p->Scr, &(p+1)->Scr, pa);
+	  ++px;
+	  pz += 2;
 	  p += 2;
 	  if(Counter >= 2)   // clipping only if an axis is manual
 	    clip(p);
 	}
-	if(*(p-3) == STROKEEND)
+	if((p-3)->isStrokeEnd() && !(p-3)->isBranchEnd())
 	  p -= 3;  // no single point after "no stroke"
-	else if(*(p-3) == BRANCHEND) {
-	  if((*(p-2) < 0) || (*(p-1) < 0))
+	else if((p-3)->isBranchEnd() && !(p-1)->isGraphEnd()) {
+	  if(((p-2)->Scr < 0) || ((p-1)->Scr < 0))
 	    p -= 2;  // erase last hidden point
 	}
-	*(p++) = BRANCHEND;
+	(p++)->setBranchEnd();
       }
 
-
-      *p = GRAPHEND;
+      p->setGraphEnd();
 /*z = p-g->Points+1;
 p = g->Points;
 qDebug("\n****** p=%p", p);
@@ -538,15 +564,18 @@ for(int zz=0; zz<z; zz+=2)
 
     default:  // symbol (e.g. star) at each point **********************
       for(i=g->countY; i>0; i--) {  // every branch of curves
-        px = g->cPointsX.getFirst()->Points;
-        for(z=g->cPointsX.getFirst()->count; z>0; z--) {  // every point
-          calcCoordinate(px, pz, py, p, p+1, pa);
-          if(insideDiagram(*p, *(p+1)))    // within diagram ?
+        px = g->axis(0)->Points;
+        for(z=g->axis(0)->count; z>0; z--) {  // every point
+          calcCoordinate(px, pz, py, &p->Scr, &(p+1)->Scr, pa);
+          ++px;
+          pz += 2;
+          if(insideDiagram(p->Scr, (p+1)->Scr))    // within diagram ?
             p += 2;
         }
-        *(p++) = BRANCHEND;
+	(p++)->setBranchEnd();
+	assert(p!=g->end());
       }
-      *p = GRAPHEND;
+      (p++)->setGraphEnd();
 /*qDebug("\n******");
 for(int zz=0; zz<60; zz+=2)
   qDebug("c: %d/%d", *(g->Points+zz), *(g->Points+zz+1));*/
@@ -558,23 +587,31 @@ for(int zz=0; zz<60; zz+=2)
   for(i=g->countY; i>0; i--) {  // every branch of curves
     Flag = 1;
     dist = -Stroke;
-    px = g->cPointsX.getFirst()->Points;
+    px = g->axis(0)->Points;
     calcCoordinate(px, pz, py, &xtmp, &ytmp, pa);
-    *(p++) = xtmp;
-    *(p++) = ytmp;
+    ++px;
+    pz += 2;
+    (p++)->Scr = xtmp;
+    assert(p!=g->end());
+    (p++)->Scr = ytmp;
+    assert(p!=g->end());
     Counter = 1;
-    for(z=g->cPointsX.getFirst()->count-1; z>0; z--) {
+    for(z=g->axis(0)->count-1; z>0; z--) {
       dx = xtmp;
       dy = ytmp;
       calcCoordinate(px, pz, py, &xtmp, &ytmp, pa);
+      ++px;
+      pz += 2;
       dx = xtmp - dx;
       dy = ytmp - dy;
       dist += sqrt(double(dx*dx + dy*dy)); // distance between points
       if(Flag == 1) if(dist <= 0.0) {
 	FIT_MEMORY_SIZE;  // need to enlarge memory block ?
 
-	*(p++) = xtmp;    // if stroke then save points
-	*(p++) = ytmp;
+	(p++)->Scr = xtmp;    // if stroke then save points
+	assert(p!=g->end());
+	(p++)->Scr = ytmp;
+	assert(p!=g->end());
 	if((++Counter) >= 2)  clip(p);
 	continue;
       }
@@ -582,22 +619,27 @@ for(int zz=0; zz<60; zz+=2)
       while(dist > 0) {   // stroke or space finished ?
 	FIT_MEMORY_SIZE;  // need to enlarge memory block ?
 
-	*(p++) = xtmp - float(dist*cos(alpha)); // linearly interpolate
-	*(p++) = ytmp - float(dist*sin(alpha));
+	(p++)->Scr = xtmp - float(dist*cos(alpha)); // linearly interpolate
+	assert(p!=g->end());
+	(p++)->Scr = ytmp - float(dist*sin(alpha));
+	assert(p!=g->end());
 	if((++Counter) >= 2)  clip(p);
 
         if(Flag == 0) {
           dist -= Stroke;
           if(dist <= 0) {
-	    *(p++) = xtmp;  // don't forget point after ...
-	    *(p++) = ytmp;  // ... interpolated point
+	    (p++)->Scr = xtmp;  // don't forget point after ...
+	    assert(p!=g->end());
+	    (p++)->Scr = ytmp;  // ... interpolated point
+	    assert(p!=g->end());
 	    if((++Counter) >= 2)  clip(p);
+	    assert(p<g->end());
           }
         }
         else {
 	  dist -= Space;
-	  if(*(p-3) < 0)  p -= 2;
-	  else *(p++) = STROKEEND;
+	  if((p-3)->Scr < 0)  p -= 2;
+	  else (p++)->setStrokeEnd();
 	  if(Counter < 0)  Counter = -50000;   // if auto-scale
 	  else  Counter = 0;
         }
@@ -606,17 +648,19 @@ for(int zz=0; zz<60; zz+=2)
 
     } // of x loop
 
-    if(*(p-3) == STROKEEND)
+    if((p-3)->isStrokeEnd() && !(p-3)->isBranchEnd()) {
       p -= 3;  // no single point after "no stroke"
-    else if(*(p-3) == BRANCHEND) {
-      if((*(p-2) < 0) || (*(p-1) < 0))
+      assert(p>g->begin());
+    } else if((p-3)->isBranchEnd() && !(p-3)->isGraphEnd()) {
+      if(((p-2)->Scr < 0) || ((p-1)->Scr < 0))
         p -= 2;  // erase last hidden point
+	assert(p>g->begin());
     }
-    *(p++) = BRANCHEND;
+    (p++)->setBranchEnd();
   } // of y loop
 
 
-  *p = GRAPHEND;
+  p->setGraphEnd();
 /*z = p-g->Points+1;
 p = g->Points;
 qDebug("\n****** p=%p", p);
@@ -667,9 +711,11 @@ bool Diagram::resizeTouched(float fX, float fY, float len)
 // --------------------------------------------------------------------------
 void Diagram::getAxisLimits(Graph *pg)
 {
+  // FIXME: Graph should know the limits. but it doesn't yet.
+  //        we should only copy here. better: just wrap, dont use {x,y,z}Axis
   int z;
   double x, y, *p;
-  DataX *pD = pg->cPointsX.first();
+  DataX *pD = pg->axis(0);
   if(pD == 0) return;
 
   if(Name[0] != 'C') {   // not for location curves
@@ -684,7 +730,7 @@ void Diagram::getAxisLimits(Graph *pg)
   }
 
   if(Name == "Rect3D") {
-    DataX *pDy = pg->cPointsX.next();
+    DataX *pDy = pg->axis(1);
     if(pDy) {
       p = pDy->Points;
       for(z=pDy->count; z>0; z--) { // check y coordinates (2. dimension)
@@ -741,11 +787,10 @@ void Diagram::loadGraphData(const QString& defaultDataSet)
 
   int No=0;
   foreach(Graph *pg, Graphs) {
-    if(loadVarData(defaultDataSet, pg) != 1)   // load data, determine max/min values
+    qDebug() << "load GraphData load" << defaultDataSet;
+    if(pg->loadDatFile(defaultDataSet) != 1)   // load data, determine max/min values
       No++;
-    else
-      getAxisLimits(pg);
-    pg->lastLoaded = QDateTime::currentDateTime();
+    getAxisLimits(pg);
   }
 
   if(No <= 0) {   // All dataset files unchanged ?
@@ -810,10 +855,7 @@ void Diagram::updateGraphData()
   int valid = calcDiagram();   // do not calculate graph data if invalid
 
   foreach(Graph *pg, Graphs) {
-    if(pg->ScrPoints != 0) {
-      free(pg->ScrPoints);
-      pg->ScrPoints = 0;
-    }
+    pg->clear();
     if((valid & (pg->yAxisNo+1)) != 0)
       calcData(pg);   // calculate screen coordinates
     else if(pg->cPointsY) {
@@ -832,8 +874,9 @@ void Diagram::updateGraphData()
 }
 
 // --------------------------------------------------------------------------
-int Diagram::loadVarData(const QString& fileName, Graph *g)
+int Graph::loadDatFile(const QString& fileName)
 {
+  Graph* g = this;
   QFile file;
   QString Variable;
   QFileInfo Info(fileName);
@@ -862,13 +905,15 @@ int Diagram::loadVarData(const QString& fileName, Graph *g)
       return 1;    // dataset unchanged -> no update neccessary
 
   g->countY = 0;
-  g->cPointsX.clear();
+  g->mutable_axes().clear(); // HACK
   if(g->cPointsY) { delete[] g->cPointsY;  g->cPointsY = 0; }
   if(Variable.isEmpty()) return 0;
 
+#if 0 // FIXME encapsulation. implement digital waves later.
   if(Variable.right(2) == ".X")
     if(Name.at(0) != 'T')
       return 0;  // digital variables only for tabulars and ziming diagram
+#endif
 
 
   if(!file.open(QIODevice::ReadOnly))  return 0;
@@ -917,13 +962,12 @@ int Diagram::loadVarData(const QString& fileName, Graph *g)
     pos = 0;
     tmp = Line.section(' ', pos, pos);
     while(!tmp.isEmpty()) {
-      g->cPointsX.append(new DataX(tmp));  // name of independet variable
+      g->mutable_axes().append(new DataX(tmp));  // name of independet variable
       pos++;
       tmp = Line.section(' ', pos, pos);
     }
   }
 
-  Axis *pa;
   // *****************************************************************
   // get independent variable ****************************************
   bool ok=true;
@@ -931,31 +975,39 @@ int Diagram::loadVarData(const QString& fileName, Graph *g)
   int counting = 0;
   if(isIndep) {    // create independent variable by myself ?
     counting = Line.toInt(&ok);  // get number of values
-    g->cPointsX.append(new DataX("number", 0, counting));
+    g->mutable_axes().append(new DataX("number", 0, counting));
     if(!ok)  return 0;
 
     p = new double[counting];  // memory of new independent variable
     g->countY = 1;
-    g->cPointsX.current()->Points = p;
+    g->mutable_axes().current()->Points = p;
     for(int z=1; z<=counting; z++)  *(p++) = double(z);
-    if(xAxis.min > 1.0)  xAxis.min = 1.0;
-    if(xAxis.max < double(counting))  xAxis.max = double(counting);
+    auto Axis = g->mutable_axes().current();
+    Axis->min(1.);
+    Axis->max(double(counting));
   }
   else {  // ...................................
     // get independent variables from data file
     g->countY = 1;
+#if 0 // FIXME: we do not have a Name.
     DataX *bLast = 0;
-    if(Name == "Rect3D")  bLast = g->cPointsX.at(1);  // y axis for Rect3D
+    if(Name == "Rect3D")  bLast = g->axis(1);  // y axis for Rect3D
+#endif
 
+#if 0 // FIXME: this is about diagram. do after load.
     double min_tmp = xAxis.min, max_tmp = xAxis.max;
-    for(DataX *pD = g->cPointsX.last(); pD!=0; pD = g->cPointsX.prev()) {
+#endif
+    DataX *pD;
+    for(int ii= g->numAxes(); (pD = g->axis(--ii)); ) {
+#if 0 // FIXME: this is about diagram. do after load.
       pa = &xAxis;
-      if(pD == g->cPointsX.getFirst()) {
+      if(pD == g->axis(0)) {
         xAxis.min = min_tmp;    // only count first independent variable
         xAxis.max = max_tmp;
       }
       else if(pD == bLast)  pa = &yAxis;   // y axis for Rect3D
-      counting = loadIndepVarData(pD->Var, FileString, pa, g);
+#endif
+      counting = loadIndepVarData(pD->Var, FileString);
       if(counting <= 0)  return 0;
 
       g->countY *= counting;
@@ -969,15 +1021,17 @@ int Diagram::loadVarData(const QString& fileName, Graph *g)
   counting  *= g->countY;
   p = new double[2*counting]; // memory for dependent variables
   g->cPointsY = p;
+#if 0 // FIXME: what does this do?!
   if(g->yAxisNo == 0)  pa = &yAxis;   // for which axis
   else  pa = &zAxis;
   (pa->numGraphs)++;    // count graphs
+#endif
 
   char *pEnd;
   double x, y;
   pPos = pFile;
 
-if(Variable.right(3) != ".X ")
+if(Variable.right(3) != ".X ") { // not "digital"
 
   for(int z=counting; z>0; z--) {
     pEnd = 0;
@@ -999,13 +1053,19 @@ if(Variable.right(3) != ".X ")
     }
     *(p++) = x;
     *(p++) = y;
-    if(Name[0] != 'C') {
+#if 0 // FIXME there is no Name here.
+    if(Name[0] != 'C')
+#endif
+	 {
       if(fabs(y) >= 1e-250) x = sqrt(x*x+y*y);
       if(std::isfinite(x)) {
-        if(x > pa->max) pa->max = x;
-        if(x < pa->min) pa->min = x;
+			auto Axis = g->mutable_axes().current();
+			Axis->min(x);
+			Axis->max(x);
       }
     }
+
+#if 0 // this is not location curce code.
     else {   // location curve needs different treatment
       if(std::isfinite(x)) {
         if(x > xAxis.max) xAxis.max = x;
@@ -1016,10 +1076,10 @@ if(Variable.right(3) != ".X ")
         if(y < pa->min) pa->min = y;
       }
     }
+#endif
   }
 
-
-else {  // of "if not digital"
+} else {  // of "if not digital"
 
   char *pc = (char*)p;
   pEnd = pc + 2*(counting-1)*sizeof(double);
@@ -1048,15 +1108,17 @@ else {  // of "if not digital"
 
 }  // of "if not digital"
 
+  lastLoaded = QDateTime::currentDateTime();
   return 2;
 }
 
 /*!
    Reads the data of an independent variable. Returns the number of points.
 */
-int Diagram::loadIndepVarData(const QString& Variable,
-			      char *FileString, Axis *pa, Graph *pg)
+int Graph::loadIndepVarData(const QString& Variable,
+			      char *FileString)
 {
+  Graph* pg = this;
   bool isIndep = false;
   QString Line, tmp;
 
@@ -1107,7 +1169,7 @@ int Diagram::loadIndepVarData(const QString& Variable,
   if(!ok)  return -1;
 
   double *p = new double[n];     // memory for new independent variable
-  DataX *pD = pg->cPointsX.current();
+  DataX *pD = pg->mutable_axes().current();
   pD->Points = p;
   pD->count  = n;
 
@@ -1126,11 +1188,13 @@ int Diagram::loadIndepVarData(const QString& Variable,
     }
     
     *(p++) = x;
+#if 0 // this is not location curve code
     if(Name[0] != 'C')   // not for location curves
       if(std::isfinite(x)) {
         if(x > pa->max) pa->max = x;
         if(x < pa->min) pa->min = x;
       }
+#endif
     
     pPos = pEnd;
     while((*pPos) && (*pPos <= ' '))  pPos++;  // find start of next number
@@ -1144,14 +1208,16 @@ int Diagram::loadIndepVarData(const QString& Variable,
 */
 bool Diagram::sameDependencies(Graph *g1, Graph *g2)
 {
+  // FIXME
+  // return g1>same(*g2);
   if(g1 == g2)  return true;
 
-  DataX *g1Data = g1->cPointsX.first();
-  DataX *g2Data = g2->cPointsX.first();
+  DataX *g1Data = g1->mutable_axes().first();
+  DataX *g2Data = g2->mutable_axes().first();
   while(g1Data && g2Data) {
     if(g1Data->Var != g2Data->Var)  return false;
-    g1Data = g1->cPointsX.next();
-    g2Data = g2->cPointsX.next();
+    g1Data = g1->mutable_axes().next();
+    g2Data = g2->mutable_axes().next();
   }
 
   if(g1Data)  return false;  // Is there more data ?
@@ -1200,6 +1266,15 @@ void Diagram::getCenter(int& x, int& y)
 Diagram* Diagram::newOne()
 {
   return new Diagram();
+}
+
+// ------------------------------------------------------------
+void Diagram::finishMarkerCoordinates(float& fCX, float& fCY) const
+{
+  if(!insideDiagram(fCX, fCY)) {
+      fCX = float(x2 >> 1);
+      fCY = float(y2 >> 1);
+  }
 }
 
 // ------------------------------------------------------------
@@ -1967,3 +2042,5 @@ else {  // not logarithmical
   else  x3 = x2+maxWidth+14;
   return true;
 }
+
+// vim:ts=8:sw=2:noet

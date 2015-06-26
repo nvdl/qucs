@@ -289,7 +289,6 @@ void MouseActions::moveElements(Q3PtrList<Element> *movElements, int x, int y)
 // ***********************************************************************
 void MouseActions::MMoveElement(Schematic *Doc, QMouseEvent *Event)
 {
-
   qDebug() << "MMoveElement";
 
   if (selElem == 0) return;
@@ -399,7 +398,6 @@ void MouseActions::MMoveWire1(Schematic *Doc, QMouseEvent *Event)
  */
 void MouseActions::MMoveSelect(Schematic *Doc, QMouseEvent *Event)
 {
-
   int x1, y1, width, height;
   //int xMin = 10000, xMax = 0, yMin = 10000, yMax = 0;
   //Element *pe;
@@ -498,8 +496,6 @@ void MouseActions::MMoveMoving(Schematic *Doc, QMouseEvent *Event)
 
   Doc->grabKeyboard();
 
-  //MAx2 = DOC_X_POS(Event->pos().x());
-  //MAy2 = DOC_Y_POS(Event->pos().y());
   MAx2 = DOC_X_POS(Event->pos().x());
   MAy2 = DOC_Y_POS(Event->pos().y());
 

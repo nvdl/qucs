@@ -66,29 +66,29 @@ QValidator::State mySpinBox::validate ( QString & text, int & pos ) const
 SweepDialog::SweepDialog(Schematic *Doc_)
 			: QDialog(Doc_)
 {
+  qDebug() << "SweepDialog::SweepDialog()";
+
   Doc = Doc_;
 
   pGraph = setBiasPoints();
+  
   // if simulation has no sweeps, terminate dialog before showing it
-
-  if (pGraph->cPointsX.count() == 0) {
+  if(!pGraph->numAxes()) {
     reject();
     return;
   }
-
-  if (pGraph->cPointsX.count() <= 1) {
-    if (pGraph->cPointsX.getFirst()->count <= 1) {
+  if(pGraph->numAxes() <= 1)
+    if(pGraph->axis(0)->count <= 1) {
       reject();
       return;
     }
-  }
+
 
   setWindowTitle(tr("Bias Points"));
 
   int i = 0;
   // ...........................................................
   QGridLayout *all = new QGridLayout(this);//, pGraph->cPointsX.count()+2,2,3,3);
-
   all->setMargin(5);
   all->setSpacing(5);
   all->setColStretch(1,5);
@@ -96,7 +96,7 @@ SweepDialog::SweepDialog(Schematic *Doc_)
   DataX *pD;
   mySpinBox *Box;
   
-  for (pD = pGraph->cPointsX.first(); pD!=0; pD = pGraph->cPointsX.next()) {
+  for(unsigned ii=0; (pD=pGraph->axis(ii)); ++ii) {
     all->addWidget(new QLabel(pD->Var, this), i,0);
     //cout<<"count: "<<pD->count-1<<", points: "<<*pD->Points<<endl;
     //works only for linear:
@@ -132,7 +132,10 @@ SweepDialog::~SweepDialog()
 // ---------------------------------------------------------------
 void SweepDialog::slotNewValue(int)
 {
-  DataX *pD = pGraph->cPointsX.first();
+  DataX *pD = pGraph->axis(0);
+
+  qDebug() << "SweepDialog::slotNewValue:pD->count:" << pD->count;
+
   int Factor = 1, Index = 0;
   QList<mySpinBox *>::const_iterator it;
 
@@ -140,15 +143,14 @@ void SweepDialog::slotNewValue(int)
     Index  += (*it)->value() * Factor;
     Factor *= pD->count;
   }
-
   Index *= 2;  // because of complex values
 
   QList<Node *>::iterator node_it;
   QList<double *>::const_iterator value_it = ValueList.begin();
-
-  for (node_it = NodeList.begin(); node_it != NodeList.end(); node_it++) {
+  for(node_it = NodeList.begin(); node_it != NodeList.end(); node_it++) {
     (*node_it)->Name = misc::num2str(*((*value_it)+Index));
     (*node_it)->Name += ((*node_it)->x1 & 0x10)? "A" : "V";
+    qDebug() << "SweepDialog::slotNewValue:(*node_it)->Name:" << (*node_it)->Name;
     value_it++;
   }
 
@@ -161,101 +163,106 @@ Graph* SweepDialog::setBiasPoints()
   // When this function is entered, a simulation was performed.
   // Thus, the node names are still in "node->Name".
 
+  qDebug() << "SweepDialog::setBiasPoints()";
+
   bool hasNoComp;
   Graph *pg = new Graph("");
-  Diagram *Diag = new Diagram();
   QFileInfo Info(Doc->DocName);
   QString DataSet = Info.dirPath() + QDir::separator() + Doc->DataSet;
 
   Node *pn;
   Element *pe;
 
+  // Note 1:
+  // Invalidate it so that "Graph::loadDatFile()" does not check for the previously loaded time.
+  // This is a current hack as "Graph::loadDatFile()" does not support multi-node data loading
+  // from the simulation results without refreshing (changing) or invalidating the timestamp.
+
+  NodeList.clear();
+  ValueList.clear();
+
   // create DC voltage for all nodes
-  for (pn = Doc->Nodes->first(); pn != 0; pn = Doc->Nodes->next()) {
+  for(pn = Doc->Nodes->first(); pn != 0; pn = Doc->Nodes->next()) {
     if(pn->Name.isEmpty()) continue;
 
     pn->x1 = 0;
-
-    if (pn->Connections.count() < 2) {
+    if(pn->Connections.count() < 2) {
       pn->Name = "";  // no text at open nodes
       continue;
-    } else {
+    }
+    else {
       hasNoComp = true;
-
-      for (pe = pn->Connections.first(); pe!=0; pe = pn->Connections.next()) {
-        if (pe->Type == isWire) {
-          if ( ((Wire*)pe)->isHorizontal() )  pn->x1 |= 2;
-        } else {
-          if ( ((Component*)pe)->Model == "GND" ) {
+      for(pe = pn->Connections.first(); pe!=0; pe = pn->Connections.next())
+        if(pe->Type == isWire) {
+          if( ((Wire*)pe)->isHorizontal() )  pn->x1 |= 2;
+        }
+        else {
+          if( ((Component*)pe)->Model == "GND" ) {
             hasNoComp = true;   // no text at ground symbol
             break;
           }
 
-          if (pn->cx < pe->cx) pn->x1 |= 1;  // to the right is no room
+          if(pn->cx < pe->cx)  pn->x1 |= 1;  // to the right is no room
           hasNoComp = false;
         }
-      }
-
-      if (hasNoComp) {  // text only were a component is connected
+      if(hasNoComp) {  // text only were a component is connected
         pn->Name = "";
         continue;
       }
     }
 
     pg->Var = pn->Name + ".V";
-
-    if (Diag->loadVarData(DataSet, pg)) {
+    pg->lastLoaded = QDateTime(); // Note 1 at the start of this function
+    if(pg->loadDatFile(DataSet) == 2) {
       pn->Name = misc::num2str(*(pg->cPointsY)) + "V";
       NodeList.append(pn);             // remember node ...
       ValueList.append(pg->cPointsY);  // ... and all of its values
       pg->cPointsY = 0;   // do not delete it next time !
-    } else {
-      pn->Name = "0V";
     }
+    else
+      pn->Name = "0V";
 
-    for (pe = pn->Connections.first(); pe!=0; pe = pn->Connections.next())
-      if (pe->Type == isWire) {
-        if ( ((Wire*)pe)->Port1 != pn ) { // no text at next node
+
+    for(pe = pn->Connections.first(); pe!=0; pe = pn->Connections.next())
+      if(pe->Type == isWire) {
+        if( ((Wire*)pe)->Port1 != pn )  // no text at next node
           ((Wire*)pe)->Port1->Name = "";
-        } else {
-          ((Wire*)pe)->Port2->Name = "";
-        }
+        else  ((Wire*)pe)->Port2->Name = "";
       }
   }
 
 
   // create DC current through each probe
   Component *pc;
-
-  for (pc = Doc->Components->first(); pc != 0; pc = Doc->Components->next())
-    if (pc->Model == "IProbe") {
+  for(pc = Doc->Components->first(); pc != 0; pc = Doc->Components->next())
+    if(pc->Model == "IProbe") {
       pn = pc->Ports.first()->Connection;
-      if (!pn->Name.isEmpty())   // preserve node voltage ?
+      if(!pn->Name.isEmpty())   // preserve node voltage ?
         pn = pc->Ports.at(1)->Connection;
 
       pn->x1 = 0x10;   // mark current
       pg->Var = pc->Name + ".I";
-
-      if (Diag->loadVarData(DataSet, pg)) {
+      pg->lastLoaded = QDateTime(); // Note 1 at the start of this function
+      if(pg->loadDatFile(DataSet) == 2) {
         pn->Name = misc::num2str(*(pg->cPointsY)) + "A";
         NodeList.append(pn);             // remember node ...
         ValueList.append(pg->cPointsY);  // ... and all of its values
         pg->cPointsY = 0;   // do not delete it next time !
-      } else {
-        pn->Name = "0A";
       }
+      else
+        pn->Name = "0A";
 
-      for (pe = pn->Connections.first(); pe!=0; pe = pn->Connections.next()) {
-        if (pe->Type == isWire) {
+      for(pe = pn->Connections.first(); pe!=0; pe = pn->Connections.next())
+        if(pe->Type == isWire) {
           if( ((Wire*)pe)->isHorizontal() )  pn->x1 |= 2;
-        } else {
+        }
+        else {
           if(pn->cx < pe->cx)  pn->x1 |= 1;  // to the right is no room
         }
-      }
     }
+
 
   Doc->showBias = 1;
 
-  delete Diag;
   return pg;
 }

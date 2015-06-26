@@ -25,6 +25,7 @@
 #include "rect3ddiagram.h"
 
 #include <cmath>
+#include <assert.h>
 
 #include <QPaintEvent>
 #include <QPushButton>
@@ -103,14 +104,20 @@ static const QRgb DefaultColors[]
 static const int NumDefaultColors = 8;
 
 
-DiagramDialog::DiagramDialog(Diagram *d, const QString& _DataSet,
-                             QWidget *parent, Graph *currentGraph)
+DiagramDialog::DiagramDialog(Diagram *d, QWidget *parent, Graph *currentGraph)
                     : QDialog(parent, 0, TRUE, Qt::WDestructiveClose)
 {
   Diag = d;
   Graphs.setAutoDelete(true);
   copyDiagramGraphs();   // make a copy of all graphs
-  defaultDataSet = _DataSet;
+  if(parent){
+	  const Schematic* s = dynamic_cast<const Schematic*>(parent);
+	  assert(s);
+	  QFileInfo Info(s->DocName);
+	  defaultDataSet = Info.dirPath() + QDir::separator() + s->DataSet;
+  }else{
+	  defaultDataSet = "unknown";
+  }
   setWindowTitle(tr("Edit Diagram Properties"));
   changed = false;
   transfer = false;  // have changes be applied ? (used by "Cancel")
@@ -844,7 +851,8 @@ void DiagramDialog::slotTakeVar(QTableWidgetItem* Item)
         if(g->Var.right(3) == ".Vb")   // harmonic balance output ?
           if(PropertyBox->count() >= GRAPHSTYLE_ARROW)
             PropertyBox->setCurrentItem(GRAPHSTYLE_ARROW);
-        g->Style   = PropertyBox->currentItem();
+        g->Style = toGraphStyle(PropertyBox->currentItem());
+        assert(g->Style!=GRAPHSTYLE_INVALID);
         if(yAxisBox) {
           g->yAxisNo = yAxisBox->currentItem();
           yAxisBox->setEnabled(true);
@@ -995,7 +1003,8 @@ void DiagramDialog::slotNewGraph()
     if(Diag->Name != "Truth") {
       g->Color = ColorButt->paletteBackgroundColor();
       g->Thick = Property2->text().toInt();
-      g->Style = PropertyBox->currentItem();
+      g->Style = toGraphStyle(PropertyBox->currentItem());
+      assert(g->Style!=GRAPHSTYLE_INVALID);
       if(yAxisBox)  g->yAxisNo = yAxisBox->currentItem();
       else if(Diag->Name == "Rect3D")  g->yAxisNo = 1;
     }
@@ -1298,7 +1307,8 @@ void DiagramDialog::slotSetGraphStyle(int style)
   if(i < 0) return;   // return, if no item selected
 
   Graph *g = Graphs.at(i);
-  g->Style = style;
+  g->Style = toGraphStyle(style);
+  assert(g->Style!=GRAPHSTYLE_INVALID);
   changed = true;
   toTake  = false;
 }

@@ -173,7 +173,6 @@ bool Schematic::createSubcircuitSymbol()
 // ---------------------------------------------------
 void Schematic::becomeCurrent(bool update)
 {
-  QString *ps;
   emit signalCursorPosChanged(0, 0);
 
   // update appropriate menu entry
@@ -1161,7 +1160,7 @@ bool Schematic::rotateElements()
 
   int x1=INT_MAX, y1=INT_MAX;
   int x2=INT_MIN, y2=INT_MIN;
-  Q3PtrList<Element> ElementCache;
+  QList<Element *> ElementCache;
   copyLabels(x1, y1, x2, y2, &ElementCache);   // must be first of all !
   copyComponents(x1, y1, x2, y2, &ElementCache);
   copyWires(x1, y1, x2, y2, &ElementCache);
@@ -1181,7 +1180,7 @@ bool Schematic::rotateElements()
   Component *pc;
   WireLabel *pl;
   // re-insert elements
-  for(Element *pe = ElementCache.first(); pe != 0; pe = ElementCache.next())
+  foreach(Element *pe, ElementCache)
     switch(pe->Type) {
       case isComponent:
       case isAnalogComponent:
@@ -1259,7 +1258,7 @@ bool Schematic::mirrorXComponents()
   Components->setAutoDelete(false);
 
   int x1, y1, x2, y2;
-  Q3PtrList<Element> ElementCache;
+  QList<Element *> ElementCache;
   if(!copyComps2WiresPaints(x1, y1, x2, y2, &ElementCache))
     return false;
   Wires->setAutoDelete(true);
@@ -1275,7 +1274,7 @@ bool Schematic::mirrorXComponents()
   Component *pc;
   WireLabel *pl;
   // re-insert elements
-  for(Element *pe = ElementCache.first(); pe != 0; pe = ElementCache.next())
+  foreach(Element *pe, ElementCache)
     switch(pe->Type) {
       case isComponent:
       case isAnalogComponent:
@@ -1328,7 +1327,7 @@ bool Schematic::mirrorYComponents()
   Components->setAutoDelete(false);
 
   int x1, y1, x2, y2;
-  Q3PtrList<Element> ElementCache;
+  QList<Element *> ElementCache;
   if(!copyComps2WiresPaints(x1, y1, x2, y2, &ElementCache))
     return false;
   Wires->setAutoDelete(true);
@@ -1343,7 +1342,7 @@ bool Schematic::mirrorYComponents()
   Component *pc;
   WireLabel *pl;
   // re-insert elements
-  for(Element *pe = ElementCache.first(); pe != 0; pe = ElementCache.next())
+  foreach(Element *pe, ElementCache)
     switch(pe->Type) {
       case isComponent:
       case isAnalogComponent:

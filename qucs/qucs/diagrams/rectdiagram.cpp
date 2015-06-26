@@ -44,7 +44,7 @@ RectDiagram::RectDiagram(int _cx, int _cy) : Diagram(_cx, _cy)
   y2 = 160;
   x3 = 247;    // with some distance for right axes text
 
-  Name = "Rect";
+  Name = "Rect"; // BUG
   calcDiagram();
 }
 
@@ -53,12 +53,12 @@ RectDiagram::~RectDiagram()
 }
 
 // ------------------------------------------------------------
-void RectDiagram::calcCoordinate(double* &xD, double* &yD, double* &,
-                                 float *px, float *py, Axis *pa)
+void RectDiagram::calcCoordinate(const double* xD, const double* yD, const double*,
+                                 float *px, float *py, Axis *pa) const
 {
-  double x  = *(xD++);
-  double yr = *(yD++);
-  double yi = *(yD++);
+  double x  = *xD;
+  double yr = yD[0];
+  double yi = yD[1];
   if(xAxis.log) {
     x /= xAxis.low;
     if(x <= 0.0)  *px = -1e5;   // "negative infinity"
@@ -80,6 +80,14 @@ void RectDiagram::calcCoordinate(double* &xD, double* &yD, double* &,
 
   if(!std::isfinite(*px))  *px = 0.0;
   if(!std::isfinite(*py))  *py = 0.0;
+}
+
+// --------------------------------------------------------------
+void RectDiagram::finishMarkerCoordinates(float& fCX, float& fCY) const
+{
+  if(!insideDiagram(fCX, fCY)) {
+	  fCX = fCY = 0.0;
+  }
 }
 
 // --------------------------------------------------------------
@@ -225,13 +233,13 @@ Frame:
 }
 
 // ------------------------------------------------------------
-bool RectDiagram::insideDiagram(float x, float y)
+bool RectDiagram::insideDiagram(float x, float y) const
 {
   return (regionCode(x, y) == 0);
 }
 
 // ------------------------------------------------------------
-void RectDiagram::clip(float* &p)
+void RectDiagram::clip(Graph::iterator &p) const
 {
   rectClip(p);
 }

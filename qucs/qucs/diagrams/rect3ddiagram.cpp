@@ -47,7 +47,7 @@ Rect3DDiagram::Rect3DDiagram(int _cx, int _cy) : Diagram(_cx, _cy)
 
   Mem = pMem = 0;  // auxiliary buffer for hidden lines
 
-  Name = "Rect3D";
+  Name = "Rect3D"; // BUG
   // symbolic diagram painting
   Lines.append(new Line(0, 0, cx,  0, QPen(Qt::black,0)));
   Lines.append(new Line(0, 0,  0, cy, QPen(Qt::black,0)));
@@ -78,19 +78,19 @@ void Rect3DDiagram::calcCoefficients()
 }
 
 // ------------------------------------------------------------
-double Rect3DDiagram::calcX_2D(double x, double y, double z)
+double Rect3DDiagram::calcX_2D(double x, double y, double z) const
 {
   return (cxx * x + cxy * y + cxz * z) * scaleX;
 }
 
 // ------------------------------------------------------------
-double Rect3DDiagram::calcY_2D(double x, double y, double z)
+double Rect3DDiagram::calcY_2D(double x, double y, double z) const
 {
   return (cyx * x + cyy * y + cyz * z) * scaleY;
 }
 
 // ------------------------------------------------------------
-double Rect3DDiagram::calcZ_2D(double x, double y, double z)
+double Rect3DDiagram::calcZ_2D(double x, double y, double z) const
 {
   return czx * x + czy * y + czz * z;
 }
@@ -136,11 +136,11 @@ int Rect3DDiagram::calcCross(int *Xses, int *Yses)
 
 // ------------------------------------------------------------
 // Is needed for markers.
-void Rect3DDiagram::calcCoordinate(double* &xD, double* &zD, double* &yD,
-                                   float *px, float *py, Axis*)
+void Rect3DDiagram::calcCoordinate(const double* xD, const double* zD, const double* yD,
+                                   float *px, float *py, Axis*) const
 {
-  double x3D = *(zD++);
-  double y3D = *(zD++);
+  double x3D = zD[0];
+  double y3D = zD[1];
   double z3D;
   if(zAxis.log) {
     z3D = sqrt(x3D*x3D + y3D*y3D);
@@ -185,6 +185,14 @@ void Rect3DDiagram::calcCoordinate(double* &xD, double* &zD, double* &yD,
 
   *px = float(xorig);
   *py = float(yorig);
+}
+
+// --------------------------------------------------------------
+void Rect3DDiagram::finishMarkerCoordinates(float& fCX, float& fCY) const
+{
+  if(!insideDiagram(fCX, fCY)) {
+	  fCX = fCY = 0.0;
+  }
 }
 
 // ------------------------------------------------------------
@@ -366,7 +374,7 @@ void Rect3DDiagram::removeHiddenLines(char *zBuffer, tBound *Bounds)
   // pre-calculate buffer size to avoid reallocations in the first step
   foreach(Graph *g, Graphs)
     if(g->cPointsY)
-      Size += g->cPointsX.getFirst()->count * g->countY;
+      Size += g->axis(0)->count * g->countY;
 
   // "Mem" should be the last malloc to simplify realloc
   tPointZ *zMem = (tPointZ*)malloc( (Size+2)*sizeof(tPointZ) );
@@ -380,20 +388,20 @@ void Rect3DDiagram::removeHiddenLines(char *zBuffer, tBound *Bounds)
 
     pz = g->cPointsY;
     if(!pz) continue;
-    if(g->cPointsX.count() < 1) continue;
+    if(g->numAxes() < 1) continue;
 
     py = &Dummy;
-    if(g->countY > 1)  py = g->cPointsX.at(1)->Points;
+    if(g->countY > 1)  py = g->axis(1)->Points;
 
     p = pMem;  // save status for cross grid
     zp_tmp = zp;
     // ..........................................
     // calculate coordinates of all lines
-    dx = g->cPointsX.first()->count;
-    if(g->countY > 1)  dy = g->cPointsX.next()->count;
+    dx = g->axis(0)->count;
+    if(g->countY > 1)  dy = g->axis(1)->count;
     else  dy = 0;
     for(i=g->countY-1; i>=0; i--) {   // y coordinates
-      px = g->cPointsX.getFirst()->Points;
+      px = g->axis(0)->Points;
     
       for(j=dx; j>0; j--) { // x coordinates
         calcCoordinate3D(*(px++), *py, *pz, *(pz+1), pMem++, zp++);
@@ -403,7 +411,7 @@ void Rect3DDiagram::removeHiddenLines(char *zBuffer, tBound *Bounds)
       (pMem-1)->done |= 8;  // mark as "last in line"
       py++;
       if(dy > 0) if((i % dy) == 0)
-        py = g->cPointsX.at(1)->Points;
+        py = g->axis(1)->Points;
     }
     (pMem-1)->done |= 512;  // mark as "last point before grid"
 
@@ -500,8 +508,8 @@ void Rect3DDiagram::removeHiddenLines(char *zBuffer, tBound *Bounds)
   zp = zMem;
   foreach(Graph *g, Graphs) {
     if(!g->cPointsY) continue;
-    dx = g->cPointsX.first()->count;
-    if(g->countY > 1)  dy = g->cPointsX.next()->count;
+    dx = g->axis(0)->count;
+    if(g->countY > 1)  dy = g->axis(1)->count;
     else  dy = 1;
 
     // look for hidden lines ...
@@ -760,7 +768,7 @@ void Rect3DDiagram::createAxis(Axis *Axis, bool Right,
           pg->cPointsY = 0;
           continue;
         }
-        pD = pg->cPointsX.at(Index);
+        pD = pg->axis(Index);
         if(!pD) continue;
         s = pD->Var;
       }
@@ -944,20 +952,20 @@ void Rect3DDiagram::calcData(Graph *g)
   if(!pMem)  return;
   if(!g->cPointsY) return;
 
-  int tmp;
-  int Size = ((2*(g->cPointsX.getFirst()->count) + 1) * g->countY) + 10;
+  int Size = ((2*(g->axis(0)->count) + 1) * g->countY) + 10;
   Size *= 2;  // memory for cross grid lines
 
   double *py;
-  if(g->countY > 1)  py = g->cPointsX.at(1)->Points;
+  if(g->countY > 1)  py = g->axis(1)->Points;
 
-  float *p = (float*)malloc( Size*sizeof(float) );  // create memory for points
-  float *p_end;
-  g->ScrPoints = p_end = p;
+  g->resizeScrPoints(Size);
+  auto p = g->begin();
+  auto p_end = g->begin();
   p_end += Size - 9;   // limit of buffer
 
 
-  *(p++) = STROKEEND;
+  p->setStrokeEnd();
+  ++p;
   float dx=0.0, dy=0.0, xtmp=0.0, ytmp=0.0;
   double Stroke=10.0, Space=10.0; // length of strokes and spaces in pixel
   switch(g->Style) {
@@ -973,22 +981,21 @@ void Rect3DDiagram::calcData(Graph *g)
               }
               else  break;
 	    }
-
           FIT_MEMORY_SIZE;  // need to enlarge memory block ?
-          *(p++) = pMem->x;
-          *(p++) = pMem->y;
+	  (p++)->Scr = pMem->x;
+	  (p++)->Scr = pMem->y;
           break;
         }
 
         FIT_MEMORY_SIZE;  // need to enlarge memory block ?
-        if(pMem->done & 8)  *(p++) = BRANCHEND;  // new branch
+        if(pMem->done & 8)  (p++)->setBranchEnd();
 
         if(pMem->done & 4)   // point invisible ?
-          if( *(p-1) >= 0 )  // line already interrupted ?
-            *(p++) = STROKEEND;
+          if( (p-1)->Scr >= 0 )  // line already interrupted ?
+            (p++)->setStrokeEnd();
 
       } while(((pMem++)->done & 256) == 0);
-      *p = GRAPHEND;
+      p->setGraphEnd();
       return;
 
     case GRAPHSTYLE_DASH:
@@ -1013,15 +1020,15 @@ void Rect3DDiagram::calcData(Graph *g)
               else  break;
 	    }
 
-          *(p++) = pMem->x;
-          *(p++) = pMem->y;
+          (p++)->Scr = pMem->x;
+          (p++)->Scr = pMem->y;
           break;
         }
 
         if(pMem->done & 8)
-          *(p++) = BRANCHEND;  // new branch
+          (p++)->setBranchEnd();
       } while(((pMem++)->done & 512) == 0);
-      *p = GRAPHEND;
+      p->setGraphEnd();
       return;
   }
 
@@ -1050,36 +1057,36 @@ void Rect3DDiagram::calcData(Graph *g)
  
     if(Counter > 1) {
       if(Counter == 2) {
-	*(p++) = dx;    // if first points of branch -> paint first one
-	*(p++) = dy;
+	(p++)->Scr = dx;    // if first points of branch -> paint first one
+	(p++)->Scr = dy;
       }
       dx = xtmp - dx;
       dy = ytmp - dy;
       dist += sqrt(double(dx*dx + dy*dy)); // distance between points
       if((Flag == 1) && (dist <= 0.0)) {
 	FIT_MEMORY_SIZE;  // need to enlarge memory block ?
-	*(p++) = xtmp;    // if stroke then save points
-	*(p++) = ytmp;
+	(p++)->Scr = xtmp;    // if stroke then save points
+	(p++)->Scr = ytmp;
       }
       else {
         alpha = atan2(double(dy), double(dx));   // slope for interpolation
         while(dist > 0) {   // stroke or space finished ?
 	  FIT_MEMORY_SIZE;  // need to enlarge memory block ?
 
-	  *(p++) = xtmp - float(dist*cos(alpha)); // linearly interpolate
-	  *(p++) = ytmp - float(dist*sin(alpha));
+	  (p++)->Scr = xtmp - float(dist*cos(alpha)); // linearly interpolate
+	  (p++)->Scr = ytmp - float(dist*sin(alpha));
 
           if(Flag == 0) {
             dist -= Stroke;
             if(dist <= 0) {
-	      *(p++) = xtmp;  // don't forget point after ...
-	      *(p++) = ytmp;  // ... interpolated point
+	      (p++)->Scr = xtmp;  // don't forget point after ...
+	      (p++)->Scr = ytmp;  // ... interpolated point
             }
           }
           else {
 	    dist -= Space;
-	    if(*(p-3) < 0)  p -= 2;
-	    else *(p++) = STROKEEND;
+	    if((p-3)->Scr < 0)  p -= 2;
+	    else (p++)->setStrokeEnd();
           }
           Flag ^= 1; // toggle between stroke and space
         }
@@ -1092,25 +1099,25 @@ void Rect3DDiagram::calcData(Graph *g)
     dy = ytmp;
 
     if(pMem->done & 8) {
-      if(*(p-3) == STROKEEND)
+      if((p-3)->isStrokeEnd() && !(p-3)->isBranchEnd()) {
         p -= 3;  // no single point after "no stroke"
-      else if(*(p-3) == BRANCHEND) {
-        if((*(p-2) < 0) || (*(p-1) < 0))
+      }else if((p-3)->isBranchEnd() && !(p-3)->isGraphEnd()) {
+        if(((p-2)->Scr < 0) || ((p-1)->Scr < 0))
           p -= 2;  // erase last hidden point
       }
-      *(p++) = BRANCHEND;  // new branch
+      (p++)->setBranchEnd();
       Counter = 0;
       Flag = 1;
       dist = -Stroke;
     }
 
     if(pMem->done & 4)   // point invisible ?
-      if( *(p-1) >= 0 )  // line already interrupted ?
-        *(p++) = STROKEEND;
+      if( (p-1)->Scr >= 0 )  // line already interrupted ?
+        (p++)->setStrokeEnd();
 
   } while(((pMem++)->done & 256) == 0);
 
-  *p = GRAPHEND;
+  p->setGraphEnd();
 
 
 /*
@@ -1133,7 +1140,7 @@ void Rect3DDiagram::createAxisLabels()
 }
 
 // ------------------------------------------------------------
-bool Rect3DDiagram::insideDiagram(float x, float y)
+bool Rect3DDiagram::insideDiagram(float x, float y) const
 {
   return (regionCode(x, y) == 0);
 }
@@ -1153,3 +1160,5 @@ Element* Rect3DDiagram::info(QString& Name, char* &BitmapFile, bool getNewOne)
   if(getNewOne)  return new Rect3DDiagram();
   return 0;
 }
+
+// vim:ts=8:sw=2:noet
